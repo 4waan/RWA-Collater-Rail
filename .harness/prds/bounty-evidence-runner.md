@@ -8,18 +8,18 @@ Build a secure, repeatable Hedera testnet lifecycle command for Collateral Rail.
 
 ## Required behavior
 
-1. Reject every network except Hedera testnet and allow only the documented Hashio, Mirror Node, and Hermes endpoints.
+1. Reject every network except Hedera testnet and allow only the documented Hashio and Mirror Node endpoints. Allow Hermes only in explicit Pyth mode.
 2. Read `HARNESS_SIGNER_ACCOUNT_ID`, `HARNESS_SIGNER_EVM_ADDRESS`, and `HARNESS_SIGNER_PRIVATE_KEY` from the process environment. Never print, serialize, or pass a private key in command arguments.
 3. Keep the existing encrypted Foundry keystore path available for local operators. The Harness path must use an in-process key and a secret-free command line.
 4. Create lender and borrower ECDSA accounts in memory, fund them within a 250 HBAR total signer cap, and delete or sweep them after the run.
-5. Honor configured ATS Factory, Resolver, Pyth, RPC, and Mirror values after strict testnet validation.
-6. Fetch a fresh HBAR/USD update from Hermes. Pyth prices the HBAR cash leg only.
+5. Honor configured ATS Factory, Resolver, oracle mode, RPC, and Mirror values after strict testnet validation. HIP-475 is the default.
+6. In explicit Pyth mode only, validate Pyth and fetch a fresh HBAR/USD update from Hermes. Both oracle modes convert the HBAR cash leg only.
 7. Open and accept two small, two-minute facilities with separate ATS holds.
 8. Repay one facility. Let the other mature and record whether HSS or the public fallback settled it.
 9. Confirm every transaction through Mirror Node. Confirm every real schedule from mined state and Mirror Node, never from a simulation.
 10. Write only public account IDs, addresses, position IDs, hold IDs, schedule IDs, receipts, timestamps, results, state reads, and explorer links to the ignored run record.
 11. Provide a publication command that verifies completeness, scans the candidate for secrets, and only then replaces `reference-testnet.json`.
-12. Add deterministic tests for account-creation failure, funding caps, Pyth failures, HSS failure classification, Mirror pagination, duplicate transaction safety, and sweep failure.
+12. Add deterministic tests for account-creation failure, funding caps, HIP-475 and Pyth evidence consistency, Pyth failures, HSS failure classification, Mirror pagination, duplicate transaction safety, and sweep failure.
 
 ## Acceptance
 

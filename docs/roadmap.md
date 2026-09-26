@@ -2,9 +2,11 @@
 
 ## Submission core
 
-Version 1 is the HBAR settlement template being prepared for submission: one ATS security, one partition, one
-bilateral obligation, internal ATS KYC, Pyth cash conversion, HSS liveness, and
-typed public evidence. Security invariants take priority over feature count.
+Version 1 is the HBAR settlement template being prepared for submission: one ATS
+security, one partition, one bilateral obligation, internal ATS KYC, HIP-475
+cash conversion by default, explicitly configured Pyth conversion, HSS
+liveness, and typed public evidence. Security invariants take priority over
+feature count.
 
 ## Next extension: HTS settlement
 

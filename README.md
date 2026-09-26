@@ -16,12 +16,17 @@ tested implementation:
 - ATS-native collateral custody through partition holds;
 - ATS internal KYC for both counterparties;
 - exact HBAR cash accounting and pull-payment withdrawals;
-- Pyth HBAR/USD conversion with freshness and confidence checks;
+- HBAR/USD cash conversion through HIP-475 by default, with an explicitly
+  configured Pyth mode that enforces freshness and confidence bounds;
 - HSS maturity scheduling with permissionless recovery;
 - Mirror Node and HashScan evidence for every published lifecycle claim.
 
-Pyth prices the HBAR cash leg only. Collateral coverage is a configured advance
-against ATS nominal value. It is not a claim about a secondary-market price.
+The committed reference lifecycle uses HIP-475. It exposes Hedera's active
+network settlement conversion rate, not a live market price oracle. The optional
+Pyth mode supplies a market feed with freshness, confidence, and update-fee
+checks. Both modes convert the HBAR cash leg only. Neither mode prices the ATS
+security. Collateral coverage remains a configured advance against ATS nominal
+value.
 
 ## Scaffold it
 
@@ -55,8 +60,8 @@ yarn dev
 3. Open `/verify?position=repaid`, then switch to the defaulted position.
 4. Follow each available proof link to its exact HashScan transaction or HSS
    entity.
-5. Notice that free ATS balance, held ATS balance, Pyth quote, cash liabilities,
-   and HSS reserves are never collapsed into one status.
+5. Notice that free ATS balance, held ATS balance, typed settlement conversion,
+   cash liabilities, and HSS reserves are never collapsed into one status.
 
 The committed reference record stays visibly pending until a complete testnet
 lifecycle has passed the publication gate. Once verified, the homepage reports
@@ -81,9 +86,9 @@ The template ships three:
 - **Custom Facility** exposes the full safe policy envelope as a starting point
   for a product-specific recipe.
 
-Every recipe uses the same ATS, Pyth, HSS, HBAR, and evidence kernel. A recipe
-changes allowed economics and starting terms. It cannot weaken the kernel safety
-ceilings.
+Every recipe uses the same ATS, HSS, HBAR, typed oracle, and evidence kernel. A
+recipe changes allowed economics and starting terms. It cannot weaken the
+kernel safety ceilings.
 
 ## Build your own recipe
 
@@ -129,8 +134,9 @@ The local bootstrap requires these public values:
 - `HEDERA_OPERATOR_ADDRESS`;
 - `LENDER_ADDRESS`;
 - `BORROWER_ADDRESS`;
-- the pinned or explicitly configured ATS Factory, Resolver, Pyth, RPC, Mirror,
-  and Hermes endpoints.
+- the pinned or explicitly configured ATS Factory, Resolver, RPC, and Mirror
+  endpoints;
+- Pyth and Hermes configuration only when the Pyth oracle mode is selected.
 
 With no keystore path, Foundry uses the named `hedera-operator` account and
 prompts interactively. For unattended local use, set both
@@ -139,8 +145,14 @@ private key in this file or in a command argument.
 
 The bootstrap deploys a checksum-valid ATS bond with Clearing disabled,
 registers the SSI issuer, grants KYC in the required order, issues borrower
-collateral, deploys the Pyth adapter and recipe-configured rail, funds HSS, and
-writes public addresses and transaction hashes only.
+collateral, deploys the selected oracle adapter and recipe-configured rail,
+funds HSS, and writes public addresses and transaction hashes only. HIP-475 is
+the default. Set `USE_PYTH_ORACLE=1` only for an explicit local Pyth deployment.
+
+Live browser mode uses the public rail, ATS token, and oracle addresses. It
+defaults `NEXT_PUBLIC_ORACLE_KIND` to `hedera-exchange-rate`. Set that variable
+to `pyth` only when the configured oracle address is a `PythHbarUsdOracle`.
+Hermes browser access and the Pyth update control are enabled only in that mode.
 
 ## Understand the secure kernel
 
@@ -176,7 +188,8 @@ contract HBAR balance >= cashLiabilities + reservedAutomation
 Read [Architecture](docs/architecture.md) for custody, accounting, automation,
 external calls, and trust boundaries. Read the
 [Hedera Integration Field Guide](docs/hedera-integration-field-guide.md) for the
-ATS, HSS, Mirror, Pyth, and Hedera EVM failure modes encoded as guards and tests.
+ATS, HSS, Mirror, HIP-475, optional Pyth, and Hedera EVM failure modes encoded as
+guards and tests.
 
 ## Safe policy envelope
 
@@ -189,9 +202,13 @@ A deployed recipe can be stricter, but it cannot exceed:
 - terms from two minutes to 365 days;
 - the ATS security maturity.
 
-Pyth data must be positive, no older than 120 seconds, and have a confidence
-interval no wider than 2%. HSS capacity is attempted at maturity plus 2, 5, and
-10 seconds.
+HIP-475 mode reads the active network settlement conversion rate from system
+contract `0x168`. HIP-475 does not provide a publisher timestamp or confidence
+band. Pyth mode requires a positive price no older than 120 seconds, a
+confidence interval no wider than 2%, the exact update fee, and an authenticated
+Hermes payload. Both modes apply the configured quote-movement bound between
+funding and acceptance. HSS capacity is attempted at maturity plus 2, 5, and 10
+seconds.
 
 The complete immutable policy is exposed by `policy()` and included in every
 verified evidence record.
@@ -245,8 +262,8 @@ yarn check:secrets
 yarn harness:validate
 ```
 
-The contract suite covers policy bounds, conversion and rounding, Pyth failure
-modes, KYC, allowance, quote movement, hold inspection, ATS balance
+The contract suite covers policy bounds, conversion and rounding, HIP-475 and
+Pyth oracle behavior, KYC, allowance, quote movement, hold inspection, ATS balance
 adjustments, HSS response codes, timestamp boundaries, repayment, default,
 reentrancy, and reserve solvency. The
 runner suite covers endpoint restrictions, funding caps, actor failures, Mirror
@@ -262,9 +279,10 @@ run that changes tracked or nonignored untracked files.
 `packages/foundry/deployments/reference-testnet.json` is the public evidence
 ledger. Publication requires the `term-credit` recipe, its complete deployed
 policy, two distinct ATS holds, one repaid position, one matured default, a real
-Mirror-confirmed HSS schedule, fresh Pyth data, live ATS roles and KYC, separate
-free and held balances, successful Mirror receipts, and solvent final
-accounting.
+Mirror-confirmed HSS schedule, typed oracle evidence, live ATS roles and KYC,
+separate free and held balances, successful Mirror receipts, and solvent final
+accounting. The current record names HIP-475 and therefore contains no Pyth
+update transaction.
 
 The direct lifecycle runner is:
 
@@ -305,9 +323,10 @@ auctions, and secondary markets remain outside the maintained core.
 ## Maintenance
 
 Compatibility checks run weekly without funded credentials. A funded Harness
-lifecycle is run manually after material ATS, Hiero, HSS, Pyth, or Mirror Node
-changes. Releases follow semantic versioning, keep old evidence schemas readable
-for one major version, and document any migration before removing an interface.
+lifecycle is run manually after material ATS, Hiero, HSS, HIP-475, Pyth, or
+Mirror Node changes. Releases follow semantic versioning, keep old evidence
+schemas readable for one major version, and document any migration before
+removing an interface.
 
 See [CONTRIBUTING](CONTRIBUTING.md), [Security](SECURITY.md), and the
 [Maintainer Guide](docs/maintainer-guide.md) for support and release policy.

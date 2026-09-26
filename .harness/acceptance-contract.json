@@ -3,12 +3,12 @@
   "assertions": [
     {
       "id": "C1",
-      "statement": "The overview explains ATS, Pyth, HSS, and Mirror roles without claiming Pyth prices the security.",
+      "statement": "The overview explains ATS, typed oracle, HSS, and Mirror roles without presenting HIP-475 as a live market price or either oracle as the security price.",
       "route": "/",
       "severity": "critical",
       "walletRequired": false,
       "verifiableWithoutCredentials": true,
-      "howToVerify": "Open the overview. Confirm four integration cards, the cash-only Pyth boundary, architecture flow, and an explicit reference evidence status."
+      "howToVerify": "Open the overview. Confirm the HIP-475 network settlement-rate caveat, the optional cash-only Pyth boundary, architecture flow, and an explicit reference evidence status."
     },
     {
       "id": "C2",
@@ -17,7 +17,7 @@
       "severity": "critical",
       "walletRequired": false,
       "verifiableWithoutCredentials": true,
-      "howToVerify": "Open the facility with no environment file. Confirm both mode controls and the Pyth update, preview, fund, approve, accept, cancel, repay, settle, and withdraw controls. Confirm writes remain disabled in reference mode."
+      "howToVerify": "Open the facility with no environment file. Confirm both mode controls and the preview, fund, approve, accept, cancel, repay, settle, and withdraw controls. Confirm writes remain disabled in reference mode. In an explicitly configured Pyth fixture, confirm the Pyth update control is present."
     },
     {
       "id": "C3",
@@ -43,7 +43,7 @@
       "severity": "critical",
       "walletRequired": false,
       "verifiableWithoutCredentials": true,
-      "howToVerify": "Open verify with no wallet. A pending record must be labeled incomplete. A verified record must show a repaid and defaulted position, distinct hold IDs, terminal path labels, separate Pyth, ATS, liability, reserve, and HSS facts, plus direct HashScan links for every lifecycle receipt."
+      "howToVerify": "Open verify with no wallet. A pending record must be labeled incomplete. A verified record must show a repaid and defaulted position, distinct hold IDs, terminal path labels, separate typed oracle, ATS, liability, reserve, and HSS facts, plus the proof type that matches each lifecycle claim. The committed HIP-475 record must not invent a Pyth receipt."
     },
     {
       "id": "C6",

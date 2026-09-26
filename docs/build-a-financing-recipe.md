@@ -2,7 +2,7 @@
 
 A recipe is a small, declarative financing policy layered over the Collateral
 Rail kernel. It changes what a facility permits without copying the ATS hold,
-cash accounting, Pyth validation, HSS scheduling, or evidence code.
+cash accounting, oracle validation, HSS scheduling, or evidence code.
 
 Run `yarn recipe:list` to see the bundled recipes and `yarn recipe:check` after
 editing one.
@@ -23,8 +23,9 @@ A recipe defines:
 - which term fields are editable; and
 - notes explaining safe extension points.
 
-The kernel still requires ATS collateral, internal KYC, HBAR cash, a valid Pyth
-quote, one terminal hold action, and a permissionless recovery path.
+The kernel still requires ATS collateral, internal KYC, HBAR cash, a valid
+configured settlement conversion, one terminal hold action, and a permissionless
+recovery path. Oracle choice is deployment configuration, not recipe policy.
 
 The canonical schema is:
 

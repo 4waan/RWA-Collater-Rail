@@ -15,14 +15,16 @@ new behavior independently verifiable.
 ## Existing app to preserve
 
 - `/` architecture, integration health, setup, and honest reference status.
-- `/facility` Pyth, lender, borrower, collateral, repayment, and recovery actions.
+- `/facility` typed oracle, lender, borrower, collateral, repayment, and recovery actions.
 - `/verify` live position, free and held balance, and Mirror receipt checks.
 - Foundry unit, fuzz, and stateful invariant suites.
 - Secret-free reference mode and encrypted-keystore bootstrap.
 
 ## Product rules
 
-1. Pyth prices only the HBAR cash leg.
+1. HIP-475 is the default HBAR cash conversion source and is a network
+   settlement rate, not a live market price. Pyth is an explicit optional cash
+   conversion source. Neither source prices the ATS security.
 2. The rail performs complete local policy before calling ATS Holds.
 3. Clearing stays disabled for the issued security.
 4. HSS failure never removes the public recovery path.

@@ -11,7 +11,11 @@ Harness creates an ephemeral ECDSA account and supplies these process environmen
 - `HARNESS_SIGNER_ACCOUNT_ID`: Hedera account ID for the ephemeral issuer and deployer.
 - `HARNESS_SIGNER_EVM_ADDRESS`: public EVM alias for that account.
 - `HARNESS_SIGNER_PRIVATE_KEY`: raw ECDSA key used only in process memory.
-- `PYTH_API_KEY`: Pyth Hermes API key used only as a bearer header when fetching the signed update payload.
+
+The default runner uses HIP-475 and needs no oracle credential. When
+`DEMO_ORACLE_KIND=pyth` is explicitly selected, the runner also requires
+`PYTH_API_KEY`. It uses that value only as a bearer header when fetching the
+signed Hermes update payload.
 
 The private key is never placed in a command argument, deployment record,
 frontend variable, or repository file. The Foundry script reads it from the
@@ -33,33 +37,40 @@ The runner supports these public settings:
 - `HEDERA_NETWORK`, which must equal `testnet` when present.
 - `HEDERA_TESTNET_RPC_URL`, fixed by policy to `https://testnet.hashio.io/api`.
 - `HEDERA_MIRROR_URL`, fixed by policy to `https://testnet.mirrornode.hedera.com`.
-- `PYTH_HERMES_URL`, fixed by policy to `https://hermes.pyth.network`.
+- `DEMO_ORACLE_KIND`, defaulting to `hedera-exchange-rate`. The only other
+  accepted value is `pyth`.
 - `ATS_FACTORY_ADDRESS`, defaulting to the pinned testnet Factory.
 - `ATS_RESOLVER_ADDRESS`, defaulting to the pinned testnet Resolver.
-- `PYTH_ADDRESS`, defaulting to the pinned Hedera Pyth contract.
+- `PYTH_HERMES_URL`, fixed by policy to `https://hermes.pyth.network` and used
+  only in Pyth mode.
+- `PYTH_ADDRESS`, defaulting to the pinned Hedera Pyth contract and used only
+  in Pyth mode.
 
 The fixed origin checks prevent a configured URL from turning the runner into an internal or credential-bearing request proxy. Address overrides remain public and are validated as EVM addresses.
 
-Pyth has required authentication for Hermes requests since August 26, 2026.
-The runner fails before spending HBAR when `PYTH_API_KEY` is absent or malformed.
-It never writes the key to evidence, command arguments, logs, or repository files.
+Pyth mode fails before spending HBAR when `PYTH_API_KEY` is absent or malformed.
+The runner never writes the key to evidence, command arguments, logs, or
+repository files. HIP-475 mode does not fetch Hermes data, check Pyth bytecode,
+or submit a Pyth update transaction.
 
 ## Lifecycle
 
 Before spending HBAR, the command verifies that the signer key, account ID, and
 EVM address agree. It also enforces the 250 HBAR signer cap, preserves an
-execution reserve, checks the exact RPC, Mirror, and Hermes origins, confirms
-Factory, Resolver, Pyth, and HSS availability, fetches a valid Pyth payload,
-checks the required local tools, and verifies that the ignored candidate path
-is writable.
+execution reserve, checks the exact RPC and Mirror origins, confirms Factory,
+Resolver, selected oracle, and HSS availability, checks the required local
+tools, and verifies that the ignored candidate path is writable. The Hermes
+origin, Pyth bytecode, and a signed update payload are checked only in Pyth mode.
 
 After preflight, the command performs these operations:
 
 1. Confirms the Harness signer balance is no greater than 250 HBAR.
 2. Creates temporary ECDSA lender and borrower accounts with 25 HBAR each.
 3. Deploys an ATS bond with Clearing disabled, configures SSI and internal KYC, and issues collateral.
-4. Deploys the Pyth adapter, financing rail, and acceptance verifier, then reserves HBAR for two HSS schedules.
-5. Fetches and submits a fresh HBAR/USD update from Hermes.
+4. Deploys the selected oracle adapter, financing rail, and acceptance verifier,
+   then reserves HBAR for two HSS schedules. The default adapter reads HIP-475
+   system contract `0x168`.
+5. In Pyth mode only, fetches and submits a fresh HBAR/USD update from Hermes.
 6. Funds and accepts two small facilities with a two-minute term.
 7. Reads both ATS holds at their acceptance blocks and verifies their holder,
    partition, ID, amount, expiration, escrow, destination, data, operator data,
@@ -85,7 +96,10 @@ policy into Foundry, reads `policy()` after deployment, and refuses to write
 evidence if the onchain values differ. Publication additionally requires
 `recipeId: term-credit` so the public reference remains stable.
 
-Pyth is used only for the HBAR cash conversion. The collateral limit remains a configured advance against ATS nominal value.
+HIP-475 mode uses the active Hedera network settlement conversion rate. It is
+not a live market price oracle. Pyth mode uses a fresh market feed. Both sources
+convert the HBAR cash leg only. The collateral limit remains a configured
+advance against ATS nominal value.
 
 ## Local encrypted-keystore path
 
@@ -110,7 +124,11 @@ The runner writes `packages/foundry/deployments/testnet.json` with mode `0600`. 
 - lifecycle transaction labels match decoded events from the expected rail or
   ATS token, including offer, hold, repayment, and fallback identifiers;
 - both terminal hold reads prove that no position-tagged collateral remains;
-- the Pyth publication data and final state reads are complete;
+- the typed oracle values and final state reads are complete;
+- HIP-475 evidence names system contract `0x168`, system file `0.0.112`, carries
+  the network-rate caveat, and contains no Pyth update transaction;
+- Pyth evidence names its feed, price, confidence, publish time, and matching
+  Mirror-confirmed update transaction;
 - the recipe ID and all six immutable policy values are complete, safe, and
   bound to the final state proof;
 - the live verifier re-queries Mirror and RPC successfully;

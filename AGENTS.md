@@ -3,8 +3,10 @@
 ## Product boundary
 
 Collateral Rail is a bilateral HBAR financing scaffold. It is not an exchange,
-an order book, a pooled lender, or a valuation engine. Pyth converts the USD cash
-terms to HBAR. It does not price the ATS security.
+an order book, a pooled lender, or a valuation engine. The configured oracle
+converts the USD cash terms to HBAR. HIP-475 is the default and exposes a network
+settlement conversion rate, not a live market price. Pyth is optional and must
+be explicitly configured. Neither source prices the ATS security.
 
 Financing flexibility belongs in validated recipe definitions. Do not duplicate
 the facility interface or weaken the custody, solvency, oracle, automation, or
@@ -224,9 +226,9 @@ satisfy the proof or reserve ghost.
   semantics.
 - Bind lifecycle labels to successful receipts, emitting contract addresses,
   decoded event arguments, schedule execution, and exact final-block state.
-- A material ATS, Hiero, HSS, Pyth, Mirror, RPC, or evidence-schema change
-  requires local gates, a clean generated scaffold, the compatibility canary,
-  and a fresh funded testnet lifecycle before release.
+- A material ATS, Hiero, HSS, HIP-475, Pyth, Mirror, RPC, or evidence-schema
+  change requires local gates, a clean generated scaffold, the compatibility
+  canary, and a fresh funded testnet lifecycle before release.
 - When adding a recipe, validate its schema, deploy its exact immutable policy,
   and keep `term-credit` as the committed public evidence recipe.
 
@@ -242,7 +244,10 @@ satisfy the proof or reserve ghost.
 
 - Keep one primary action in the active facility step.
 - Keep free ATS balance, held ATS balance, cash liabilities, automation reserves,
-  Pyth quotes, and HSS status as separate facts.
+  typed settlement conversion, and HSS status as separate facts.
+- Derive oracle labels, caveats, and proof links from evidence `oracle.kind`.
+  HIP-475 uses block state and must never cite a Pyth update receipt. Pyth uses
+  its matching update transaction and must remain explicit configuration.
 - Never label pending, simulated, or unverified data as public evidence.
 - Preserve shareable recipe, mode, and position query parameters.
 - Keep raw protocol data inside a technical disclosure unless it is the subject

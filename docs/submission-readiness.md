@@ -50,7 +50,10 @@ The committed reference record is publishable only when:
   free balances, and held balances are read live;
 - funding, acceptance, repayment, and fallback labels are bound to decoded
   receipt events from the expected contracts;
-- Pyth data, immutable policy, liabilities, reserves, and solvency are complete;
+- typed oracle data, source-specific proof, immutable policy, liabilities,
+  reserves, and solvency are complete;
+- HIP-475 evidence contains the network-rate caveat and no Pyth update
+  transaction, while Pyth evidence contains its matching update transaction;
 - the candidate contains no private material and passes the secret scan.
 
 Until that gate passes, the committed record must stay visibly pending.

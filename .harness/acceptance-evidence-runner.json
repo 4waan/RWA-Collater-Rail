@@ -3,11 +3,11 @@
   "assertions": [
     {
       "id": "E1",
-      "statement": "The runner rejects non-testnet networks and non-allowlisted RPC, Mirror, and Hermes endpoints.",
+      "statement": "The runner rejects non-testnet networks and non-allowlisted RPC and Mirror endpoints, and applies the Hermes allowlist only to explicitly configured Pyth mode.",
       "severity": "critical",
       "walletRequired": false,
       "verifiableWithoutCredentials": true,
-      "howToVerify": "Inspect evidence-lib.mjs and demo-testnet.ts, then run yarn test:runner. Confirm exact HTTPS endpoint policies and the explicit HEDERA_NETWORK testnet guard."
+      "howToVerify": "Inspect evidence-lib.mjs, demo-config.ts, and demo-testnet.ts, then run yarn test:runner. Confirm exact HTTPS endpoint policies, the explicit HEDERA_NETWORK testnet guard, HIP-475 default mode, and Pyth-only Hermes path."
     },
     {
       "id": "E2",

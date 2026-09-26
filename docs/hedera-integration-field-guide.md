@@ -126,9 +126,11 @@ both grants.
 **Failure mode:** A documented address may be stale, undeployed, or paired with
 a different resolver configuration.
 
-**Template consequence:** Bootstrap validates Resolver, Factory, and Pyth code
-before spending HBAR. The verifier checks the deployed entities through Mirror
-Node rather than treating documentation as evidence.
+**Template consequence:** Bootstrap validates Resolver and Factory code before
+spending HBAR. It validates Pyth code only when Pyth mode is explicitly
+selected. The default lifecycle checks HIP-475 through the selected adapter. The
+verifier checks deployed entities through Mirror Node rather than treating
+documentation as evidence.
 
 **Guard and test:** `verify-deployment.mjs` rejects missing Mirror entities and
 empty transaction results. The reference record stays pending until it passes.
@@ -245,20 +247,27 @@ fractional-tinybar rejection, and solvency after RPC balance conversion.
 **Primary source:** Hedera
 [Ethereum transaction unit reference](https://docs.hedera.com/hedera/sdks-and-apis/sdks/smart-contracts/ethereum-transaction).
 
-## 14. Pyth HBAR/USD is a cash feed, not an RWA valuation feed
+## 14. Settlement conversion is not an RWA valuation feed
 
 **Status:** derived
 
-**Failure mode:** Using HBAR/USD to claim a market price for a bond would combine
-unrelated facts and overstate the oracle's role.
+**Failure mode:** Using any HBAR/USD conversion to claim a market price for a
+bond would combine unrelated facts and overstate the oracle's role. Describing
+the HIP-475 network settlement conversion rate as a live market price would also
+misstate what the system contract provides.
 
-**Template consequence:** Pyth converts `principalUsdE8` into tinybar. Collateral
-coverage uses configured ATS nominal value and a recipe-selected advance that
-cannot exceed 70%. UI and docs repeat this boundary at the point of use.
+**Template consequence:** The default adapter uses HIP-475 to convert
+`principalUsdE8` into tinybar from the active network settlement conversion
+rate. The optional Pyth adapter performs the same cash conversion with a fresh,
+confidence-bounded market feed. Collateral coverage uses configured ATS nominal
+value and a recipe-selected advance that cannot exceed 70%. The evidence kind
+controls the public label, caveat, and proof source.
 
 **Guard and test:** `testPreviewUsesHaircutConversionAndConservativeInterest`
-checks both calculations as separate outputs. Oracle tests enforce freshness,
-positive value, exponent normalization, exact update fee, and confidence width.
+checks both calculations as separate outputs. HIP-475 tests enforce conversion,
+zero and malformed response handling, and the network-rate boundary. Pyth tests
+enforce freshness, positive value, exponent normalization, exact update fee,
+and confidence width. Evidence tests reject cross-mode proof claims.
 
-**Primary source:** Pyth
+**Primary sources:** [HIP-475](https://hips.hedera.com/hip/hip-475) and Pyth
 [price feed documentation](https://docs.pyth.network/price-feeds/core/use-real-time-data/evm).

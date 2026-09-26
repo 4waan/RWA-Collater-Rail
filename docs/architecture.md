@@ -3,9 +3,10 @@
 ## Boundary
 
 `AtsCollateralRail` is a bilateral obligation manager. It is bound at deployment
-to one ATS token, one partition, one Pyth adapter, the token decimal count, a
-configured nominal value, and an immutable rail policy. It does not discover
-assets, match orders, pool funds, or calculate a security market price.
+to one ATS token, one partition, one HBAR/USD settlement-conversion adapter, the
+token decimal count, a configured nominal value, and an immutable rail policy.
+It does not discover assets, match orders, pool funds, or calculate a security
+market price.
 
 Financing recipes sit above this kernel. A recipe selects safe policy limits and
 starting terms without changing custody, accounting, automation, or terminal
@@ -63,7 +64,7 @@ The borrower grants the rail an ATS allowance. Acceptance checks:
 1. borrower and lender internal KYC;
 2. offer expiry and self-dealing;
 3. configured collateral coverage;
-4. fresh Pyth data and at most 1% movement from funding;
+4. a valid settlement conversion and at most 1% movement from funding;
 5. free partition balance and allowance;
 6. asset maturity after facility maturity.
 
@@ -92,7 +93,10 @@ HSS improves liveness.
 
 - ATS enforces native balances, allowance, and hold mechanics.
 - The rail enforces facility policy before asking ATS to hold.
-- Pyth is trusted only for HBAR/USD conversion within freshness and confidence bounds.
+- The default HIP-475 adapter reads Hedera's active network settlement
+  conversion rate. It is not trusted or described as a live market price.
+- The optional Pyth adapter is trusted only for HBAR/USD cash conversion within
+  freshness and confidence bounds. Pyth mode must be explicitly configured.
 - HSS may fail or be saturated without blocking acceptance or recovery.
 - Mirror Node supplies historical evidence, but direct contract reads determine current state.
 - The deployment operator controls ATS issuance and KYC setup, but cannot seize rail credits.
@@ -107,6 +111,13 @@ Public evidence is typed by what the network actually proves:
   execution timestamp when applicable, and HashScan link;
 - a state proof contains the Hedera block number, approved RPC origin, and the
   exact assertions read at that block.
+
+Oracle evidence is also discriminated by source. A HIP-475 record names system
+contract `0x168`, system file `0.0.112`, the observed settlement rate, its block
+state proof, and the required network-rate caveat. It must not contain a Pyth
+update transaction. A Pyth record names the feed, price, confidence, publish
+time, and the successful Mirror-confirmed update transaction. The interface and
+documentation render the label, source, caveat, and proof from this typed field.
 
 An HSS default uses the executed schedule plus a later terminal state proof. A
 permissionless default uses its successful settlement transaction plus the same

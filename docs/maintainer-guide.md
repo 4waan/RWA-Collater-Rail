@@ -32,8 +32,10 @@ interface, the pinned ABI list, and its regression test in the same change.
 5. Read ATS roles, KYC, Clearing mode, decimals, nominal configuration,
    maturity, free balance, held balance, both opening hold details, and both
    terminal hold deletions at exact blocks.
-6. Read the immutable policy, Pyth data, liabilities, HSS reserve, and final
-   backing at the recorded verification block.
+6. Read the immutable policy, typed oracle source and values, liabilities, HSS
+   reserve, and final backing at the recorded verification block. HIP-475 must
+   use a state proof and must not cite a Pyth update transaction. Pyth mode must
+   bind its update transaction, feed, price, confidence, and publish time.
 7. Confirm the real schedule address through Mirror Node. Require a non-null
    execution timestamp before attributing a terminal action to HSS.
 8. Bind funding, acceptance, repayment, and fallback claims to decoded receipt
@@ -52,8 +54,9 @@ browser. Issuer setup stays in Foundry. Only public addresses and the public RPC
 URL may use `NEXT_PUBLIC_` names.
 
 Keep external requests pinned to the Hedera testnet RPC, Hedera testnet Mirror
-Node, Pyth Hermes, and the configured wallet transport. Validate transaction IDs,
-hashes, addresses, and response shapes before rendering links or evidence.
+Node, and the configured wallet transport. Permit Pyth Hermes requests only in
+explicit Pyth mode. Validate transaction IDs, hashes, addresses, and response
+shapes before rendering links or evidence.
 
 ## Release checklist
 
@@ -78,8 +81,8 @@ release. Contracts are immutable, so never present a newly deployed address as
 an in-place upgrade of an older rail.
 
 Review the compatibility matrix before updating ATS, Hiero contracts, HSS,
-Pyth, viem, wagmi, Foundry, or Solidity. These updates require a fresh funded
-testnet lifecycle after local and generated-project gates pass.
+HIP-475 handling, Pyth, viem, wagmi, Foundry, or Solidity. These updates require
+a fresh funded testnet lifecycle after local and generated-project gates pass.
 
 ## Maintenance cadence
 
