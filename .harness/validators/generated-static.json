@@ -1,0 +1,56 @@
+{
+  "jsonAssertions": [
+    { "file": "package.json", "path": "packageManager", "equals": "yarn@3.2.3" }
+  ],
+  "fileAssertions": {
+    "required": [
+      "LICENSE",
+      "NOTICE",
+      "AGENTS.md",
+      "packages/foundry/contracts/AtsCollateralRail.sol",
+      "packages/foundry/contracts/verifiers/RailAcceptance.sol",
+      "packages/nextjs/app/page.tsx",
+      "packages/nextjs/app/facility/page.tsx",
+      "packages/nextjs/app/verify/page.tsx",
+      "docs/hedera-integration-field-guide.md",
+      "docs/templates/decision-record.md",
+      "docs/templates/measured-finding.md"
+    ],
+    "forbidden": [
+      "packages/hardhat",
+      ".env",
+      "packages/foundry/.env",
+      "packages/nextjs/.env.local"
+    ]
+  },
+  "textAssertions": [
+    {
+      "file": "packages/foundry/script/BootstrapTestnet.s.sol",
+      "contains": [
+        "clearingActive: false",
+        "internalKycActivated: true",
+        "addIssuer(config.operator)",
+        "config.lender, \"collateral-rail-lender\"",
+        "config.borrower, \"collateral-rail-borrower\"",
+        "new RailAcceptance(rail)"
+      ]
+    },
+    {
+      "file": "packages/foundry/contracts/AtsCollateralRail.sol",
+      "contains": [
+        "is HederaScheduleService",
+        "responseCode == HEDERA_SUCCESS",
+        "maturity + offsets[i]",
+        "cashLiabilities + reservedAutomation"
+      ]
+    },
+    {
+      "file": "AGENTS.md",
+      "contains": [
+        "Never infer Hedera behavior solely from Ethereum conventions.",
+        "Never add a keeper as a correctness dependency.",
+        "Never place a secret in a `NEXT_PUBLIC_` variable."
+      ]
+    }
+  ]
+}

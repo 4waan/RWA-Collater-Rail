@@ -1,0 +1,67 @@
+schemaVersion: 2
+
+name: generated-collateral-rail
+description: Validate a generated Collateral Rail application without source-template metadata.
+prd: .harness/prds/bounty-evidence-runner.md
+agent: claude
+maxAttempts: 2
+skills:
+  - hss-system-contract
+  - quality-gates
+
+baseline:
+  commands:
+    - name: install
+      command: corepack yarn install --immutable
+      timeoutMs: 600000
+    - name: contracts
+      command: yarn foundry:test
+      timeoutMs: 600000
+    - name: web-build
+      command: yarn next:build
+      timeoutMs: 600000
+
+validators:
+  static: .harness/validators/generated-static.json
+  commands: .harness/validators/yarn.json
+  playwright: .harness/validators/playwright-smoke.yaml
+
+contract: .harness/acceptance-evidence-runner.json
+validator:
+  enabled: true
+
+constraints:
+  packageManager: yarn@3.2.3
+  workspaces:
+    - packages/foundry
+    - packages/nextjs
+    - packages/shared
+  forbiddenWorkspaces:
+    - packages/hardhat
+
+forbiddenFiles:
+  - .env
+  - packages/foundry/.env
+  - packages/nextjs/.env.local
+
+secretScan:
+  failOnFiles:
+    - .env
+    - packages/foundry/.env
+    - packages/nextjs/.env.local
+  patterns:
+    - name: private-key-assignment
+      pattern: "(PRIVATE_KEY|OPERATOR_KEY|MNEMONIC)\\s*=\\s*(0x)?[0-9a-fA-F]{32,}"
+    - name: pem-private-key
+      pattern: "BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY"
+
+requiredFiles:
+  - packages/foundry/contracts/AtsCollateralRail.sol
+  - packages/foundry/contracts/oracle/PythHbarUsdOracle.sol
+  - packages/foundry/contracts/verifiers/RailAcceptance.sol
+  - packages/nextjs/app/facility/page.tsx
+  - packages/nextjs/app/verify/page.tsx
+  - docs/hedera-integration-field-guide.md
+  - packages/foundry/scripts/demo-testnet.ts
+  - packages/foundry/scripts/publish-evidence.mjs
+  - packages/shared/recipes/term-credit.json

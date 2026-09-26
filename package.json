@@ -41,7 +41,7 @@
     "check:compatibility": "node scripts/check-compatibility.mjs",
     "harness:doctor": "hedera-harness doctor .harness/spec.yaml",
     "harness:doctor:recipe": "hedera-harness doctor .harness/spec.yaml --recipe-only",
-    "harness:validate": "hedera-harness validate .harness/spec.yaml",
+    "harness:validate": "node scripts/harness-validate.mjs",
     "harness:run": "hedera-harness run .harness/spec.yaml",
     "harness:run:judge": "hedera-harness run .harness/judge-proof-spec.yaml",
     "harness:semantic": "hedera-harness validate-semantic .harness/judge-proof-spec.yaml",
