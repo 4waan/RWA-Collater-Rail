@@ -38,3 +38,13 @@ jobs:
         env:
           FOUNDRY_PROFILE: ci
         run: yarn release:validate
+      - name: Retain Playwright failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: fresh-scaffold-playwright-failure
+          path: |
+            gate-check/packages/nextjs/test-results
+            gate-check/packages/nextjs/playwright-report
+          if-no-files-found: ignore
+          retention-days: 7

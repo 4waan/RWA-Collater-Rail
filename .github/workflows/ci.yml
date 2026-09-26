@@ -31,6 +31,16 @@ jobs:
         env:
           FOUNDRY_PROFILE: ci
         run: yarn release:validate
+      - name: Retain Playwright failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ci-playwright-failure
+          path: |
+            packages/nextjs/test-results
+            packages/nextjs/playwright-report
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Gitleaks
         uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
         env:
