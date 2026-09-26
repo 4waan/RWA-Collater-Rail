@@ -85,6 +85,28 @@ export type EvidenceMetrics = {
   mirrorConfirmedTransactions: number;
 };
 
+export type PythOracleEvidence = {
+  kind: "pyth";
+  feedId: string;
+  priceUsdE8: string;
+  confidenceUsdE8: string;
+  observedAt: number;
+  purpose: string;
+};
+
+export type HederaExchangeRateEvidence = {
+  kind: "hedera-exchange-rate";
+  systemContract: string;
+  systemFile: string;
+  priceUsdE8: string;
+  confidenceUsdE8: string;
+  observedAt: number;
+  purpose: string;
+  caveat: string;
+};
+
+export type OracleEvidence = PythOracleEvidence | HederaExchangeRateEvidence;
+
 export type ReferenceDeployment = {
   schemaVersion: 3;
   network: string;
@@ -97,26 +119,7 @@ export type ReferenceDeployment = {
   actors: Record<string, { accountId: string; evmAddress: string } | null>;
   transactions: TransactionProof[];
   lifecycle: ReferenceLifecycle;
-  oracle?:
-    | {
-        kind: "pyth";
-        feedId: string;
-        priceUsdE8: string;
-        confidenceUsdE8: string;
-        observedAt: number;
-        purpose: string;
-      }
-    | {
-        kind: "hedera-exchange-rate";
-        systemContract: string;
-        systemFile: string;
-        priceUsdE8: string;
-        confidenceUsdE8: string;
-        observedAt: number;
-        purpose: string;
-        caveat: string;
-      }
-    | null;
+  oracle: OracleEvidence | null;
   pyth: {
     feedId: string;
     priceUsdE8: string;

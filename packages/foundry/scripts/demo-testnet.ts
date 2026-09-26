@@ -26,6 +26,7 @@ import {
   TINYBAR_PER_HBAR,
   assertDependencyBytecode,
   assertFundingBudget,
+  assertHip475Availability,
   assertHssCapacity,
   categorizeBootstrapTransactions,
   classifyDefaultPath,
@@ -143,6 +144,9 @@ async function main() {
         ? { factory, resolver, pyth }
         : { factory, resolver },
   });
+  if (oracleKind === "hedera-exchange-rate") {
+    await assertHip475Availability({ publicClient });
+  }
   await assertHssCapacity({
     publicClient,
     startSecond: Math.floor(Date.now() / 1_000) + Number(TERM_SECONDS) + 2,

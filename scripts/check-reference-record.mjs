@@ -24,6 +24,7 @@ if (record.status === "verified") {
   deployedAddressValues.some((value) => value !== null) ||
   actorValues.some((value) => value !== null) ||
   lifecycleValues.some((value) => value !== null) ||
+  record.oracle !== null ||
   record.pyth !== null ||
   record.ats !== null ||
   record.accounting !== null ||

@@ -41,8 +41,9 @@ export function readDemoConfiguration(
     throw new Error("DEMO_ORACLE_KIND must be hedera-exchange-rate or pyth.");
   }
   const pythApiKey = environment.PYTH_API_KEY?.trim() ?? null;
+  const pythMode = oracleKind === "pyth";
   if (
-    oracleKind === "pyth" &&
+    pythMode &&
     (!pythApiKey ||
       pythApiKey.length > 1_024 ||
       /[\u0000-\u001f\u007f]/u.test(pythApiKey))
@@ -63,10 +64,12 @@ export function readDemoConfiguration(
       "mirror",
       environment.HEDERA_MIRROR_URL ?? DEFAULT_MIRROR_URL,
     ),
-    hermesUrl: validatedEndpoint(
-      "hermes",
-      environment.PYTH_HERMES_URL ?? DEFAULT_HERMES_URL,
-    ),
+    hermesUrl: pythMode
+      ? validatedEndpoint(
+          "hermes",
+          environment.PYTH_HERMES_URL ?? DEFAULT_HERMES_URL,
+        )
+      : DEFAULT_HERMES_URL,
     pythApiKey,
     oracleKind: oracleKind as "hedera-exchange-rate" | "pyth",
     factory: requireAddress(
@@ -77,6 +80,8 @@ export function readDemoConfiguration(
       "ATS Resolver",
       environment.ATS_RESOLVER_ADDRESS ?? ATS_RESOLVER_ADDRESS,
     ),
-    pyth: requireAddress("Pyth", environment.PYTH_ADDRESS ?? PYTH_ADDRESS),
+    pyth: pythMode
+      ? requireAddress("Pyth", environment.PYTH_ADDRESS ?? PYTH_ADDRESS)
+      : (PYTH_ADDRESS as Address),
   };
 }

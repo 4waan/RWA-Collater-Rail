@@ -25,8 +25,12 @@ const chainId = readNumberConstant("HEDERA_TESTNET_CHAIN_ID");
 const dependencies = {
   "ATS Factory": readStringConstant("ATS_FACTORY_ADDRESS"),
   "ATS Resolver": readStringConstant("ATS_RESOLVER_ADDRESS"),
-  Pyth: readStringConstant("PYTH_ADDRESS"),
+  "Optional Pyth": readStringConstant("PYTH_ADDRESS"),
 };
+const exchangeRateSystem = "0x0000000000000000000000000000000000000168";
+const oneHbarInTinybar =
+  "0000000000000000000000000000000000000000000000000000000005f5e100";
+const tinybarsToTinycentsSelector = "43a88229";
 
 const parsedRpcUrl = new URL(rpcUrl);
 if (
@@ -98,6 +102,20 @@ for (const [name, address] of Object.entries(dependencies)) {
   }
 }
 
+const exchangeRateResult = await rpc("eth_call", [
+  {
+    to: exchangeRateSystem,
+    data: `0x${tinybarsToTinycentsSelector}${oneHbarInTinybar}`,
+  },
+  "latest",
+]);
+if (
+  !/^0x[0-9a-f]{64}$/i.test(exchangeRateResult) ||
+  BigInt(exchangeRateResult) <= 0n
+) {
+  throw new Error("HIP-475 returned an invalid HBAR settlement conversion.");
+}
+
 for (const [file, expectedDigest] of Object.entries(atsSurface.sourceFiles)) {
   const url = new URL(
     `https://raw.githubusercontent.com/hashgraph/asset-tokenization-studio/${atsSurface.upstreamCommit}/${file}`,
@@ -121,5 +139,5 @@ for (const [file, expectedDigest] of Object.entries(atsSurface.sourceFiles)) {
 }
 
 console.log(
-  `Hedera testnet chain ${chainId}, ${Object.keys(dependencies).length} dependencies, and ${Object.keys(atsSurface.sourceFiles).length} pinned ATS sources are verified.`,
+  `Hedera testnet chain ${chainId}, HIP-475, ${Object.keys(dependencies).length} deployed dependencies, and ${Object.keys(atsSurface.sourceFiles).length} pinned ATS sources are verified.`,
 );

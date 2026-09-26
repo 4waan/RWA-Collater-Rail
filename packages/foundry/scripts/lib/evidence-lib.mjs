@@ -170,6 +170,23 @@ export async function assertDependencyBytecode({ publicClient, dependencies }) {
   }
 }
 
+export async function assertHip475Availability({ publicClient }) {
+  const oneHbarInTinybar =
+    "0000000000000000000000000000000000000000000000000000000005f5e100";
+  const result = await publicClient.call({
+    to: EXCHANGE_RATE_ADDRESS,
+    data: `0x43a88229${oneHbarInTinybar}`,
+  });
+  if (!/^0x[a-fA-F0-9]{64}$/.test(result?.data ?? "")) {
+    throw new Error("HIP-475 returned a malformed settlement conversion.");
+  }
+  const tinycentsPerHbar = BigInt(result.data);
+  if (tinycentsPerHbar <= 0n) {
+    throw new Error("HIP-475 returned a zero settlement conversion.");
+  }
+  return tinycentsPerHbar;
+}
+
 export async function assertHssCapacity({
   publicClient,
   startSecond,
@@ -785,6 +802,11 @@ export function validateEvidenceRecord(record) {
     }
   }
   if (oracleEvidence.kind === "pyth") {
+    if (lifecycle.pythPriceUpdate?.type !== "transaction") {
+      throw new Error(
+        "Pyth evidence must claim its Mirror-confirmed update transaction.",
+      );
+    }
     const proof = validateTransactionProof(lifecycle.pythPriceUpdate);
     const canonical = verifiedTransactions.get(proof.hash.toLowerCase());
     if (
@@ -1035,7 +1057,12 @@ export function validateEvidenceRecord(record) {
       !/^[1-9]\d*$/.test(oracleEvidence.priceUsdE8 ?? "") ||
       !isCanonicalUnsignedInteger(oracleEvidence.confidenceUsdE8) ||
       typeof oracleEvidence.purpose !== "string" ||
-      oracleEvidence.purpose.length === 0
+      oracleEvidence.purpose.length === 0 ||
+      record.pyth?.feedId !== oracleEvidence.feedId ||
+      record.pyth?.priceUsdE8 !== oracleEvidence.priceUsdE8 ||
+      record.pyth?.confidenceUsdE8 !== oracleEvidence.confidenceUsdE8 ||
+      record.pyth?.publishTime !== oracleEvidence.observedAt ||
+      record.pyth?.purpose !== oracleEvidence.purpose
     ) {
       throw new Error("Evidence is missing Pyth oracle data.");
     }

@@ -223,7 +223,7 @@ export async function readVerifiedFinalState({
     );
   }
   if (oraclePrice[0] <= 0n || oraclePrice[2] <= 0n) {
-    throw new Error("Final Pyth HBAR/USD verification failed.");
+    throw new Error("Final HBAR settlement conversion verification failed.");
   }
 
   const policy = {

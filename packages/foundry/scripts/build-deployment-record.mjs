@@ -74,6 +74,7 @@ const record = {
     maturedDefault: null,
     liveConfigurationRead: null,
   },
+  oracle: null,
   pyth: null,
   ats: null,
   positions: [],

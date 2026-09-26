@@ -9,8 +9,8 @@ import {ReentrancyLock} from "./utils/ReentrancyLock.sol";
 /// @title AtsCollateralRail
 /// @notice A bilateral HBAR financing rail secured by one ATS partition hold.
 /// @dev Native amounts are named tinybar because Hedera exposes HBAR to the EVM
-/// in tinybar units. Pyth converts the cash leg only. ATS nominal value is a
-/// configured underwriting input, not a secondary-market price.
+/// in tinybar units. The configured oracle converts the HBAR cash leg only.
+/// ATS nominal value is an underwriting input, not a secondary-market price.
 contract AtsCollateralRail is HederaScheduleService, ReentrancyLock {
     enum PositionState {
         NONE,

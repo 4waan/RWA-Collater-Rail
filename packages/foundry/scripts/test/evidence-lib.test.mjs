@@ -8,6 +8,7 @@ import {
   TINYBAR_PER_HBAR,
   assertDependencyBytecode,
   assertFundingBudget,
+  assertHip475Availability,
   assertHssCapacity,
   categorizeBootstrapTransactions,
   classifyDefaultPath,
@@ -132,9 +133,10 @@ function verifiedEvidence() {
       "rail.policy.minimumTermSeconds": 120,
       "rail.policy.maximumTermSeconds": 31_536_000,
       "rail.policy.maximumOfferLifetimeSeconds": 86_400,
-      "pyth.priceUsdE8": "10000000",
-      "pyth.confidenceUsdE8": "1000",
-      "pyth.publishTime": 1_700_000_000,
+      "oracle.kind": "pyth",
+      "oracle.priceUsdE8": "10000000",
+      "oracle.confidenceUsdE8": "1000",
+      "oracle.observedAt": 1_700_000_000,
       "positions.repaidState": "REPAID",
       "positions.defaultedState": "DEFAULTED",
     },
@@ -260,6 +262,14 @@ function verifiedEvidence() {
       holdEvidence(defaultedPositionId, "2", "1201"),
     ],
     schedules: [firstSchedule, secondSchedule],
+    oracle: {
+      kind: "pyth",
+      feedId: HBAR_USD_PRICE_ID,
+      purpose: "HBAR cash-leg conversion only",
+      priceUsdE8: "10000000",
+      confidenceUsdE8: "1000",
+      observedAt: 1_700_000_000,
+    },
     pyth: {
       feedId: HBAR_USD_PRICE_ID,
       purpose: "HBAR cash-leg conversion only",
@@ -307,6 +317,30 @@ function verifiedEvidence() {
       mirrorConfirmedTransactions: transactions.length,
     },
   };
+}
+
+function hip475Evidence() {
+  const record = verifiedEvidence();
+  const systemContract = "0x0000000000000000000000000000000000000168";
+  record.oracle = {
+    kind: "hedera-exchange-rate",
+    systemContract,
+    systemFile: "0.0.112",
+    purpose: "HBAR cash-leg settlement conversion only",
+    priceUsdE8: "10000000",
+    confidenceUsdE8: "0",
+    observedAt: 1_700_000_000,
+    caveat:
+      "HIP-475 exposes the active network settlement conversion rate, not a live market price oracle.",
+  };
+  record.pyth = null;
+  record.addresses.pyth = null;
+  record.addresses.exchangeRateSystem = systemContract;
+  record.lifecycle.pythPriceUpdate = null;
+  record.transactions[3].kind = "bootstrap-extra-4";
+  record.verification.state.assertions["oracle.kind"] = "hedera-exchange-rate";
+  record.verification.state.assertions["oracle.confidenceUsdE8"] = "0";
+  return record;
 }
 
 test("endpoint policy accepts only exact public testnet endpoints", () => {
@@ -460,6 +494,39 @@ test("preflight checks dependency bytecode and HSS capacity", async () => {
   });
   assert.equal(result, 110n);
   assert.deepEqual(expiries, [100n, 105n, 110n]);
+});
+
+test("HIP-475 preflight requires a positive canonical system response", async () => {
+  const encodedRate = `0x${(7_802_800n * 100n).toString(16).padStart(64, "0")}`;
+  const calls = [];
+  const rate = await assertHip475Availability({
+    publicClient: {
+      call: async (request) => {
+        calls.push(request);
+        return { data: encodedRate };
+      },
+    },
+  });
+  assert.equal(rate, 780_280_000n);
+  assert.deepEqual(calls, [
+    {
+      to: "0x0000000000000000000000000000000000000168",
+      data: `0x43a88229${"5f5e100".padStart(64, "0")}`,
+    },
+  ]);
+
+  await assert.rejects(
+    assertHip475Availability({
+      publicClient: { call: async () => ({ data: "0x" }) },
+    }),
+    /malformed/,
+  );
+  await assert.rejects(
+    assertHip475Availability({
+      publicClient: { call: async () => ({ data: `0x${"0".repeat(64)}` }) },
+    }),
+    /zero/,
+  );
 });
 
 test("bootstrap proofs are categorized by semantics instead of position", () => {
@@ -795,6 +862,38 @@ test("verified evidence binds its recipe, policy, Mirror proofs, and links", () 
 
   record.transactions[0].hashScan = "https://example.com/not-proof";
   assert.throws(() => validateEvidenceRecord(record), /unverified transaction/);
+});
+
+test("oracle evidence accepts both explicit Pyth and HIP-475 proof models", () => {
+  const pyth = verifiedEvidence();
+  assert.equal(validateEvidenceRecord(pyth), pyth);
+
+  const hip475 = hip475Evidence();
+  assert.equal(validateEvidenceRecord(hip475), hip475);
+});
+
+test("oracle evidence rejects proof claims from the other oracle mode", () => {
+  const hip475WithPythReceipt = hip475Evidence();
+  hip475WithPythReceipt.lifecycle.pythPriceUpdate =
+    hip475WithPythReceipt.transactions[3];
+  assert.throws(
+    () => validateEvidenceRecord(hip475WithPythReceipt),
+    /must not claim a Pyth update transaction/,
+  );
+
+  const pythWithoutReceipt = verifiedEvidence();
+  pythWithoutReceipt.lifecycle.pythPriceUpdate = null;
+  assert.throws(
+    () => validateEvidenceRecord(pythWithoutReceipt),
+    /must claim its Mirror-confirmed update transaction/,
+  );
+
+  const inconsistentPyth = verifiedEvidence();
+  inconsistentPyth.pyth.priceUsdE8 = "99999999";
+  assert.throws(
+    () => validateEvidenceRecord(inconsistentPyth),
+    /missing Pyth oracle data/,
+  );
 });
 
 test("evidence rejects forbidden secret-shaped fields", () => {
