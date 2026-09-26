@@ -153,6 +153,24 @@ async function mockReceipt(page: Page, status: "0x0" | "0x1") {
   });
 }
 
+test("@live exposes Pyth controls only when Pyth is explicitly configured", async ({
+  page,
+}) => {
+  test.skip(process.env.PLAYWRIGHT_LIVE_FIXTURE !== "1");
+  await installProvider(page);
+  await connectWallet(page);
+  await page.getByRole("button", { name: /Price and fund/i }).click();
+  await expect(
+    page.getByText(/Pyth converts the USD cash terms into exact tinybar/),
+  ).toBeVisible();
+  await page.getByText("Technical details").click();
+  await expect(page.getByRole("button", { name: "Update Pyth" })).toBeVisible();
+  const response = await page.request.get("/");
+  expect(response.headers()["content-security-policy"]).toContain(
+    "https://hermes.pyth.network",
+  );
+});
+
 test("@live blocks writes on the wrong chain and switches explicitly", async ({
   page,
 }) => {

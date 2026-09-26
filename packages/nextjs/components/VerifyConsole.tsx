@@ -19,6 +19,7 @@ import {
   RemoteReadError,
   remoteReadMessage,
 } from "@/lib/network";
+import { presentOracleEvidence } from "@/lib/oracle-evidence";
 import { referenceDeployment } from "@/lib/reference";
 
 type PositionSelection = "repaid" | "defaulted";
@@ -134,15 +135,14 @@ export function VerifyConsole({ initialPosition }: VerifyConsoleProps) {
   const hold = referenceDeployment.holds.find(
     (candidate) => candidate.positionId === position?.id,
   );
+  const oracleEvidence = presentOracleEvidence(referenceDeployment);
 
   const claims = [
     {
-      claim: "A fresh HBAR/USD cash quote was submitted.",
-      source: "Pyth adapter and Mirror receipt",
-      detail: referenceDeployment.pyth
-        ? `$${formatUnits(BigInt(referenceDeployment.pyth.priceUsdE8), 8)} at ${referenceDeployment.pyth.publishTime}`
-        : "Awaiting verified publication",
-      proof: lifecycle.pythPriceUpdate,
+      claim: oracleEvidence.claim,
+      source: oracleEvidence.source,
+      detail: oracleEvidence.detail,
+      proof: oracleEvidence.proof,
     },
     {
       claim: "The lender funded an exact HBAR principal.",
@@ -370,12 +370,8 @@ export function VerifyConsole({ initialPosition }: VerifyConsoleProps) {
             </dd>
           </div>
           <div>
-            <dt>Pyth cash quote</dt>
-            <dd>
-              {referenceDeployment.pyth
-                ? `$${formatUnits(BigInt(referenceDeployment.pyth.priceUsdE8), 8)}`
-                : "Pending"}
-            </dd>
+            <dt>{oracleEvidence.label}</dt>
+            <dd>{oracleEvidence.value}</dd>
           </div>
           <div>
             <dt>Cash liabilities</dt>
@@ -400,6 +396,7 @@ export function VerifyConsole({ initialPosition }: VerifyConsoleProps) {
             </dd>
           </div>
         </dl>
+        <p>{oracleEvidence.caveat}</p>
       </section>
 
       <details className="liveVerifier">

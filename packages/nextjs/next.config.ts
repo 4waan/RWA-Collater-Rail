@@ -4,6 +4,10 @@ const scriptPolicy =
   process.env.NODE_ENV === "development"
     ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
     : "script-src 'self' 'unsafe-inline'";
+const pythConnectSource =
+  process.env.NEXT_PUBLIC_ORACLE_KIND === "pyth"
+    ? " https://hermes.pyth.network"
+    : "";
 
 const contentSecurityPolicy = [
   "default-src 'self'",
@@ -15,7 +19,7 @@ const contentSecurityPolicy = [
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
   scriptPolicy,
-  "connect-src 'self' https://testnet.hashio.io https://testnet.mirrornode.hedera.com https://hermes.pyth.network wss://relay.walletconnect.com https://relay.walletconnect.com",
+  `connect-src 'self' https://testnet.hashio.io https://testnet.mirrornode.hedera.com${pythConnectSource} wss://relay.walletconnect.com https://relay.walletconnect.com`,
 ].join("; ");
 
 const nextConfig: NextConfig = {

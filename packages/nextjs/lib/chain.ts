@@ -35,6 +35,16 @@ function publicAddress(value: string | undefined): Address | undefined {
     : undefined;
 }
 
+export type OracleKind = "hedera-exchange-rate" | "pyth";
+
+const configuredOracleKind = process.env.NEXT_PUBLIC_ORACLE_KIND?.trim();
+const isOracleConfigurationValid =
+  !configuredOracleKind ||
+  configuredOracleKind === "hedera-exchange-rate" ||
+  configuredOracleKind === "pyth";
+export const oracleKind: OracleKind =
+  configuredOracleKind === "pyth" ? "pyth" : "hedera-exchange-rate";
+
 export const addresses = {
   rail: publicAddress(process.env.NEXT_PUBLIC_RAIL_ADDRESS),
   atsToken: publicAddress(process.env.NEXT_PUBLIC_ATS_TOKEN_ADDRESS),
@@ -43,7 +53,10 @@ export const addresses = {
 };
 
 export const isLiveMode = Boolean(
-  addresses.rail && addresses.atsToken && addresses.oracle,
+  isOracleConfigurationValid &&
+    addresses.rail &&
+    addresses.atsToken &&
+    addresses.oracle,
 );
 
 export { HEDERA_TESTNET_CHAIN_ID };

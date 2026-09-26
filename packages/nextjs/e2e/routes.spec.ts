@@ -95,8 +95,14 @@ test("verification keeps financial claims and balances distinct", async ({
     page.getByText("Held ATS balance", { exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByText("Pyth cash quote", { exact: true }),
+    page.getByText("HIP-475 settlement conversion rate", { exact: true }),
   ).toBeVisible();
+  await expect(
+    page.getByText("The HBAR settlement conversion rate was read from Hedera."),
+  ).toBeVisible();
+  await expect(page.getByText(/Pyth adapter and Mirror receipt/)).toHaveCount(
+    0,
+  );
   await expect(
     page.getByText("Cash liabilities", { exact: true }),
   ).toBeVisible();
@@ -151,6 +157,7 @@ test("production security policy excludes script evaluation", async ({
   const response = await request.get("/");
   const policy = response.headers()["content-security-policy"] ?? "";
   expect(policy).toContain("script-src 'self' 'unsafe-inline'");
+  expect(policy).not.toContain("https://hermes.pyth.network");
   if (process.env.PLAYWRIGHT_SERVER_MODE === "production") {
     expect(policy).not.toContain("unsafe-eval");
   }

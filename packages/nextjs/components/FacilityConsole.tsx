@@ -25,7 +25,12 @@ import {
 import { tinybarToWeibar } from "@collateral-rail/shared/hedera";
 import { FacilityStep } from "@/components/FacilityStep";
 import { ProofReference } from "@/components/ProofReference";
-import { addresses, HEDERA_TESTNET_CHAIN_ID, isLiveMode } from "@/lib/chain";
+import {
+  addresses,
+  HEDERA_TESTNET_CHAIN_ID,
+  isLiveMode,
+  oracleKind,
+} from "@/lib/chain";
 import { atsAbi, oracleAbi, pythAbi, railAbi } from "@/lib/contracts";
 import {
   isRecord,
@@ -34,6 +39,7 @@ import {
   remoteReadMessage,
 } from "@/lib/network";
 import { hashScanTransaction } from "@/lib/proofs";
+import { presentOracleEvidence } from "@/lib/oracle-evidence";
 import { referenceDeployment } from "@/lib/reference";
 
 const PRICE_ID =
@@ -322,6 +328,7 @@ export function FacilityConsole({
   const [transactionHash, setTransactionHash] = useState<Hex>();
   const [actionState, setActionState] = useState<ActionState>("idle");
   const [technicalError, setTechnicalError] = useState("");
+  const oracleEvidence = presentOracleEvidence(referenceDeployment);
 
   const terms = useMemo(() => {
     if (!isAddress(borrower)) return undefined;
@@ -492,7 +499,11 @@ export function FacilityConsole({
         args: [terms],
       });
       setPreview(result);
-      setMessage("Quote read from the rail using its validated Pyth price.");
+      setMessage(
+        oracleKind === "pyth"
+          ? "Quote read from the rail using its validated Pyth price."
+          : "Quote read from the rail using Hedera's HIP-475 settlement conversion rate.",
+      );
     } catch (error) {
       const described = actionError(error);
       setMessage(described.message);
@@ -679,7 +690,7 @@ export function FacilityConsole({
               : null;
     const supportingProof =
       step === 2
-        ? lifecycle.pythPriceUpdate
+        ? oracleEvidence.proof
         : step === 4 && terminalChoice === "settle"
           ? lifecycle.hssScheduleCreation
           : null;
@@ -713,12 +724,8 @@ export function FacilityConsole({
         {step === 2 && (
           <dl className="proofMiniLedger">
             <div>
-              <dt>Pyth HBAR/USD</dt>
-              <dd>
-                {referenceDeployment.pyth
-                  ? formatUnits(BigInt(referenceDeployment.pyth.priceUsdE8), 8)
-                  : "Pending"}
-              </dd>
+              <dt>{oracleEvidence.label}</dt>
+              <dd>{oracleEvidence.value}</dd>
             </div>
             <div>
               <dt>Cash leg</dt>
@@ -910,8 +917,9 @@ export function FacilityConsole({
         <>
           {actorLine(step)}
           <p>
-            Pyth converts the USD cash terms into exact tinybar. It does not
-            value the ATS security.
+            {oracleKind === "pyth"
+              ? "Pyth converts the USD cash terms into exact tinybar. It does not value the ATS security."
+              : "HIP-475 converts the USD cash terms using Hedera's active network settlement conversion rate. It is not a live market price or an ATS security valuation."}
           </p>
           {preview && (
             <dl className="proofMiniLedger">
@@ -943,18 +951,28 @@ export function FacilityConsole({
           </button>
           <details className="technicalDetails">
             <summary>Technical details</summary>
-            <p>
-              If the stored quote is stale, submit a fresh Hermes payload before
-              previewing again.
-            </p>
-            <button
-              className="secondaryButton"
-              disabled={!canWrite || actionBusy}
-              onClick={updatePyth}
-              type="button"
-            >
-              Update Pyth
-            </button>
+            {oracleKind === "pyth" ? (
+              <>
+                <p>
+                  If the stored quote is stale, submit a fresh Hermes payload
+                  before previewing again.
+                </p>
+                <button
+                  className="secondaryButton"
+                  disabled={!canWrite || actionBusy}
+                  onClick={updatePyth}
+                  type="button"
+                >
+                  Update Pyth
+                </button>
+              </>
+            ) : (
+              <p>
+                The adapter reads system contract 0x168. HIP-475 supplies the
+                active network settlement conversion rate without a publisher
+                timestamp or confidence band.
+              </p>
+            )}
           </details>
         </>
       );

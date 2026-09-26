@@ -2,6 +2,7 @@ import Link from "next/link";
 import { RecipeExplorer } from "@/components/RecipeExplorer";
 import { isTransactionProof } from "@/lib/proofs";
 import { referenceDeployment } from "@/lib/reference";
+import { presentOracleEvidence } from "@/lib/oracle-evidence";
 
 export default function OverviewPage() {
   const repaid = referenceDeployment.positions.find(
@@ -12,6 +13,7 @@ export default function OverviewPage() {
   );
   const verifiedTransactions =
     referenceDeployment.transactions.filter(isTransactionProof).length;
+  const oracleEvidence = presentOracleEvidence(referenceDeployment);
 
   return (
     <main className="homePage">
@@ -30,8 +32,8 @@ export default function OverviewPage() {
           </Link>
         </div>
         <p className="frameAside">
-          One tested kernel combines ATS holds, exact HBAR accounting, Pyth
-          pricing, HSS automation, and Mirror evidence.
+          One tested kernel combines ATS holds, exact HBAR accounting, typed
+          settlement conversion, HSS automation, and Mirror evidence.
         </p>
       </section>
 
@@ -46,9 +48,9 @@ export default function OverviewPage() {
           <span className="kicker">Public testnet evidence</span>
           <h2>Every claim has a source.</h2>
           <p>
-            The reference record separates contract state, ATS balances, Pyth
-            data, HSS schedules, Mirror receipts, and HashScan links. Missing
-            proof stays visibly pending.
+            The reference record separates contract state, ATS balances, the
+            {` ${oracleEvidence.label}, `}HSS schedules, Mirror receipts, and
+            HashScan links. Missing proof stays visibly pending.
           </p>
           <dl className="proofStatus" aria-label="Reference evidence status">
             <div>
