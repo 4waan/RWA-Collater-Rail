@@ -1,7 +1,7 @@
 name: collateral-rail-routes
 server:
-  command: yarn dev
-  url: http://localhost:3000
+  command: yarn workspace @collateral-rail/nextjs start -p 3211 -H 127.0.0.1
+  url: http://127.0.0.1:3211
   timeoutMs: 120000
 defaults:
   timeoutMs: 30000
