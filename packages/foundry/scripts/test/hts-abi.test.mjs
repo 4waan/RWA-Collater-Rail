@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -82,6 +83,16 @@ test("settlement initialization remains isolated to the HTS ABI", () => {
   );
   assert.equal(hbarEntries.length, 0);
   assert.equal(htsEntries.length, 1);
+});
+
+test("HBAR rail ABI remains pinned to the v1.0.0 surface", () => {
+  const digest = createHash("sha256")
+    .update(JSON.stringify(railAbi))
+    .digest("hex");
+  assert.equal(
+    digest,
+    "38fc10fd7a728570b79d31fcb278a42a097939eb615c6c61d910ae95dce33501",
+  );
 });
 
 test("generic USD oracle ABI export matches the compiled Pyth adapter", async () => {
