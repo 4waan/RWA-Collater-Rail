@@ -184,15 +184,6 @@ export const railAbi = [
   },
   {
     type: "event",
-    name: "SettlementInitialized",
-    inputs: [
-      { indexed: true, name: "token", type: "address" },
-      { indexed: false, name: "decimals", type: "uint8" },
-      { indexed: false, name: "kycNotApplicable", type: "bool" },
-    ],
-  },
-  {
-    type: "event",
     name: "OfferFunded",
     inputs: [
       { indexed: true, name: "offerId", type: "bytes32" },
@@ -731,6 +722,15 @@ export const htsRailAbi = [
     outputs: [
       { name: "tokenLiabilities", type: "uint256" },
       { name: "hbarAutomationReserve", type: "uint256" },
+    ],
+  },
+  {
+    type: "event",
+    name: "SettlementInitialized",
+    inputs: [
+      { indexed: true, name: "token", type: "address" },
+      { indexed: false, name: "decimals", type: "uint8" },
+      { indexed: false, name: "kycNotApplicable", type: "bool" },
     ],
   },
   {
