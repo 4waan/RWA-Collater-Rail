@@ -81,6 +81,46 @@ the runner nor a maintainer may submit a redundant `settle` call or relabel the
 terminal path. The detailed acceptance record is in
 [`2026-09-27-hss-observation-and-fallback-assurance.md`](findings/2026-09-27-hss-observation-and-fallback-assurance.md).
 
+## Version 1.0 fallback
+
+The immutable `v1.0.0` tag remains the submission fallback. HTS work must not
+modify its contract, ABI, HBAR evidence, or tag. A failure in the HTS candidate
+does not weaken the already verified HBAR lifecycle.
+
+## Version 1.1 candidate gate
+
+The HTS candidate may be selected only when all of the following are true:
+
+- the controlled six-decimal token lifecycle is published as
+  `controlled-test`, uses `FixedTestUsdOracle`, completes one repayment and one
+  Mirror-confirmed HSS default, and states that it proves mechanics rather than
+  market value;
+- the Circle testnet USDC lifecycle is published as `circle-usdc`, revalidates
+  token `0.0.429274`, uses the pinned live Pyth USDC/USD feed, completes one
+  repayment and one Mirror-confirmed HSS default, and makes no claim about
+  arbitrary HTS assets holding a dollar peg;
+- each record passes its schema, proof-relationship, accounting, live
+  deployment, and secret checks without replacing the HBAR evidence record;
+- independent arithmetic verification has no unresolved high-impact defect;
+- deterministic, fuzz, invariant, runner, browser, production-build, route,
+  ABI, Harness, and secret gates pass in both the source repository and a clean
+  generated scaffold;
+- every Mirror, Pyth, token, schedule, and HashScan source has been inspected
+  manually, with unavailable secondary explorers represented honestly;
+- issue #13 records the September 29 office-hours answers about release
+  selection, load-bearing integration, preferred proof links, and expected
+  Harness artifacts.
+
+The presence of HTS code, tests, or an unpublished candidate is not evidence of
+a testnet lifecycle. Public text must use "implemented candidate" until the
+corresponding verified record is committed. Only Circle testnet USDC with its
+live Pyth proof may be described as the market-valued HTS demonstration.
+
+After office hours, tag and submit `v1.1.0` only if every candidate gate is
+green and the organizers accept the release approach. If any condition remains
+incomplete by October 3, submit `v1.0.0`. Never move or replace the existing
+`v1.0.0` tag.
+
 ## Release gate
 
 1. Confirm source CI is green.
@@ -89,4 +129,4 @@ terminal path. The detailed acceptance record is in
 4. Merge to `main` and pass the public Fresh scaffold gate.
 5. Record dated setup, validation, and lifecycle measurements.
 6. Confirm the submitted commit matches the reviewed commit.
-7. Tag `v1.0.0` only after every item above is green.
+7. Apply the version decision above without moving an existing tag.

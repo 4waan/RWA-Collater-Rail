@@ -3,10 +3,11 @@
 Finance an ATS security without rebuilding custody, compliance ordering, oracle
 safety, maturity automation, or public proof.
 
-Collateral Rail is a developer-first Scaffold-HBAR template for bilateral HBAR
-financing against Asset Tokenization Studio securities. It gives a new project
-one narrow, tested financing kernel and declarative recipes for changing product
-policy without changing the safety model.
+Collateral Rail is a developer-first Scaffold-HBAR template for bilateral
+financing against Asset Tokenization Studio securities. The tagged HBAR kernel
+remains intact. The version 1.1 candidate adds a separate HTS settlement rail
+without changing that fallback. Declarative recipes change product policy
+without changing either rail's safety model.
 
 Use it to start a term facility, maturity bridge, treasury advance, receivables
 facility, or another bilateral secured-credit pattern. The recipe can change.
@@ -16,18 +17,27 @@ tested implementation:
 - ATS-native collateral custody through partition holds;
 - ATS internal KYC for both counterparties;
 - exact HBAR cash accounting and pull-payment withdrawals;
+- isolated HTS fungible-token settlement with exact transfer deltas, separate
+  token liabilities, and independent HBAR automation reserves;
 - HBAR/USD cash conversion through HIP-475 by default, with an explicitly
   configured Pyth mode that enforces freshness and confidence bounds;
 - HSS maturity scheduling with permissionless recovery;
 - authoritative Mirror Node evidence and HashScan explorer references for every
   published lifecycle claim.
 
-The committed reference lifecycle uses HIP-475. It exposes Hedera's active
+The committed HBAR reference lifecycle uses HIP-475. It exposes Hedera's active
 network settlement conversion rate, not a live market price oracle. The optional
 Pyth mode supplies a market feed with freshness, confidence, and update-fee
 checks. Both modes convert the HBAR cash leg only. Neither mode prices the ATS
 security. Collateral coverage remains a configured advance against ATS nominal
 value.
+
+The HTS candidate has two deliberately separate evidence profiles. A controlled
+six-decimal token with `FixedTestUsdOracle` proves compliance and failure-path
+mechanics only. Circle testnet USDC `0.0.429274` uses the pinned Pyth USDC/USD
+feed for the market-valued demonstration. Neither HTS record is described as
+observed on testnet until its candidate passes live verification and atomic
+publication.
 
 ## Scaffold it
 
@@ -84,7 +94,7 @@ yarn recipe:list
 yarn recipe:check
 ```
 
-The template ships three:
+The template ships four:
 
 - **Term Credit** is the canonical evidence recipe. The committed lifecycle
   demonstrates funding, a native hold, repayment, and an HSS default. The
@@ -94,10 +104,13 @@ The template ships three:
   movement, and shorter offer window.
 - **Custom Facility** exposes the full safe policy envelope as a starting point
   for a product-specific recipe.
+- **HTS USDC Term Credit** selects the isolated HTS rail, Circle testnet USDC,
+  and the pinned Pyth USDC/USD feed. Principal and repayment are token units.
+  The recipe does not claim that an arbitrary HTS token maintains a dollar peg.
 
-Every recipe uses the same ATS, HSS, HBAR, typed oracle, and evidence kernel. A
-recipe changes allowed economics and starting terms. It cannot weaken the
-kernel safety ceilings.
+The first three recipes use the HBAR rail. The HTS recipe uses the separate HTS
+rail. Both preserve ATS holds, HSS automation, typed oracle evidence, terminal
+exclusivity, and immutable policy ceilings.
 
 ## Build your own recipe
 
@@ -194,6 +207,18 @@ The central cash invariant is:
 contract HBAR balance >= cashLiabilities + reservedAutomation
 ```
 
+The HTS rail keeps two backing rules independent:
+
+```text
+rail HTS balance >= cashTokenLiabilities
+rail HBAR balance >= reservedAutomation
+```
+
+HTS funding and repayment use checked `transferFrom` calls. Withdrawals use a
+checked HTS transfer. Every inbound and outbound movement must produce the exact
+expected balance delta, and every transfer rechecks token policy and custom
+fees.
+
 Read [Architecture](docs/architecture.md) for custody, accounting, automation,
 external calls, and trust boundaries. Read the
 [Hedera Integration Field Guide](docs/hedera-integration-field-guide.md) for the
@@ -257,6 +282,7 @@ yarn typecheck
 yarn recipe:check
 yarn check:dead-code
 yarn foundry:build
+yarn test:hts
 yarn foundry:test
 yarn foundry:fuzz
 yarn foundry:invariant
@@ -323,6 +349,22 @@ a capped, funded Hedera testnet account. It creates temporary lender and borrowe
 accounts and attempts best-effort sweep-back. See
 [Testnet Evidence Runner](docs/testnet-evidence-runner.md).
 
+The isolated HTS runners write separate ignored candidates and never overwrite
+the HBAR record:
+
+```sh
+yarn demo:testnet:hts:controlled
+yarn publish:testnet:hts:controlled
+yarn demo:testnet:hts:usdc
+yarn publish:testnet:hts:usdc
+```
+
+The Circle run requires a small operator balance of testnet USDC and a Pyth API
+key supplied only for that authorized run. The controlled run creates its own
+test-only token with KYC, freeze, and pause controls but no fee-schedule key.
+Both runs require one observed HSS default. Permissionless fallback remains an
+adversarially tested recovery path and cannot be relabeled as observed HSS.
+
 Hedera Harness is optional for ordinary application development and required for
 maintainers running the canonical release gate. Follow the committed
 specifications in `.harness/` and the [Maintainer Guide](docs/maintainer-guide.md).
@@ -340,11 +382,11 @@ specifications in `.harness/` and the [Maintainer Guide](docs/maintainer-guide.m
 - [2026-09-26 release and lifecycle timings](docs/findings/2026-09-26-release-validation.md)
 - [2026-09-27 public proof link audit](docs/findings/2026-09-27-public-proof-link-audit.md)
 
-Version 1 uses one HBAR cash leg, one ATS asset per rail, and ATS internal KYC.
-The next maintained extension is a separately versioned HTS settlement rail.
-An external KYC reference adapter and CLPR collateral-mobility experiment follow
-only after compatibility and security review against their pinned upstream
-interfaces. HCS event duplication,
+Version 1.0 remains the immutable HBAR fallback. The version 1.1 candidate adds
+an isolated HTS settlement rail and retains one ATS asset and one settlement
+asset per deployment. An external KYC reference adapter and CLPR
+collateral-mobility experiment follow only after compatibility and security
+review against their pinned upstream interfaces. HCS event duplication,
 direct Block Streams consumption, pooled lending, order books, margin calls,
 auctions, and secondary markets remain outside the maintained core.
 

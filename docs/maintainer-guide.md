@@ -22,6 +22,19 @@ interface, the pinned ABI list, and its regression test in the same change.
 - Failed ATS calls leave no partial rail state.
 - Owner recovery never touches lender or borrower funds.
 
+For the HTS rail, add these non-substitutable requirements:
+
+- HTS balance covers `cashTokenLiabilities`.
+- HBAR balance covers `reservedAutomation` independently.
+- Every inbound and outbound HTS transfer produces the exact requested balance
+  delta.
+- Fixed, fractional, and royalty fee schedules fail closed at initialization
+  and every later transfer.
+- Empty returndata, facade bytecode, and low-level success never replace an HTS
+  success response and the expected return shape.
+- An ATS failure after an HTS transfer reverts the token movement and every rail
+  state change in the same transaction.
+
 ## Testnet evidence procedure
 
 1. Supply the capped funded operator only to the manual Harness testnet run.
@@ -59,6 +72,25 @@ The version 1 reference observed HSS execution on testnet. Permissionless
 fallback is accepted through adversarial tests. Do not force HSS failure merely
 to produce another record, do not cite a terminal no-op as fallback proof, and
 do not replace the canonical HSS lifecycle with a synthetic outage scenario.
+
+### HTS evidence profiles
+
+The HTS extension uses two separate candidate and publication paths. Never copy
+either record over `reference-testnet.json`.
+
+- `controlled-test` creates a six-decimal token and exercises association, KYC,
+  freeze, pause, allowance, recovery, repayment, and HSS default. Its fixed
+  oracle is evidence of mechanics only.
+- `circle-usdc` revalidates Circle testnet USDC `0.0.429274`, provisions small
+  balances from the authorized operator, and uses the pinned live Pyth USDC/USD
+  feed. This is the only stablecoin settlement demonstration.
+
+Each record must bind native HTS transactions separately from EVM contract
+transactions, prove exact token transfers through Mirror, verify one repayment
+and one observed HSS default, show zero terminal token liabilities, and show the
+rail's token balance and HBAR reserve independently. Current Mirror token
+relationship proofs cover the lender, borrower, and rail. They must not make a
+mutable operator balance part of long-lived verification.
 
 An `eth_call` result is never an entity receipt. HashScan code verification is
 not a substitute for live constructor, role, KYC, or hold reads.
@@ -125,8 +157,8 @@ operator supplied only to the manual Harness run.
 
 ## Extension order
 
-The HBAR rail remains the version 1 reference. After its tagged submission, the
-next contract is an isolated HTS settlement rail. An external KYC adapter follows
-only after compatibility and security review of the confirmed upstream
-interface. CLPR remains an experimental RFC
-until its proof and recovery contracts are stable.
+The HBAR rail remains the version 1.0 reference and immutable fallback. The
+isolated HTS settlement rail is the version 1.1 candidate. An external KYC
+adapter follows only after compatibility and security review of the confirmed
+upstream interface. CLPR remains an experimental RFC until its proof and
+recovery contracts are stable.
