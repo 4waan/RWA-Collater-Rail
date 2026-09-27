@@ -96,6 +96,13 @@ policy into Foundry, reads `policy()` after deployment, and refuses to write
 evidence if the onchain values differ. Publication additionally requires
 `recipeId: term-credit` so the public reference remains stable.
 
+The committed version 1 lifecycle was observed on testnet with HSS executing
+the matured default. It does not contain a permissionless fallback transaction.
+That fallback is established by adversarial contract, invariant, runner, and
+evidence-validation tests. A second funded run is not required for release, and
+the runner must never force an outage, submit a redundant terminal call, or
+relabel the path that actually occurred.
+
 HIP-475 mode uses the active Hedera network settlement conversion rate. It is
 not a live market price oracle. Pyth mode uses a fresh market feed. Both sources
 convert the HBAR cash leg only. The collateral limit remains a configured
@@ -145,3 +152,7 @@ verifier, and scans the deployment directory. Only then does it write a
 temporary public record and atomically rename it over `reference-testnet.json`.
 A failed run leaves the pending or previously verified public record untouched.
 Run the repository history and staged secret scans again before a public push.
+
+The exact boundary between the observed HSS path and the tested permissionless
+recovery is documented in the
+[HSS observation and fallback assurance finding](findings/2026-09-27-hss-observation-and-fallback-assurance.md).

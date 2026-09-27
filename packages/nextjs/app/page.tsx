@@ -79,7 +79,7 @@ export default function OverviewPage() {
             <b>{defaulted ? "Verified" : "Awaiting publication"}</b>
             <small>
               {defaulted
-                ? defaulted.terminalPath.replaceAll("-", " ")
+                ? `${defaulted.terminalPath.replaceAll("-", " ")} observed on testnet`
                 : "No claim invented"}
             </small>
           </div>

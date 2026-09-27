@@ -21,6 +21,9 @@ test("home presents one promise, one recipe, and one proof frame", async ({
   await expect(
     page.getByRole("heading", { name: "Every claim has a source." }),
   ).toBeVisible();
+  await expect(
+    page.getByText("hss observed on testnet", { exact: true }),
+  ).toBeVisible();
 });
 
 test("facility expands only one lifecycle step", async ({ page }) => {
@@ -112,6 +115,9 @@ test("verification keeps financial claims and balances distinct", async ({
   ).toBeVisible();
   await expect(
     page.getByText("Final state and solvency were read at an exact block."),
+  ).toBeVisible();
+  await expect(
+    page.getByText("DEFAULTED via hss, observed on testnet", { exact: true }),
   ).toBeVisible();
 });
 

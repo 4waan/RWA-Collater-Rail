@@ -27,11 +27,11 @@
     },
     {
       "id": "E4",
-      "statement": "The real lifecycle covers two separate ATS holds, one repayment, one matured default, and an HSS or permissionless terminal path.",
+      "statement": "The real lifecycle covers two separate ATS holds, one repayment, one matured default, and honestly records the terminal path that occurred. The current record observed HSS execution on testnet.",
       "severity": "critical",
       "walletRequired": false,
       "verifiableWithoutCredentials": true,
-      "howToVerify": "Inspect demo-testnet.ts for two offer and acceptance iterations, post-create hold inspection, repayment, maturity waiting, HSS state detection, and the public settle fallback."
+      "howToVerify": "Inspect reference-testnet.json and demo-testnet.ts. Confirm the defaulted position names terminalPath hss, schedule 0.0.10730732 has an execution timestamp, and the runner submits no redundant settle transaction after HSS default."
     },
     {
       "id": "E5",
@@ -56,6 +56,14 @@
       "walletRequired": false,
       "verifiableWithoutCredentials": true,
       "howToVerify": "Compare bootstrap-local.mjs with demo-testnet.ts and BootstrapTestnet.s.sol. Confirm the local path uses a named or encrypted keystore while the Harness path reads its in-process signer environment."
+    },
+    {
+      "id": "E8",
+      "statement": "Permissionless recovery under unavailable or delayed HSS is established by adversarial tests and is never presented as an observed testnet transaction unless a successful fallback receipt exists.",
+      "severity": "critical",
+      "walletRequired": false,
+      "verifiableWithoutCredentials": true,
+      "howToVerify": "Run yarn foundry:test, yarn foundry:invariant, and yarn test:runner. Inspect testBadHssResponseDoesNotTrapCollateral, the fallback coverage bit in RailSolvency.invariant.t.sol, and the fallback receipt and terminal-path evidence tests."
     }
   ]
 }

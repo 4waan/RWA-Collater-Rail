@@ -185,7 +185,7 @@ export function VerifyConsole({ initialPosition }: VerifyConsoleProps) {
               ? "Permissionless fallback and ATS hold execution"
               : "HSS call and ATS hold execution",
       detail: position
-        ? `${position.state} via ${position.terminalPath.replaceAll("-", " ")}`
+        ? `${position.state} via ${position.terminalPath.replaceAll("-", " ")}, observed on testnet`
         : "Awaiting verified publication",
       proof: terminalProof,
     },

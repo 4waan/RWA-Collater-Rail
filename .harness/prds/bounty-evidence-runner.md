@@ -21,6 +21,16 @@ Build a secure, repeatable Hedera testnet lifecycle command for Collateral Rail.
 11. Provide a publication command that verifies completeness, scans the candidate for secrets, and only then replaces `reference-testnet.json`.
 12. Add deterministic tests for account-creation failure, funding caps, HIP-475 and Pyth evidence consistency, Pyth failures, HSS failure classification, Mirror pagination, duplicate transaction safety, and sweep failure.
 
+## Release evidence boundary
+
+The version 1 committed lifecycle was observed on testnet with HSS executing the
+default. Permissionless recovery under unavailable or delayed HSS is established
+by adversarial unit, runner, fuzz, invariant, and evidence-validation tests. A
+second funded lifecycle that forces an HSS outage is not required for release.
+The runner may label a live fallback only when the position remains open after
+the grace window and the fallback has a successful receipt with a matching
+`PositionDefaulted` event.
+
 ## Acceptance
 
 The normal unit, fuzz, invariant, ABI, formatting, type, build, route, secret, and browser gates remain green. The evidence runner tests pass without network credentials. A real Tier 3.5 run is allowed only through `.harness/testnet-spec.yaml` with a funded ECDSA testnet operator.

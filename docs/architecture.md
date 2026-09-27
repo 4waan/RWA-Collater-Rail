@@ -124,6 +124,12 @@ permissionless default uses its successful settlement transaction plus the same
 final state checks. The runner never submits or cites a later no-op call as proof
 that HSS performed the earlier terminal action.
 
+These proof types also define the assurance boundary. The current committed
+lifecycle was observed on testnet with HSS executing the default. Permissionless
+recovery under unavailable or delayed HSS is established by adversarial tests.
+Test coverage is not presented as a testnet transaction, and an HSS observation
+is never relabeled as a permissionless fallback.
+
 The public reference file is replaced atomically only after the complete record
 passes relationship validation, live Mirror and RPC verification, receipt-event
 binding, final hold reads, and secret scanning. A failed run leaves the previous

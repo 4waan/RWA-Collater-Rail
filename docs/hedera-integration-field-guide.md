@@ -152,6 +152,11 @@ failure becomes `UNAVAILABLE` without reverting acceptance.
 **Guard and test:** `testBadHssResponseDoesNotTrapCollateral` returns a non-22
 code for all attempts and proves the hold remains recoverable.
 
+**Observed on testnet:** The committed reference lifecycle records HSS schedule
+`0.0.10730732` executing the matured default. Permissionless recovery for the
+failure mode above is established by adversarial tests, not presented as a
+second observed network event.
+
 **Primary source:** Official
 [`HederaScheduleService.sol`](https://www.npmjs.com/package/@hiero-ledger/hiero-contracts) and
 [HIP-1215](https://hips.hedera.com/hip/hip-1215).

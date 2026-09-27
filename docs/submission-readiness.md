@@ -58,6 +58,25 @@ The committed reference record is publishable only when:
 
 Until that gate passes, the committed record must stay visibly pending.
 
+### HSS release assurance
+
+The version 1 gate distinguishes network observation from recovery assurance:
+
+- **Observed on testnet:** the committed reference lifecycle contains an HSS
+  default with a Mirror-confirmed schedule execution and a later `DEFAULTED`
+  state read.
+- **Established by adversarial tests:** non-success HSS responses preserve the
+  hold and leave public settlement available. Invariant handlers exercise the
+  fallback and prove terminal exclusivity, hold drainage, and solvency. Runner
+  and evidence tests require a successful receipt and matching default event
+  before a permissionless path can be published.
+
+This is sufficient for the version 1 release. A second funded lifecycle that
+artificially forces HSS failure is not required. If HSS executes first, neither
+the runner nor a maintainer may submit a redundant `settle` call or relabel the
+terminal path. The detailed acceptance record is in
+[`2026-09-27-hss-observation-and-fallback-assurance.md`](findings/2026-09-27-hss-observation-and-fallback-assurance.md).
+
 ## Release gate
 
 1. Confirm source CI is green.

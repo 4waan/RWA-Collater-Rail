@@ -63,10 +63,10 @@ yarn dev
 5. Notice that free ATS balance, held ATS balance, typed settlement conversion,
    cash liabilities, and HSS reserves are never collapsed into one status.
 
-The committed reference record stays visibly pending until a complete testnet
-lifecycle has passed the publication gate. Once verified, the homepage reports
-its transaction count and the verification page links every claim to a typed
-transaction, HSS schedule, or state proof. The interface never invents proof.
+The publication gate keeps an incomplete testnet lifecycle visibly pending. The
+current committed record is verified. The homepage reports its transaction
+count, and the verification page links every claim to a typed transaction, HSS
+schedule, or state proof. The interface never invents proof.
 
 ## Choose a recipe
 
@@ -79,8 +79,10 @@ yarn recipe:check
 
 The template ships three:
 
-- **Term Credit** is the canonical evidence recipe. It demonstrates funding, a native
-  hold, repayment, default, and both recovery paths.
+- **Term Credit** is the canonical evidence recipe. The committed lifecycle
+  demonstrates funding, a native hold, repayment, and an HSS default. The
+  permissionless recovery path is established by adversarial contract, runner,
+  fuzz, invariant, and evidence-validation tests.
 - **Maturity Bridge** uses a tighter advance, shorter term, smaller quote
   movement, and shorter offer window.
 - **Custom Facility** exposes the full safe policy envelope as a starting point
@@ -283,6 +285,15 @@ Mirror-confirmed HSS schedule, typed oracle evidence, live ATS roles and KYC,
 separate free and held balances, successful Mirror receipts, and solvent final
 accounting. The current record names HIP-475 and therefore contains no Pyth
 update transaction.
+
+The evidence classes are deliberately separate. **Observed on testnet:** the
+committed default was executed by HSS schedule `0.0.10730732` and confirmed by a
+later terminal state read. **Established by adversarial tests:** if HSS is
+unavailable or delayed, any account can call `settle` after maturity, and the
+runner accepts that path only with a successful transaction and matching
+`PositionDefaulted` event. Version 1 does not require a fabricated HSS outage or
+a second funded lifecycle. See the
+[HSS observation and fallback assurance finding](docs/findings/2026-09-27-hss-observation-and-fallback-assurance.md).
 
 The direct lifecycle runner is:
 

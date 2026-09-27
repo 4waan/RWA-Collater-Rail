@@ -44,6 +44,19 @@ interface, the pinned ABI list, and its regression test in the same change.
 10. Publish through the atomic candidate validator. Never copy a partial record
     by hand.
 
+Keep two assurance classes explicit in every release note and public claim:
+
+- **Observed on testnet** means the committed record contains the corresponding
+  transaction or executed schedule plus its state proof.
+- **Established by adversarial tests** means deterministic contract, runner,
+  invariant, or evidence tests prove the recovery behavior without claiming a
+  public network event.
+
+The version 1 reference observed HSS execution on testnet. Permissionless
+fallback is accepted through adversarial tests. Do not force HSS failure merely
+to produce another record, do not cite a terminal no-op as fallback proof, and
+do not replace the canonical HSS lifecycle with a synthetic outage scenario.
+
 An `eth_call` result is never an entity receipt. HashScan code verification is
 not a substitute for live constructor, role, KYC, or hold reads.
 
@@ -68,6 +81,12 @@ README outro and reference mode with no environment file present.
 Never publish a release while the committed evidence is pending, a workflow is
 red, or the validation run changes a tracked or nonignored untracked repository
 file.
+
+For HSS assurance, the release passes when the verified record honestly proves
+the terminal path that occurred and the adversarial fallback suites are green.
+A separate funded fallback run is optional. It becomes public evidence only if
+HSS naturally remains unavailable through the grace window and the runner
+records a successful permissionless settlement receipt.
 
 ## Versioning and compatibility
 
