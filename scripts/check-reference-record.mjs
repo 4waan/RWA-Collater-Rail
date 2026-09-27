@@ -33,6 +33,13 @@ if (record.status === "verified") {
   record.verification?.mirrorOrigin !==
     "https://testnet.mirrornode.hedera.com" ||
   Object.keys(record.verification?.contractLinks ?? {}).length !== 0 ||
+  Object.keys(record.verification?.contractMirrorLinks ?? {}).length !== 0 ||
+  record.verification?.linkAudit?.checkedAt !== null ||
+  record.verification?.linkAudit?.hashScanStatus !== "unchecked" ||
+  record.verification?.linkAudit?.mirrorStatus !== "unchecked" ||
+  record.verification?.linkAudit?.hashScanChecked !== 0 ||
+  record.verification?.linkAudit?.mirrorChecked !== 0 ||
+  record.verification?.linkAudit?.finding !== null ||
   record.metrics !== null ||
   (record.transactions ?? []).length !== 0 ||
   (record.positions ?? []).length !== 0 ||

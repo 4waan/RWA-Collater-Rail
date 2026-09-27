@@ -12,6 +12,7 @@ const HEDERA_ID = /^0\.0\.\d+$/;
 const CONSENSUS_TIMESTAMP = /^\d+\.\d+$/;
 const BLOCK_NUMBER = /^\d+$/;
 const ALLOWED_STATE_ORIGINS = new Set(["https://testnet.hashio.io"]);
+const MIRROR_ORIGIN = "https://testnet.mirrornode.hedera.com";
 
 export function safeHashScanLink(
   value: string | null | undefined,
@@ -57,6 +58,62 @@ export function hashScanTransaction(hash: string | null | undefined) {
     : undefined;
 }
 
+export function safeMirrorLink(
+  value: string | null | undefined,
+  kind?: "contract" | "schedule" | "transaction",
+) {
+  if (!value) return undefined;
+  try {
+    const parsed = new URL(value);
+    if (
+      parsed.protocol !== "https:" ||
+      parsed.origin !== MIRROR_ORIGIN ||
+      parsed.username ||
+      parsed.password ||
+      parsed.search ||
+      parsed.hash
+    ) {
+      return undefined;
+    }
+    const transactionPath =
+      /^\/api\/v1\/contracts\/results\/0x[a-fA-F0-9]{64}$/;
+    const schedulePath = /^\/api\/v1\/schedules\/0\.0\.\d+$/;
+    const contractPath = /^\/api\/v1\/contracts\/0x[a-fA-F0-9]{40}$/;
+    const expected =
+      kind === "transaction"
+        ? transactionPath
+        : kind === "schedule"
+          ? schedulePath
+          : kind === "contract"
+            ? contractPath
+            : null;
+    if (expected && !expected.test(parsed.pathname)) return undefined;
+    if (
+      !expected &&
+      !transactionPath.test(parsed.pathname) &&
+      !schedulePath.test(parsed.pathname) &&
+      !contractPath.test(parsed.pathname)
+    ) {
+      return undefined;
+    }
+    return parsed.href;
+  } catch {
+    return undefined;
+  }
+}
+
+export function mirrorTransaction(hash: string | null | undefined) {
+  return hash && TRANSACTION_HASH.test(hash)
+    ? `${MIRROR_ORIGIN}/api/v1/contracts/results/${hash}`
+    : undefined;
+}
+
+export function mirrorSchedule(scheduleId: string | null | undefined) {
+  return scheduleId && HEDERA_ID.test(scheduleId)
+    ? `${MIRROR_ORIGIN}/api/v1/schedules/${scheduleId}`
+    : undefined;
+}
+
 function scheduleIdForAddress(address: string) {
   const normalized = address.slice(2).toLowerCase();
   if (!/^0{24}[a-f0-9]{16}$/.test(normalized)) return undefined;
@@ -74,6 +131,8 @@ export function isTransactionProof(
       TRANSACTION_HASH.test(proof.hash) &&
       CONSENSUS_TIMESTAMP.test(proof.consensusTimestamp) &&
       proof.result === "SUCCESS" &&
+      safeMirrorLink(proof.mirror, "transaction") ===
+        mirrorTransaction(proof.hash) &&
       safeHashScanLink(proof.hashScan, "transaction") ===
         hashScanTransaction(proof.hash),
   );
@@ -90,6 +149,8 @@ export function isScheduleProof(
       scheduleIdForAddress(proof.address) === proof.scheduleId &&
       (proof.executedTimestamp === null ||
         CONSENSUS_TIMESTAMP.test(proof.executedTimestamp)) &&
+      safeMirrorLink(proof.mirror, "schedule") ===
+        mirrorSchedule(proof.scheduleId) &&
       safeHashScanLink(proof.hashScan, "schedule") ===
         `https://hashscan.io/testnet/schedule/${proof.scheduleId}`,
   );

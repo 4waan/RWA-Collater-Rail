@@ -6,6 +6,7 @@ export type TransactionProof = {
   hash: string;
   consensusTimestamp: string;
   result: string;
+  mirror: string;
   hashScan: string;
 };
 
@@ -14,7 +15,17 @@ export type ScheduleProof = {
   address: string;
   scheduleId: string;
   executedTimestamp: string | null;
+  mirror: string;
   hashScan: string;
+};
+
+export type PublicLinkAudit = {
+  checkedAt: string | null;
+  hashScanStatus: "available" | "unavailable" | "mixed" | "unchecked";
+  mirrorStatus: "verified" | "unavailable" | "unchecked";
+  hashScanChecked: number;
+  mirrorChecked: number;
+  finding: string | null;
 };
 
 export type StateAssertion = string | number | boolean;
@@ -152,6 +163,8 @@ export type ReferenceDeployment = {
     state: StateProof | null;
     mirrorOrigin: string;
     contractLinks: Record<string, string>;
+    contractMirrorLinks: Record<string, string>;
+    linkAudit: PublicLinkAudit;
   };
   metrics: EvidenceMetrics | null;
   notice: string;

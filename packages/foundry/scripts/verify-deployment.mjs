@@ -158,6 +158,7 @@ for (const transaction of record.transactions) {
     mirrorProof.hash !== transaction.hash ||
     mirrorProof.result !== transaction.result ||
     mirrorProof.consensusTimestamp !== transaction.consensusTimestamp ||
+    mirrorProof.mirror !== transaction.mirror ||
     mirrorProof.hashScan !== transaction.hashScan
   ) {
     throw new Error(
@@ -182,6 +183,7 @@ if (record.status === "verified") {
     if (
       mirrorSchedule.scheduleId !== schedule.scheduleId ||
       mirrorSchedule.executedTimestamp !== schedule.executedTimestamp ||
+      mirrorSchedule.mirror !== schedule.mirror ||
       mirrorSchedule.hashScan !== schedule.hashScan
     ) {
       throw new Error(

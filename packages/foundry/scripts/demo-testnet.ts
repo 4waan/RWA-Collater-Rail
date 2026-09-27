@@ -34,6 +34,7 @@ import {
   createTemporaryActor,
   fetchAllowedJson,
   hashScanContract,
+  mirrorContract,
   parseHermesUpdate,
   proofForSemanticKind,
   sweepTemporaryActor,
@@ -875,6 +876,19 @@ async function main() {
             ([name, address]) => [name, hashScanContract(address)],
           ),
         ),
+        contractMirrorLinks: Object.fromEntries(
+          Object.entries({ atsToken, oracle, rail, acceptance }).map(
+            ([name, address]) => [name, mirrorContract(address)],
+          ),
+        ),
+        linkAudit: {
+          checkedAt: null,
+          hashScanStatus: "unchecked",
+          mirrorStatus: "verified",
+          hashScanChecked: 0,
+          mirrorChecked: verifiedTransactions.length + schedules.length + 4,
+          finding: null,
+        },
       },
       metrics: {
         startedAt,

@@ -18,6 +18,9 @@ import {
   hashScanContract,
   hashScanSchedule,
   hashScanTransaction,
+  mirrorContract,
+  mirrorSchedule,
+  mirrorTransaction,
   parseHermesUpdate,
   proofForSemanticKind,
   sweepTemporaryActor,
@@ -88,6 +91,7 @@ function verifiedEvidence() {
     hash: transactionHash,
     result: "SUCCESS",
     consensusTimestamp: `170000000${index}.${index + 1}`,
+    mirror: mirrorTransaction(transactionHash),
     hashScan: hashScanTransaction(transactionHash),
   }));
   const firstSchedule = {
@@ -95,6 +99,7 @@ function verifiedEvidence() {
     address: firstScheduleAddress,
     scheduleId: "0.0.1",
     executedTimestamp: "1700000121.000000001",
+    mirror: mirrorSchedule("0.0.1"),
     hashScan: hashScanSchedule("0.0.1"),
   };
   const secondSchedule = {
@@ -102,6 +107,7 @@ function verifiedEvidence() {
     address: secondScheduleAddress,
     scheduleId: "0.0.2",
     executedTimestamp: "1700000122.000000001",
+    mirror: mirrorSchedule("0.0.2"),
     hashScan: hashScanSchedule("0.0.2"),
   };
   const state = {
@@ -309,6 +315,20 @@ function verifiedEvidence() {
           hashScanContract(addresses[name]),
         ]),
       ),
+      contractMirrorLinks: Object.fromEntries(
+        ["atsToken", "oracle", "rail", "acceptance"].map((name) => [
+          name,
+          mirrorContract(addresses[name]),
+        ]),
+      ),
+      linkAudit: {
+        checkedAt: "2026-09-25T12:00:11.000Z",
+        hashScanStatus: "available",
+        mirrorStatus: "verified",
+        hashScanChecked: transactions.length + 6,
+        mirrorChecked: transactions.length + 6,
+        finding: "docs/findings/test-proof-link-audit.md",
+      },
     },
     metrics: {
       startedAt: "2026-09-25T12:00:00.000Z",
@@ -809,6 +829,10 @@ test("Mirror transaction proof uses the Ethereum contract result endpoint", asyn
   );
   assert.equal(proof.result, "SUCCESS");
   assert.equal(proof.consensusTimestamp, "1700000000.123456789");
+  assert.equal(
+    proof.mirror,
+    `https://testnet.mirrornode.hedera.com/api/v1/contracts/results/${hash}`,
+  );
 });
 
 test("evidence journal is retry-safe and rejects conflicting duplicates", () => {
@@ -819,6 +843,7 @@ test("evidence journal is retry-safe and rejects conflicting duplicates", () => 
     hash,
     result: "SUCCESS",
     consensusTimestamp: "1.2",
+    mirror: mirrorTransaction(hash),
     hashScan: `https://hashscan.io/testnet/transaction/${hash}`,
   };
   journal.add("fund", transaction);
@@ -862,6 +887,26 @@ test("verified evidence binds its recipe, policy, Mirror proofs, and links", () 
 
   record.transactions[0].hashScan = "https://example.com/not-proof";
   assert.throws(() => validateEvidenceRecord(record), /unverified transaction/);
+});
+
+test("evidence rejects Mirror origin escape and incomplete link audits", () => {
+  const escaped = verifiedEvidence();
+  escaped.transactions[0].mirror =
+    "https://testnet.mirrornode.hedera.com.attacker.invalid/api/v1/contracts/results/" +
+    escaped.transactions[0].hash;
+  assert.throws(
+    () => validateEvidenceRecord(escaped),
+    /unverified transaction/,
+  );
+
+  const wrongContract = verifiedEvidence();
+  wrongContract.verification.contractMirrorLinks.rail =
+    "https://example.com/api/v1/contracts/0.0.1";
+  assert.throws(() => validateEvidenceRecord(wrongContract), /Mirror source/);
+
+  const incompleteAudit = verifiedEvidence();
+  incompleteAudit.verification.linkAudit.hashScanChecked = 1;
+  assert.throws(() => validateEvidenceRecord(incompleteAudit), /link audit/);
 });
 
 test("oracle evidence accepts both explicit Pyth and HIP-475 proof models", () => {
@@ -922,6 +967,7 @@ test("evidence rejects missing recipes and lifecycle proofs without binding", ()
   unknownHash.lifecycle.holdCreation = {
     ...unknownHash.lifecycle.holdCreation,
     hash: `0x${"f".repeat(64)}`,
+    mirror: mirrorTransaction(`0x${"f".repeat(64)}`),
     hashScan: hashScanTransaction(`0x${"f".repeat(64)}`),
   };
   assert.throws(() => validateEvidenceRecord(unknownHash), /not bound/);

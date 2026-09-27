@@ -10,7 +10,14 @@ import {
   WEIBAR_PER_TINYBAR,
   weibarToTinybar,
 } from "@collateral-rail/shared/hedera";
-import { isScheduleProof, isStateProof, isTransactionProof } from "./proofs";
+import {
+  isScheduleProof,
+  isStateProof,
+  isTransactionProof,
+  mirrorSchedule,
+  mirrorTransaction,
+  safeMirrorLink,
+} from "./proofs";
 
 const request = {
   origin: "https://testnet.mirrornode.hedera.com",
@@ -148,6 +155,7 @@ test("typed proof guards bind identifiers to their exact sources", () => {
     hash,
     consensusTimestamp: "1700000000.1",
     result: "SUCCESS",
+    mirror: mirrorTransaction(hash)!,
     hashScan: `https://hashscan.io/testnet/transaction/${hash}`,
   };
   assert.equal(isTransactionProof(transaction), true);
@@ -158,16 +166,39 @@ test("typed proof guards bind identifiers to their exact sources", () => {
     }),
     false,
   );
+  assert.equal(
+    isTransactionProof({
+      ...transaction,
+      mirror: `${transaction.mirror}?redirect=https://attacker.invalid`,
+    }),
+    false,
+  );
 
   const schedule = {
     type: "schedule" as const,
     address: `0x${"0".repeat(39)}1`,
     scheduleId: "0.0.1",
     executedTimestamp: "1700000120.1",
+    mirror: mirrorSchedule("0.0.1")!,
     hashScan: "https://hashscan.io/testnet/schedule/0.0.1",
   };
   assert.equal(isScheduleProof(schedule), true);
   assert.equal(isScheduleProof({ ...schedule, scheduleId: "0.0.2" }), false);
+
+  assert.equal(
+    safeMirrorLink(
+      `https://testnet.mirrornode.hedera.com.attacker.invalid/api/v1/contracts/results/${hash}`,
+      "transaction",
+    ),
+    undefined,
+  );
+  assert.equal(
+    safeMirrorLink(
+      `https://testnet.mirrornode.hedera.com/api/v1/contracts/results/${hash}/../accounts`,
+      "transaction",
+    ),
+    undefined,
+  );
 
   assert.equal(
     isStateProof({

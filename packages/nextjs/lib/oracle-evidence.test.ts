@@ -16,6 +16,7 @@ const transactionProof = {
   hash: `0x${"1".repeat(64)}`,
   consensusTimestamp: "1.000000001",
   result: "SUCCESS",
+  mirror: `https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x${"1".repeat(64)}`,
   hashScan: `https://hashscan.io/testnet/transaction/0x${"1".repeat(64)}`,
 };
 
@@ -42,6 +43,15 @@ function deployment(
       state: stateProof,
       mirrorOrigin: "https://testnet.mirrornode.hedera.com",
       contractLinks: {},
+      contractMirrorLinks: {},
+      linkAudit: {
+        checkedAt: null,
+        hashScanStatus: "unchecked",
+        mirrorStatus: "unchecked",
+        hashScanChecked: 0,
+        mirrorChecked: 0,
+        finding: null,
+      },
     },
   } as ReferenceDeployment;
 }

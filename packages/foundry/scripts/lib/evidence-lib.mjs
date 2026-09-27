@@ -271,14 +271,29 @@ export function hashScanTransaction(hash) {
   return `https://hashscan.io/testnet/transaction/${hash}`;
 }
 
+export function mirrorTransaction(hash) {
+  if (!HASH_RE.test(hash)) throw new Error("Invalid transaction hash.");
+  return `${DEFAULT_MIRROR_URL}/api/v1/contracts/results/${hash}`;
+}
+
 export function hashScanContract(address) {
   if (!ADDRESS_RE.test(address)) throw new Error("Invalid contract address.");
   return `https://hashscan.io/testnet/contract/${address}`;
 }
 
+export function mirrorContract(address) {
+  if (!ADDRESS_RE.test(address)) throw new Error("Invalid contract address.");
+  return `${DEFAULT_MIRROR_URL}/api/v1/contracts/${address}`;
+}
+
 export function hashScanSchedule(scheduleId) {
   if (!ACCOUNT_ID_RE.test(scheduleId)) throw new Error("Invalid schedule ID.");
   return `https://hashscan.io/testnet/schedule/${scheduleId}`;
+}
+
+export function mirrorSchedule(scheduleId) {
+  if (!ACCOUNT_ID_RE.test(scheduleId)) throw new Error("Invalid schedule ID.");
+  return `${DEFAULT_MIRROR_URL}/api/v1/schedules/${scheduleId}`;
 }
 
 function semanticBootstrapCategory(transaction) {
@@ -454,6 +469,7 @@ export async function waitForMirrorTransaction({
         hash,
         consensusTimestamp: result.timestamp,
         result: "SUCCESS",
+        mirror: mirrorTransaction(hash),
         hashScan: hashScanTransaction(hash),
       };
     } catch (error) {
@@ -486,6 +502,7 @@ export async function confirmMirrorSchedule({
     address: scheduleAddress,
     scheduleId,
     executedTimestamp: payload.executed_timestamp ?? null,
+    mirror: mirrorSchedule(scheduleId),
     hashScan: hashScanSchedule(scheduleId),
   };
 }
@@ -645,6 +662,7 @@ function validateTransactionProof(proof) {
     !HASH_RE.test(proof?.hash ?? "") ||
     proof?.result !== "SUCCESS" ||
     !CONSENSUS_TIMESTAMP_RE.test(proof?.consensusTimestamp ?? "") ||
+    proof?.mirror !== mirrorTransaction(proof.hash) ||
     proof?.hashScan !== hashScanTransaction(proof.hash)
   ) {
     throw new Error("Evidence contains an unverified transaction proof.");
@@ -660,6 +678,7 @@ function validateScheduleProof(proof) {
     solidityAddressToEntityId(proof.address) !== proof.scheduleId ||
     (proof.executedTimestamp !== null &&
       !CONSENSUS_TIMESTAMP_RE.test(proof.executedTimestamp)) ||
+    proof?.mirror !== mirrorSchedule(proof.scheduleId) ||
     proof?.hashScan !== hashScanSchedule(proof.scheduleId)
   ) {
     throw new Error("Evidence contains an invalid HSS schedule proof.");
@@ -1095,6 +1114,40 @@ export function validateEvidenceRecord(record) {
     ) {
       throw new Error(`Evidence has an invalid ${name} proof link.`);
     }
+    if (
+      record.verification.contractMirrorLinks?.[name] !==
+      mirrorContract(record.addresses[name])
+    ) {
+      throw new Error(`Evidence has an invalid ${name} Mirror source link.`);
+    }
+  }
+  const expectedPublicLinks =
+    record.transactions.length + record.schedules.length + 4;
+  const linkAudit = record.verification.linkAudit;
+  if (
+    !linkAudit ||
+    !["available", "unavailable", "mixed", "unchecked"].includes(
+      linkAudit.hashScanStatus,
+    ) ||
+    !["verified", "unavailable", "unchecked"].includes(
+      linkAudit.mirrorStatus,
+    ) ||
+    !Number.isSafeInteger(linkAudit.hashScanChecked) ||
+    linkAudit.hashScanChecked < 0 ||
+    !Number.isSafeInteger(linkAudit.mirrorChecked) ||
+    linkAudit.mirrorChecked < 0 ||
+    (linkAudit.hashScanStatus === "unchecked" &&
+      (linkAudit.checkedAt !== null || linkAudit.hashScanChecked !== 0)) ||
+    (linkAudit.hashScanStatus !== "unchecked" &&
+      (!Number.isFinite(Date.parse(linkAudit.checkedAt ?? "")) ||
+        linkAudit.hashScanChecked !== expectedPublicLinks)) ||
+    (linkAudit.mirrorStatus === "verified" &&
+      linkAudit.mirrorChecked !== expectedPublicLinks) ||
+    (linkAudit.finding !== null &&
+      (typeof linkAudit.finding !== "string" ||
+        !/^docs\/findings\/[a-z0-9-]+\.md$/.test(linkAudit.finding)))
+  ) {
+    throw new Error("Evidence has an invalid public link audit.");
   }
   if (
     !record.ats ||

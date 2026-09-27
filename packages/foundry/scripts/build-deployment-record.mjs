@@ -86,6 +86,15 @@ const record = {
     state: null,
     mirrorOrigin: DEFAULT_MIRROR_URL,
     contractLinks: {},
+    contractMirrorLinks: {},
+    linkAudit: {
+      checkedAt: null,
+      hashScanStatus: "unchecked",
+      mirrorStatus: "unchecked",
+      hashScanChecked: 0,
+      mirrorChecked: 0,
+      finding: null,
+    },
   },
   metrics: {
     startedAt: new Date(startedAtMilliseconds).toISOString(),
