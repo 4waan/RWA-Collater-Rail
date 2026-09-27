@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { HtsEvidenceJournal } from "../lib/hts-proof-runtime.mjs";
-import { htsOutputPath, selectedHtsProfile } from "../lib/hts-demo-runtime.ts";
+import {
+  assertCircleUsdcPreflight,
+  htsOutputPath,
+  selectedHtsProfile,
+} from "../lib/hts-demo-runtime.ts";
 
 const evmProof = {
   type: "transaction",
@@ -40,6 +44,72 @@ test("HTS candidate paths remain profile-specific and private", () => {
     /deployments\/testnet-hts-controlled\.json$/,
   );
   assert.match(htsOutputPath("usdc"), /deployments\/testnet-hts-usdc\.json$/);
+});
+
+function circleMetadata(overrides = {}) {
+  return {
+    token_id: "0.0.429274",
+    name: "USD Coin",
+    symbol: "USDC",
+    type: "FUNGIBLE_COMMON",
+    decimals: "6",
+    deleted: false,
+    freeze_default: false,
+    freeze_key: { _type: "ED25519", key: "public-key" },
+    kyc_key: null,
+    pause_key: null,
+    pause_status: "NOT_APPLICABLE",
+    fee_schedule_key: null,
+    custom_fees: { fixed_fees: [], fractional_fees: [] },
+    ...overrides,
+  };
+}
+
+function operatorRelationship(overrides = {}) {
+  return {
+    tokens: [
+      {
+        token_id: "0.0.429274",
+        balance: 240_000_000,
+        kyc_status: "NOT_APPLICABLE",
+        freeze_status: "UNFROZEN",
+        ...overrides,
+      },
+    ],
+  };
+}
+
+test("Circle preflight pins token controls and operator readiness", () => {
+  assert.doesNotThrow(() =>
+    assertCircleUsdcPreflight(circleMetadata(), operatorRelationship()),
+  );
+  for (const metadata of [
+    circleMetadata({ symbol: "FAKE" }),
+    circleMetadata({ pause_status: "PAUSED" }),
+    circleMetadata({ fee_schedule_key: { key: "mutable-fees" } }),
+    circleMetadata({ custom_fees: { fixed_fees: [{}], fractional_fees: [] } }),
+  ]) {
+    assert.throws(
+      () => assertCircleUsdcPreflight(metadata, operatorRelationship()),
+      /metadata failed preflight/,
+    );
+  }
+  assert.throws(
+    () =>
+      assertCircleUsdcPreflight(
+        circleMetadata(),
+        operatorRelationship({ freeze_status: "FROZEN" }),
+      ),
+    /relationship failed preflight/,
+  );
+  assert.throws(
+    () =>
+      assertCircleUsdcPreflight(
+        circleMetadata(),
+        operatorRelationship({ balance: 239_999_999 }),
+      ),
+    /at least 240 Circle testnet USDC/,
+  );
 });
 
 test("HTS evidence journal deduplicates identical typed proofs", () => {

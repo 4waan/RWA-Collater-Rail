@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { parseEventLogs } from "viem";
 import type { TransactionReceipt } from "viem";
 import { htsRailAbi } from "@collateral-rail/shared/abis";
+import { CIRCLE_TESTNET_USDC_TOKEN_ID } from "@collateral-rail/shared/hedera";
 import { redactSignerMaterial } from "./demo-runtime.ts";
 
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
@@ -38,6 +39,65 @@ export const HTS_GAS = {
   repayment: 2_000_000n,
   settlement: 2_000_000n,
 } as const;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+export function assertCircleUsdcPreflight(
+  metadata: Record<string, unknown>,
+  relationshipPayload: Record<string, unknown>,
+) {
+  const fees = isRecord(metadata.custom_fees)
+    ? metadata.custom_fees
+    : undefined;
+  if (
+    metadata.token_id !== CIRCLE_TESTNET_USDC_TOKEN_ID ||
+    metadata.name !== "USD Coin" ||
+    metadata.symbol !== "USDC" ||
+    metadata.type !== "FUNGIBLE_COMMON" ||
+    metadata.decimals !== "6" ||
+    metadata.deleted !== false ||
+    metadata.freeze_default !== false ||
+    !isRecord(metadata.freeze_key) ||
+    metadata.kyc_key !== null ||
+    metadata.pause_key !== null ||
+    metadata.pause_status !== "NOT_APPLICABLE" ||
+    metadata.fee_schedule_key !== null ||
+    !Array.isArray(fees?.fixed_fees) ||
+    fees.fixed_fees.length !== 0 ||
+    !Array.isArray(fees?.fractional_fees) ||
+    fees.fractional_fees.length !== 0
+  ) {
+    throw new Error("Circle testnet USDC metadata failed preflight.");
+  }
+
+  const relationships = relationshipPayload.tokens;
+  if (
+    !Array.isArray(relationships) ||
+    relationships.length !== 1 ||
+    !isRecord(relationships[0])
+  ) {
+    throw new Error("The funded operator is not associated with Circle USDC.");
+  }
+  const relationship = relationships[0];
+  const balance = String(relationship.balance ?? "");
+  if (
+    relationship.token_id !== CIRCLE_TESTNET_USDC_TOKEN_ID ||
+    relationship.kyc_status !== "NOT_APPLICABLE" ||
+    relationship.freeze_status !== "UNFROZEN" ||
+    !/^\d+$/.test(balance)
+  ) {
+    throw new Error(
+      "The funded operator Circle USDC relationship failed preflight.",
+    );
+  }
+  if (BigInt(balance) < HTS_ACTOR_TOKEN_UNITS * 2n) {
+    throw new Error(
+      "The funded operator needs at least 240 Circle testnet USDC for this lifecycle.",
+    );
+  }
+}
 
 export function selectedHtsProfile(argv = process.argv.slice(2)): HtsProfile {
   const inline = argv.find((value) => value.startsWith("--profile="));

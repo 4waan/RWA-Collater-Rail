@@ -9,6 +9,7 @@ import {
   TokenGrantKycTransaction,
   TokenId,
   TokenPauseTransaction,
+  TokenRevokeKycTransaction,
   TokenType,
   TokenUnfreezeTransaction,
   TokenUnpauseTransaction,
@@ -58,6 +59,7 @@ import {
   HTS_ACTOR_TOKEN_UNITS,
   HTS_GAS,
   HTS_PRINCIPAL_TOKEN_UNITS,
+  assertCircleUsdcPreflight,
   assertWritableHtsArtifactPath,
   htsAddressesPath,
   htsBroadcastPath,
@@ -346,16 +348,6 @@ async function main() {
         new URL(`/api/v1/tokens/${CIRCLE_TESTNET_USDC_TOKEN_ID}`, mirrorUrl),
         new URL(mirrorUrl).origin,
       );
-      if (
-        metadata.token_id !== CIRCLE_TESTNET_USDC_TOKEN_ID ||
-        metadata.type !== "FUNGIBLE_COMMON" ||
-        metadata.decimals !== "6" ||
-        metadata.deleted !== false ||
-        metadata.custom_fees?.fixed_fees?.length !== 0 ||
-        metadata.custom_fees?.fractional_fees?.length !== 0
-      ) {
-        throw new Error("Circle testnet USDC metadata failed preflight.");
-      }
       const operatorRelationship = await fetchAllowedJson(
         new URL(
           `/api/v1/accounts/${signer.accountId}/tokens?token.id=${CIRCLE_TESTNET_USDC_TOKEN_ID}`,
@@ -363,15 +355,7 @@ async function main() {
         ),
         new URL(mirrorUrl).origin,
       );
-      const balance = operatorRelationship.tokens?.[0]?.balance;
-      if (
-        !Number.isSafeInteger(balance) ||
-        BigInt(balance) < HTS_ACTOR_TOKEN_UNITS * 2n
-      ) {
-        throw new Error(
-          "The funded operator needs at least 240 Circle testnet USDC for this lifecycle.",
-        );
-      }
+      assertCircleUsdcPreflight(metadata, operatorRelationship);
     }
 
     await runHtsFoundry({
@@ -519,6 +503,35 @@ async function main() {
     ];
 
     if (profile === "controlled") {
+      const initialLenderKyc = await grantKyc(
+        settlementTokenId,
+        lender.accountId,
+        "grant-settlement-kyc-lender-initial",
+      );
+      const borrowerKyc = await grantKyc(
+        settlementTokenId,
+        borrower.accountId,
+        "grant-settlement-kyc-borrower",
+      );
+      const railKyc = await grantKyc(
+        settlementTokenId,
+        railAccountId,
+        "grant-settlement-kyc-rail",
+      );
+      const lenderKycRevocation = await nativeSuccess(
+        "revoke-settlement-kyc-lender",
+        await new TokenRevokeKycTransaction()
+          .setTokenId(settlementTokenId)
+          .setAccountId(lender.accountId)
+          .setMaxTransactionFee(new Hbar(5))
+          .execute(sdkClient),
+      );
+      actorProvisioning.push(
+        initialLenderKyc.proof,
+        borrowerKyc.proof,
+        railKyc.proof,
+        lenderKycRevocation.proof,
+      );
       const kycReject = await evmWrite(
         "probe-kyc-revoked",
         async () =>
@@ -532,27 +545,17 @@ async function main() {
           }),
         false,
       );
-      const lenderKyc = await grantKyc(
+      const lenderKycRecovery = await grantKyc(
         settlementTokenId,
         lender.accountId,
-        "grant-settlement-kyc-lender",
+        "regrant-settlement-kyc-lender",
       );
-      const borrowerKyc = await grantKyc(
-        settlementTokenId,
-        borrower.accountId,
-        "grant-settlement-kyc-borrower",
-      );
-      const railKyc = await grantKyc(
-        settlementTokenId,
-        railAccountId,
-        "grant-settlement-kyc-rail",
-      );
-      actorProvisioning.push(lenderKyc.proof, borrowerKyc.proof, railKyc.proof);
+      actorProvisioning.push(lenderKycRecovery.proof);
       complianceProbes.push({
         kind: "kyc-revoked",
-        expectedFailure: "Settlement KYC is revoked",
+        expectedFailure: "Settlement KYC was revoked",
         rejectedTransaction: kycReject.proof,
-        recoveryTransaction: lenderKyc.proof,
+        recoveryTransaction: lenderKycRecovery.proof,
         verified: true,
       });
     }
