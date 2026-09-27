@@ -3,8 +3,10 @@ import test from "node:test";
 import { HtsEvidenceJournal } from "../lib/hts-proof-runtime.mjs";
 import {
   assertCircleUsdcPreflight,
+  htsFoundryEnvironment,
   htsOutputPath,
   selectedHtsProfile,
+  writeHtsEvidenceCandidateAtomic,
 } from "../lib/hts-demo-runtime.ts";
 
 const evmProof = {
@@ -44,6 +46,54 @@ test("HTS candidate paths remain profile-specific and private", () => {
     /deployments\/testnet-hts-controlled\.json$/,
   );
   assert.match(htsOutputPath("usdc"), /deployments\/testnet-hts-usdc\.json$/);
+});
+
+test("HTS Foundry receives only allowlisted ambient and configured values", () => {
+  const environment = htsFoundryEnvironment(
+    {
+      PATH: "/usr/bin",
+      HOME: "/tmp/test-home",
+      PYTH_API_KEY: "must-not-reach-forge",
+      UNRELATED_SECRET: "must-not-reach-forge",
+    },
+    {
+      HARNESS_SIGNER_PRIVATE_KEY: `0x${"1".repeat(64)}`,
+      HEDERA_TESTNET_RPC_URL: "https://testnet.hashio.io/api",
+      SETTLEMENT_TOKEN_ADDRESS: `0x${"2".repeat(40)}`,
+    },
+  );
+  assert.deepEqual(environment, {
+    PATH: "/usr/bin",
+    HOME: "/tmp/test-home",
+    HARNESS_SIGNER_PRIVATE_KEY: `0x${"1".repeat(64)}`,
+    HEDERA_TESTNET_RPC_URL: "https://testnet.hashio.io/api",
+    SETTLEMENT_TOKEN_ADDRESS: `0x${"2".repeat(40)}`,
+  });
+  assert.equal(environment.PYTH_API_KEY, undefined);
+  assert.equal(environment.UNRELATED_SECRET, undefined);
+  assert.throws(
+    () => htsFoundryEnvironment({}, { UNEXPECTED_VALUE: "rejected" }),
+    /Unexpected HTS Foundry environment key/,
+  );
+});
+
+test("atomic HTS candidate writes reject every noncanonical path", async () => {
+  await assert.rejects(
+    writeHtsEvidenceCandidateAtomic(
+      "/tmp/testnet-hts-controlled.json",
+      "controlled",
+      "{}\n",
+    ),
+    /ignored candidate path/,
+  );
+  await assert.rejects(
+    writeHtsEvidenceCandidateAtomic(
+      htsOutputPath("controlled"),
+      "usdc",
+      "{}\n",
+    ),
+    /ignored candidate path/,
+  );
 });
 
 function circleMetadata(overrides = {}) {

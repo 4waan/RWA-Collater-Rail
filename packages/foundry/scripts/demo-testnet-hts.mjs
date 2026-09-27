@@ -15,7 +15,7 @@ import {
   TokenUnpauseTransaction,
   TransferTransaction,
 } from "@hiero-ledger/sdk";
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import {
   createPublicClient,
   createWalletClient,
@@ -63,10 +63,12 @@ import {
   assertWritableHtsArtifactPath,
   htsAddressesPath,
   htsBroadcastPath,
+  htsFoundryEnvironment,
   htsOfferFundedArgs,
   htsOutputPath,
   htsPositionOpenedArgs,
   runHtsFoundry,
+  writeHtsEvidenceCandidateAtomic,
 } from "./lib/hts-demo-runtime.ts";
 import {
   ACTOR_FUNDING_HBAR,
@@ -358,30 +360,36 @@ async function main() {
       assertCircleUsdcPreflight(metadata, operatorRelationship);
     }
 
-    await runHtsFoundry({
-      ...process.env,
-      HEDERA_NETWORK: "testnet",
-      HEDERA_TESTNET_RPC_URL: rpcUrl,
-      HEDERA_MIRROR_URL: mirrorUrl,
-      ATS_FACTORY_ADDRESS: factory,
-      ATS_RESOLVER_ADDRESS: resolver,
-      PYTH_ADDRESS: pyth,
-      SETTLEMENT_TOKEN_ADDRESS: settlementTokenAddress,
-      USE_FIXED_TEST_ORACLE: profile === "controlled" ? "1" : "0",
-      HEDERA_OPERATOR_ADDRESS: signer.evmAddress,
-      LENDER_ADDRESS: lenderAddress,
-      BORROWER_ADDRESS: borrowerAddress,
-      RAIL_MAXIMUM_ADVANCE_BPS: String(recipe.policy.maximumAdvanceBps),
-      RAIL_MAXIMUM_ANNUAL_RATE_BPS: String(recipe.policy.maximumAnnualRateBps),
-      RAIL_MAXIMUM_QUOTE_MOVEMENT_BPS: String(
-        recipe.policy.maximumQuoteMovementBps,
-      ),
-      RAIL_MINIMUM_TERM_SECONDS: String(recipe.policy.minimumTermSeconds),
-      RAIL_MAXIMUM_TERM_SECONDS: String(recipe.policy.maximumTermSeconds),
-      RAIL_MAXIMUM_OFFER_LIFETIME_SECONDS: String(
-        recipe.policy.maximumOfferLifetimeSeconds,
-      ),
-    });
+    await runHtsFoundry(
+      htsFoundryEnvironment(process.env, {
+        HARNESS_SIGNER_ACCOUNT_ID: signer.accountId,
+        HARNESS_SIGNER_EVM_ADDRESS: signer.evmAddress,
+        HARNESS_SIGNER_PRIVATE_KEY: signer.privateKey,
+        HEDERA_NETWORK: "testnet",
+        HEDERA_TESTNET_RPC_URL: rpcUrl,
+        HEDERA_MIRROR_URL: mirrorUrl,
+        ATS_FACTORY_ADDRESS: factory,
+        ATS_RESOLVER_ADDRESS: resolver,
+        PYTH_ADDRESS: pyth,
+        SETTLEMENT_TOKEN_ADDRESS: settlementTokenAddress,
+        USE_FIXED_TEST_ORACLE: profile === "controlled" ? "1" : "0",
+        HEDERA_OPERATOR_ADDRESS: signer.evmAddress,
+        LENDER_ADDRESS: lenderAddress,
+        BORROWER_ADDRESS: borrowerAddress,
+        RAIL_MAXIMUM_ADVANCE_BPS: String(recipe.policy.maximumAdvanceBps),
+        RAIL_MAXIMUM_ANNUAL_RATE_BPS: String(
+          recipe.policy.maximumAnnualRateBps,
+        ),
+        RAIL_MAXIMUM_QUOTE_MOVEMENT_BPS: String(
+          recipe.policy.maximumQuoteMovementBps,
+        ),
+        RAIL_MINIMUM_TERM_SECONDS: String(recipe.policy.minimumTermSeconds),
+        RAIL_MAXIMUM_TERM_SECONDS: String(recipe.policy.maximumTermSeconds),
+        RAIL_MAXIMUM_OFFER_LIFETIME_SECONDS: String(
+          recipe.policy.maximumOfferLifetimeSeconds,
+        ),
+      }),
+    );
 
     const addresses = JSON.parse(await readFile(htsAddressesPath, "utf8"));
     const broadcast = JSON.parse(await readFile(htsBroadcastPath, "utf8"));
@@ -1251,9 +1259,11 @@ async function main() {
         "Observed on Hedera testnet. This evidence contains no signer material or raw transaction payloads.",
     };
     validateHtsEvidenceRecord(record);
-    await writeFile(outputPath, `${JSON.stringify(record, null, 2)}\n`, {
-      mode: 0o600,
-    });
+    await writeHtsEvidenceCandidateAtomic(
+      outputPath,
+      profile,
+      `${JSON.stringify(record, null, 2)}\n`,
+    );
     console.log(`Verified HTS evidence written to ${outputPath}.`);
   } finally {
     for (const actor of actors.reverse()) {

@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
-import { access, lstat } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
+import { access, lstat, rename, unlink, writeFile } from "node:fs/promises";
 import { constants as fsConstants } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -13,6 +14,39 @@ const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 const foundryRoot = path.resolve(scriptDirectory, "../..");
 
 export type HtsProfile = "controlled" | "usdc";
+
+const inheritedFoundryEnvironmentKeys = [
+  "PATH",
+  "HOME",
+  "TMPDIR",
+  "FOUNDRY_PROFILE",
+  "NO_COLOR",
+  "FORCE_COLOR",
+  "RUST_LOG",
+] as const;
+
+const configuredFoundryEnvironmentKeys = new Set([
+  "HARNESS_SIGNER_ACCOUNT_ID",
+  "HARNESS_SIGNER_EVM_ADDRESS",
+  "HARNESS_SIGNER_PRIVATE_KEY",
+  "HEDERA_NETWORK",
+  "HEDERA_TESTNET_RPC_URL",
+  "HEDERA_MIRROR_URL",
+  "ATS_FACTORY_ADDRESS",
+  "ATS_RESOLVER_ADDRESS",
+  "PYTH_ADDRESS",
+  "SETTLEMENT_TOKEN_ADDRESS",
+  "USE_FIXED_TEST_ORACLE",
+  "HEDERA_OPERATOR_ADDRESS",
+  "LENDER_ADDRESS",
+  "BORROWER_ADDRESS",
+  "RAIL_MAXIMUM_ADVANCE_BPS",
+  "RAIL_MAXIMUM_ANNUAL_RATE_BPS",
+  "RAIL_MAXIMUM_QUOTE_MOVEMENT_BPS",
+  "RAIL_MINIMUM_TERM_SECONDS",
+  "RAIL_MAXIMUM_TERM_SECONDS",
+  "RAIL_MAXIMUM_OFFER_LIFETIME_SECONDS",
+]);
 
 export const htsAddressesPath = path.join(
   foundryRoot,
@@ -140,6 +174,43 @@ export async function assertWritableHtsArtifactPath(
     }
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+  }
+}
+
+export function htsFoundryEnvironment(
+  ambient: NodeJS.ProcessEnv,
+  configured: NodeJS.ProcessEnv,
+) {
+  const environment: NodeJS.ProcessEnv = {};
+  for (const key of inheritedFoundryEnvironmentKeys) {
+    if (ambient[key] !== undefined) environment[key] = ambient[key];
+  }
+  for (const [key, value] of Object.entries(configured)) {
+    if (!configuredFoundryEnvironmentKeys.has(key)) {
+      throw new Error(`Unexpected HTS Foundry environment key: ${key}.`);
+    }
+    if (value !== undefined) environment[key] = value;
+  }
+  return environment;
+}
+
+export async function writeHtsEvidenceCandidateAtomic(
+  filePath: string,
+  profile: HtsProfile,
+  contents: string,
+) {
+  await assertWritableHtsArtifactPath(filePath, profile);
+  const resolved = path.resolve(filePath);
+  const temporaryPath = path.join(
+    path.dirname(resolved),
+    `.${path.basename(resolved)}.${process.pid}.${randomUUID()}.tmp`,
+  );
+  try {
+    await writeFile(temporaryPath, contents, { mode: 0o600, flag: "wx" });
+    await rename(temporaryPath, resolved);
+  } catch (error) {
+    await unlink(temporaryPath).catch(() => undefined);
+    throw error;
   }
 }
 
