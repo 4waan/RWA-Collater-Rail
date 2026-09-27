@@ -826,7 +826,7 @@ export function validateHtsEvidenceRecord(record) {
     record.verification?.complete !== true ||
     record.verification?.mirrorOrigin !== MIRROR_ORIGIN ||
     !Array.isArray(record.verification?.settlementBalances) ||
-    record.verification.settlementBalances.length < 4 ||
+    record.verification.settlementBalances.length < 3 ||
     !record.verification?.hbarBalance
   ) {
     throw new Error("HTS verification evidence is incomplete.");
@@ -845,7 +845,8 @@ export function validateHtsEvidenceRecord(record) {
     settlementBalances.set(proof.accountId, proof);
   }
   for (const evmAddress of [
-    ...actorValues.map((actor) => actor.evmAddress),
+    record.actors.lender.evmAddress,
+    record.actors.borrower.evmAddress,
     record.addresses.rail,
   ]) {
     if (

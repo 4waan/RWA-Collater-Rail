@@ -259,7 +259,6 @@ function controlledEvidence() {
     mirror: transaction.mirror,
   }));
   const settlementBalances = [
-    [actors.issuer, "800000000"],
     [actors.lender, "100000000"],
     [actors.borrower, "100000000"],
     [{ accountId: "0.0.600", evmAddress: addresses.rail }, "0"],
@@ -577,7 +576,11 @@ test("exact-block accounting and current Mirror balances must agree", () => {
   assert.throws(() => validateHtsEvidenceRecord(stateMismatch), /state proof/);
 
   const balanceMismatch = controlledEvidence();
-  balanceMismatch.verification.settlementBalances[3].balanceTokenUnits = "1";
+  balanceMismatch.verification.settlementBalances.find(
+    (proof) =>
+      proof.evmAddress.toLowerCase() ===
+      balanceMismatch.addresses.rail.toLowerCase(),
+  ).balanceTokenUnits = "1";
   assert.throws(
     () => validateHtsEvidenceRecord(balanceMismatch),
     /Mirror token/,

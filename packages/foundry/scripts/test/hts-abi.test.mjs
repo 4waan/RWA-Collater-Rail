@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 import {
+  fixedTestUsdOracleAbi,
   htsAcceptanceAbi,
   htsRailAbi,
   usdOracleAbi,
@@ -74,6 +75,13 @@ test("HTS rail ABI export matches the compiled contract", async () => {
 test("generic USD oracle ABI export matches the compiled Pyth adapter", async () => {
   const compiled = await compiledAbi("PythUsdOracle.sol/PythUsdOracle.json");
   assertCanonicalSubset(usdOracleAbi, compiled);
+});
+
+test("fixed test oracle ABI export matches the compiled adapter", async () => {
+  const compiled = await compiledAbi(
+    "FixedTestUsdOracle.sol/FixedTestUsdOracle.json",
+  );
+  assertCanonicalSubset(fixedTestUsdOracleAbi, compiled);
 });
 
 test("HTS acceptance ABI export matches the compiled verifier", async () => {

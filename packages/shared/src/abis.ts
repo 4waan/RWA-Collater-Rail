@@ -184,6 +184,15 @@ export const railAbi = [
   },
   {
     type: "event",
+    name: "SettlementInitialized",
+    inputs: [
+      { indexed: true, name: "token", type: "address" },
+      { indexed: false, name: "decimals", type: "uint8" },
+      { indexed: false, name: "kycNotApplicable", type: "bool" },
+    ],
+  },
+  {
+    type: "event",
     name: "OfferFunded",
     inputs: [
       { indexed: true, name: "offerId", type: "bytes32" },
@@ -824,6 +833,20 @@ export const htsTokenAbi = [
 export const usdOracleAbi = [
   {
     type: "function",
+    name: "pyth",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "address" }],
+  },
+  {
+    type: "function",
+    name: "priceId",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "bytes32" }],
+  },
+  {
+    type: "function",
     name: "updatePrice",
     stateMutability: "payable",
     inputs: [{ name: "updateData", type: "bytes[]" }],
@@ -832,6 +855,37 @@ export const usdOracleAbi = [
       { name: "confidenceUsdE8", type: "uint256" },
       { name: "publishTime", type: "uint64" },
     ],
+  },
+  {
+    type: "function",
+    name: "latestUsdPrice",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [
+      { name: "priceUsdE8", type: "uint256" },
+      { name: "confidenceUsdE8", type: "uint256" },
+      { name: "publishTime", type: "uint64" },
+    ],
+  },
+  {
+    type: "event",
+    name: "PriceUpdated",
+    inputs: [
+      { name: "feePaid", type: "uint256", indexed: false },
+      { name: "priceUsdE8", type: "uint256", indexed: false },
+      { name: "publishTime", type: "uint64", indexed: false },
+    ],
+    anonymous: false,
+  },
+] as const;
+
+export const fixedTestUsdOracleAbi = [
+  {
+    type: "function",
+    name: "fixedPriceUsdE8",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
   },
   {
     type: "function",
