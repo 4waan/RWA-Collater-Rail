@@ -8,6 +8,7 @@ const scripts = [
   "recipe:check",
   "check:dead-code",
   "foundry:build",
+  "foundry:size",
   "test:hts",
   "foundry:test",
   "foundry:fuzz",

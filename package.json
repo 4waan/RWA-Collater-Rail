@@ -25,6 +25,7 @@
     "test:e2e:live": "yarn workspace @collateral-rail/nextjs test:e2e:live",
     "test:e2e:production": "PLAYWRIGHT_SERVER_MODE=production yarn workspace @collateral-rail/nextjs test:e2e",
     "foundry:build": "yarn workspace @collateral-rail/foundry build",
+    "foundry:size": "yarn workspace @collateral-rail/foundry size",
     "foundry:fmt": "yarn workspace @collateral-rail/foundry fmt:check",
     "foundry:test": "yarn workspace @collateral-rail/foundry test",
     "test:hts": "yarn workspace @collateral-rail/foundry test:hts",

@@ -11,7 +11,8 @@ project and the public testnet proof must also pass.
 - The license is MIT and third-party notices remain intact.
 - No environment file, key, mnemonic, keystore, or funded credential is tracked.
 - Immutable installation, formatting, linting, type checking, compilation,
-  tests, production build, route checks, ABI checks, and secret scans pass.
+  production-contract size limits, tests, production build, route checks, ABI
+  checks, and secret scans pass.
 - Browser tests start their own isolated server and pass at desktop and mobile
   viewports.
 - Harness recipe validation passes without requiring funded credentials.

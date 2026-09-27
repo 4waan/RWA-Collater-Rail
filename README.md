@@ -282,6 +282,7 @@ yarn typecheck
 yarn recipe:check
 yarn check:dead-code
 yarn foundry:build
+yarn foundry:size
 yarn test:hts
 yarn foundry:test
 yarn foundry:fuzz
