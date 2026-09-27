@@ -19,7 +19,8 @@ tested implementation:
 - HBAR/USD cash conversion through HIP-475 by default, with an explicitly
   configured Pyth mode that enforces freshness and confidence bounds;
 - HSS maturity scheduling with permissionless recovery;
-- Mirror Node and HashScan evidence for every published lifecycle claim.
+- authoritative Mirror Node evidence and HashScan explorer references for every
+  published lifecycle claim.
 
 The committed reference lifecycle uses HIP-475. It exposes Hedera's active
 network settlement conversion rate, not a live market price oracle. The optional
@@ -58,8 +59,8 @@ yarn dev
 2. Open `/facility?recipe=term-credit&mode=reference` and move through one step
    at a time.
 3. Open `/verify?position=repaid`, then switch to the defaulted position.
-4. Follow each available proof link to its exact HashScan transaction or HSS
-   entity.
+4. Follow each authoritative Mirror proof to its exact transaction or HSS
+   entity. HashScan remains available as a secondary explorer reference.
 5. Notice that free ATS balance, held ATS balance, typed settlement conversion,
    cash liabilities, and HSS reserves are never collapsed into one status.
 
@@ -295,6 +296,12 @@ runner accepts that path only with a successful transaction and matching
 a second funded lifecycle. See the
 [HSS observation and fallback assurance finding](docs/findings/2026-09-27-hss-observation-and-fallback-assurance.md).
 
+The [public proof link audit](docs/findings/2026-09-27-public-proof-link-audit.md)
+opened all 23 transaction, schedule, and contract links. Mirror returned every
+exact entity. HashScan deep links returned HTTP 404 during the dated audit, so
+the interface marks the explorer unavailable without weakening the verified
+Mirror or RPC evidence.
+
 The direct lifecycle runner is:
 
 ```sh
@@ -322,6 +329,7 @@ specifications in `.harness/` and the [Maintainer Guide](docs/maintainer-guide.m
 - [Decision record template](docs/templates/decision-record.md)
 - [Measured finding template](docs/templates/measured-finding.md)
 - [2026-09-26 local release validation](docs/findings/2026-09-26-release-validation.md)
+- [2026-09-27 public proof link audit](docs/findings/2026-09-27-public-proof-link-audit.md)
 
 Version 1 uses one HBAR cash leg, one ATS asset per rail, and ATS internal KYC.
 The next maintained extension is a separately versioned HTS settlement rail.

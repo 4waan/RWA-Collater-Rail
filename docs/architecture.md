@@ -106,9 +106,10 @@ HSS improves liveness.
 Public evidence is typed by what the network actually proves:
 
 - a transaction proof contains a successful Mirror-confirmed hash, consensus
-  timestamp, and HashScan link;
+  timestamp, an exact authoritative Mirror URL, and a secondary HashScan link;
 - a schedule proof contains the long-zero address, Hedera schedule ID,
-  execution timestamp when applicable, and HashScan link;
+  execution timestamp when applicable, an exact authoritative Mirror URL, and a
+  secondary HashScan link;
 - a state proof contains the Hedera block number, approved RPC origin, and the
   exact assertions read at that block.
 
@@ -129,6 +130,12 @@ lifecycle was observed on testnet with HSS executing the default. Permissionless
 recovery under unavailable or delayed HSS is established by adversarial tests.
 Test coverage is not presented as a testnet transaction, and an HSS observation
 is never relabeled as a permissionless fallback.
+
+Mirror links are constructed only from validated transaction hashes, schedule
+IDs, and contract addresses on the exact public testnet origin. HashScan is a
+convenience explorer. A dated unavailable state never changes the underlying
+Mirror or RPC verification result, and schedules remain visually distinct from
+transactions.
 
 The public reference file is replaced atomically only after the complete record
 passes relationship validation, live Mirror and RPC verification, receipt-event

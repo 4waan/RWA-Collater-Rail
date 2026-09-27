@@ -142,10 +142,17 @@ The runner writes `packages/foundry/deployments/testnet.json` with mode `0600`. 
 - gitleaks passes over the deployment candidate directory.
 
 Schema version 3 never treats every claim as a transaction. A transaction proof
-contains its hash, consensus timestamp, result, and exact HashScan URL. A
-schedule proof contains its EVM address, Hedera schedule ID, execution timestamp
-when executed, and exact HashScan URL. A state proof contains the verified block
-number, approved RPC origin, and assertions read at that block.
+contains its hash, consensus timestamp, result, exact Mirror source URL, and
+secondary HashScan URL. A schedule proof contains its EVM address, Hedera
+schedule ID, execution timestamp when executed, exact Mirror source URL, and
+secondary HashScan URL. A state proof contains the verified block number,
+approved RPC origin, and assertions read at that block.
+
+The runner records Mirror URLs directly from validated identifiers. It marks
+HashScan as unchecked until a maintainer completes the manual release audit.
+Explorer failure does not downgrade Mirror-confirmed evidence. The current
+[public proof link audit](findings/2026-09-27-public-proof-link-audit.md) records
+all 23 destinations and the explicit HashScan unavailable state.
 
 Publication first validates the ignored candidate, runs the live Mirror and RPC
 verifier, and scans the deployment directory. Only then does it write a

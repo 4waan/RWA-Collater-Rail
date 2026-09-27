@@ -9,9 +9,13 @@ Turn the three existing routes into a credential-free proof experience backed by
 3. The verify route must reconstruct the repaid and defaulted positions from the committed record, direct contract reads, and Mirror Node.
 4. Free ATS balance, held ATS balance, HSS schedule state, typed cash conversion, cash liabilities, and automation reserves must appear as distinct facts.
 5. The permissionless fallback must be labeled whenever HSS did not execute the default.
-6. Every public transaction, contract, and schedule must have a direct HashScan link when the record is verified.
-7. The acceptance contract must allow a judge to validate the committed lifecycle without credentials.
-8. Measure and publish the path from scaffolding to reference inspection before
+6. Every public transaction and schedule must have an exact authoritative
+   Mirror link. Transactions, contracts, and schedules retain direct HashScan
+   explorer links with a dated availability status.
+7. An unavailable explorer must be explicit and must not hide or invalidate the
+   authoritative Mirror or RPC source.
+8. The acceptance contract must allow a judge to validate the committed lifecycle without credentials.
+9. Measure and publish the path from scaffolding to reference inspection before
    making any speed claim.
 
 ## Boundaries

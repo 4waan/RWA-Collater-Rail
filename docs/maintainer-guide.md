@@ -43,6 +43,9 @@ interface, the pinned ABI list, and its regression test in the same change.
 9. Populate a typed lifecycle proof only after the corresponding probe passes.
 10. Publish through the atomic candidate validator. Never copy a partial record
     by hand.
+11. Open every transaction, schedule, and contract link. Record the result in a
+    dated finding. Mirror must identify the exact entity. Record HashScan
+    availability separately from proof validity.
 
 Keep two assurance classes explicit in every release note and public claim:
 
@@ -69,7 +72,9 @@ URL may use `NEXT_PUBLIC_` names.
 Keep external requests pinned to the Hedera testnet RPC, Hedera testnet Mirror
 Node, and the configured wallet transport. Permit Pyth Hermes requests only in
 explicit Pyth mode. Validate transaction IDs, hashes, addresses, and response
-shapes before rendering links or evidence.
+shapes before rendering links or evidence. Construct Mirror and HashScan paths
+only after identifier validation. Never trust a stored origin, query string,
+redirect, or path suffix.
 
 ## Release checklist
 

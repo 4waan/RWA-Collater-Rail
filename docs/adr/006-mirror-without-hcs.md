@@ -5,8 +5,9 @@
 
 ## Decision
 
-Reconstruct evidence from contract reads, transaction receipts, Mirror Node, and
-HashScan links. Do not relay lifecycle events through HCS.
+Reconstruct evidence from contract reads, transaction receipts, and exact
+Mirror Node sources. Keep HashScan as a secondary explorer reference with an
+independent availability status. Do not relay lifecycle events through HCS.
 
 ## Alternatives considered
 
@@ -28,4 +29,6 @@ pagination, and live state explicitly.
 ## Validation
 
 The verifier rejects empty successful responses, keeps free and held balances
-separate, and requires direct configuration reads.
+separate, requires direct configuration reads, and binds every rendered Mirror
+URL to its validated identifier and allowlisted origin. Explorer failure does
+not invalidate Mirror or RPC evidence.

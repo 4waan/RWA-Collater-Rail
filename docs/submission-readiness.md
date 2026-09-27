@@ -41,6 +41,7 @@ The committed reference record is publishable only when:
 - the network is Hedera testnet and the recipe is `term-credit`;
 - all public dependencies and deployed contracts are confirmed;
 - every transaction proof is successful and Mirror-confirmed;
+- every transaction and schedule proof carries an exact allowlisted Mirror URL;
 - HSS proof names a real schedule, and an HSS terminal path has an execution
   timestamp plus a later terminal state read;
 - a permissionless terminal path names its successful settlement transaction;

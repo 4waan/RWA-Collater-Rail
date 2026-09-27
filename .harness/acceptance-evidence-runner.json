@@ -64,6 +64,14 @@
       "walletRequired": false,
       "verifiableWithoutCredentials": true,
       "howToVerify": "Run yarn foundry:test, yarn foundry:invariant, and yarn test:runner. Inspect testBadHssResponseDoesNotTrapCollateral, the fallback coverage bit in RailSolvency.invariant.t.sol, and the fallback receipt and terminal-path evidence tests."
+    },
+    {
+      "id": "E9",
+      "statement": "Every public transaction, schedule, and contract source is bound to an exact authoritative Mirror URL. HashScan availability is audited and displayed independently from proof validity.",
+      "severity": "critical",
+      "walletRequired": false,
+      "verifiableWithoutCredentials": true,
+      "howToVerify": "Run yarn test:runner and yarn test:e2e. Inspect the dated public proof link audit, typed proof guards, Mirror source links, and explicit unavailable explorer state."
     }
   ]
 }
