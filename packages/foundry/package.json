@@ -9,6 +9,7 @@
     "fmt": "forge fmt",
     "fmt:check": "forge fmt --check",
     "test": "forge test --offline -vvv",
+    "test:hts": "FOUNDRY_INVARIANT_RUNS=64 FOUNDRY_INVARIANT_DEPTH=32 forge test --offline --match-contract '(AtsCollateralRailHtsTest|PythUsdOracleTest|HtsRailMathFuzzTest|HtsRailSolvencyInvariantTest)'",
     "fuzz": "forge test --offline --match-path 'test/fuzz/*.t.sol' -vvv",
     "invariant": "forge test --offline --match-path 'test/invariant/*.t.sol' -vvv",
     "bootstrap:testnet": "node scripts/bootstrap-local.mjs",

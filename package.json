@@ -27,6 +27,7 @@
     "foundry:build": "yarn workspace @collateral-rail/foundry build",
     "foundry:fmt": "yarn workspace @collateral-rail/foundry fmt:check",
     "foundry:test": "yarn workspace @collateral-rail/foundry test",
+    "test:hts": "yarn workspace @collateral-rail/foundry test:hts",
     "foundry:fuzz": "yarn workspace @collateral-rail/foundry fuzz",
     "foundry:invariant": "yarn workspace @collateral-rail/foundry invariant",
     "next:build": "yarn workspace @collateral-rail/nextjs build",

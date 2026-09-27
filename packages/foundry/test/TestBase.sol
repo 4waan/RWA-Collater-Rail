@@ -9,6 +9,7 @@ interface Vm {
     function warp(uint256 newTimestamp) external;
     function expectRevert(bytes4 selector) external;
     function expectRevert(bytes calldata revertData) external;
+    function expectRevert() external;
     function mockCall(address callee, bytes calldata data, bytes calldata returnData) external;
 }
 
