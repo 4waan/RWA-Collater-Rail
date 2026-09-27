@@ -28,6 +28,7 @@ import {
   assertFundingBudget,
   assertHip475Availability,
   assertHssCapacity,
+  assertRailSolvency,
   categorizeBootstrapTransactions,
   classifyDefaultPath,
   confirmMirrorAccountIdentity,
@@ -37,6 +38,7 @@ import {
   mirrorContract,
   parseHermesUpdate,
   proofForSemanticKind,
+  readCurrentMirrorBalance,
   sweepTemporaryActor,
   validateEvidenceRecord,
   waitForMirrorTransaction,
@@ -678,7 +680,6 @@ async function main() {
       cashLiabilities,
       reservedAutomation,
       requiredBacking,
-      railBalance,
       policy,
       oraclePriceUsdE8,
       oracleConfidenceUsdE8,
@@ -693,6 +694,14 @@ async function main() {
       borrower: borrowerAddress,
       expectedPolicy: recipe.policy,
       blockNumber: verificationBlock,
+    });
+    const balanceProof = await readCurrentMirrorBalance({
+      mirrorOrigin: mirrorUrl,
+      evmAddress: rail,
+    });
+    assertRailSolvency({
+      balanceTinybar: balanceProof.balanceTinybar,
+      requiredBackingTinybar: requiredBacking.toString(),
     });
 
     const defaultSchedule = schedules.find(
@@ -723,7 +732,6 @@ async function main() {
         "rail.cashLiabilitiesTinybar": cashLiabilities.toString(),
         "rail.reservedAutomationTinybar": reservedAutomation.toString(),
         "rail.requiredBackingTinybar": requiredBacking.toString(),
-        "rail.contractBalanceTinybar": railBalance.toString(),
         "rail.policy.maximumAdvanceBps": policy.maximumAdvanceBps,
         "rail.policy.maximumAnnualRateBps": policy.maximumAnnualRateBps,
         "rail.policy.maximumQuoteMovementBps": policy.maximumQuoteMovementBps,
@@ -865,11 +873,12 @@ async function main() {
         cashLiabilitiesTinybar: cashLiabilities.toString(),
         reservedAutomationTinybar: reservedAutomation.toString(),
         requiredBackingTinybar: requiredBacking.toString(),
-        contractBalanceTinybar: railBalance.toString(),
+        contractBalanceTinybar: balanceProof.balanceTinybar,
       },
       verification: {
         complete: true,
         state: stateProof,
+        balance: balanceProof,
         mirrorOrigin: mirrorUrl,
         contractLinks: Object.fromEntries(
           Object.entries({ atsToken, oracle, rail, acceptance }).map(
@@ -886,7 +895,7 @@ async function main() {
           hashScanStatus: "unchecked",
           mirrorStatus: "verified",
           hashScanChecked: 0,
-          mirrorChecked: verifiedTransactions.length + schedules.length + 4,
+          mirrorChecked: verifiedTransactions.length + schedules.length + 5,
           finding: null,
         },
       },

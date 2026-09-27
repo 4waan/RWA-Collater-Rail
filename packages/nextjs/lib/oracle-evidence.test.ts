@@ -41,6 +41,7 @@ function deployment(
     verification: {
       complete: true,
       state: stateProof,
+      balance: null,
       mirrorOrigin: "https://testnet.mirrornode.hedera.com",
       contractLinks: {},
       contractMirrorLinks: {},

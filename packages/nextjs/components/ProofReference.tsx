@@ -1,4 +1,5 @@
 import {
+  isBalanceProof,
   isScheduleProof,
   isStateProof,
   isTransactionProof,
@@ -124,6 +125,25 @@ export function ProofReference({
         <small>
           Block {proof.blockNumber} via {proof.rpcOrigin}
         </small>
+      </div>
+    );
+  }
+
+  if (isBalanceProof(proof)) {
+    return (
+      <div className="typedProof" data-proof-type="balance">
+        <span>Current Mirror account balance</span>
+        <small>
+          {proof.balanceTinybar} tinybar at {proof.balanceTimestamp}
+        </small>
+        <a
+          className="proofLink"
+          href={proof.mirror}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          Open authoritative Mirror balance
+        </a>
       </div>
     );
   }

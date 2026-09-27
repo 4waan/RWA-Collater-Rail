@@ -1,9 +1,11 @@
 # Public proof link audit
 
-- Audited at: 2026-09-27T02:12:33Z
+- Transaction, schedule, and contract links audited at: 2026-09-27T02:12:33Z
+- Current balance source audited at: 2026-09-27T12:24:59Z
 - Network: Hedera testnet
 - Record: `packages/foundry/deployments/reference-testnet.json`
-- Scope: 17 transactions, 2 schedules, and 4 deployed contracts
+- Scope: 17 transactions, 2 schedules, 4 deployed contracts, and 1 current rail
+  balance
 - Result: Mirror sources verified, HashScan deep links unavailable
 
 ## Method
@@ -65,11 +67,20 @@ ID.
 - Collateral rail: [HashScan](https://hashscan.io/testnet/contract/0xBb038155597b01D38eb61Af8A2d6117f79A14cB5), [Mirror](https://testnet.mirrornode.hedera.com/api/v1/contracts/0xBb038155597b01D38eb61Af8A2d6117f79A14cB5), contract `0.0.10730723`.
 - Acceptance verifier: [HashScan](https://hashscan.io/testnet/contract/0x9fF2B637d4f9bD750256C0D5D550FBfB5C19B9Aa), [Mirror](https://testnet.mirrornode.hedera.com/api/v1/contracts/0x9fF2B637d4f9bD750256C0D5D550FBfB5C19B9Aa), contract `0.0.10730726`.
 
+## Current rail balance
+
+The exact allowlisted [Mirror account source](https://testnet.mirrornode.hedera.com/api/v1/accounts/0xbb038155597b01d38eb61af8a2d6117f79a14cb5?transactions=false)
+returned HTTP 200, account `0.0.10730723`, the exact rail EVM address, balance
+`936603529` tinybar, and balance timestamp `1790433041.060326208`. The request
+contains no historical timestamp and is therefore classified as a current
+Mirror account balance, not a block-bound state read.
+
 ## Release interpretation
 
 HashScan is an explorer convenience and is not the authoritative proof source.
 Its current 404 responses do not invalidate the lifecycle. Mirror independently
-confirms all public entities, while the final state remains bound to the exact
-Hashio RPC block. The proof interface therefore presents Mirror first, marks
-the dated HashScan outage explicitly, and keeps the HashScan URLs available for
-retry if the explorer restores deep-link service.
+confirms all public entities. Final contract state remains bound to the exact
+Hashio RPC block, while solvency uses the separately typed current Mirror
+account balance. The proof interface presents Mirror first, marks the dated
+HashScan outage explicitly, and keeps the HashScan URLs available for retry if
+the explorer restores deep-link service.

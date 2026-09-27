@@ -1,8 +1,5 @@
 import { atsAbi, oracleAbi, railAbi } from "@collateral-rail/shared/abis";
-import {
-  DEFAULT_PARTITION,
-  weibarToTinybar,
-} from "@collateral-rail/shared/hedera";
+import { DEFAULT_PARTITION } from "@collateral-rail/shared/hedera";
 import type { RailPolicy } from "@collateral-rail/shared/recipes";
 import type { Address, PublicClient } from "viem";
 import { ROLE_ISSUER, ROLE_KYC, ROLE_SSI_MANAGER } from "./demo-runtime.ts";
@@ -51,7 +48,6 @@ export async function readVerifiedFinalState({
     cashLiabilities,
     reservedAutomation,
     requiredBacking,
-    railBalanceWeibar,
     deployedPolicy,
     oraclePrice,
   ] = await Promise.all([
@@ -185,7 +181,6 @@ export async function readVerifiedFinalState({
       functionName: "requiredBacking",
       blockNumber,
     }),
-    publicClient.getBalance({ address: rail, blockNumber }),
     publicClient.readContract({
       address: rail,
       abi: railAbi,
@@ -199,8 +194,6 @@ export async function readVerifiedFinalState({
       blockNumber,
     }),
   ]);
-
-  const railBalance = weibarToTinybar(railBalanceWeibar);
 
   if (!internalKyc || !isIssuer || !issuerRole || !kycRole || !ssiRole) {
     throw new Error("Final ATS issuer, KYC, or role verification failed.");
@@ -216,11 +209,6 @@ export async function readVerifiedFinalState({
     nominalValueCurrency.toLowerCase() !== "0x555344"
   ) {
     throw new Error("Final ATS asset configuration verification failed.");
-  }
-  if (railBalance < requiredBacking) {
-    throw new Error(
-      "Rail balance does not cover final liabilities and reserves.",
-    );
   }
   if (oraclePrice[0] <= 0n || oraclePrice[2] <= 0n) {
     throw new Error("Final HBAR settlement conversion verification failed.");
@@ -261,7 +249,6 @@ export async function readVerifiedFinalState({
     cashLiabilities,
     reservedAutomation,
     requiredBacking,
-    railBalance,
     policy,
     oraclePriceUsdE8: oraclePrice[0],
     oracleConfidenceUsdE8: oraclePrice[1],

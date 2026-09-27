@@ -30,6 +30,7 @@ if (record.status === "verified") {
   record.accounting !== null ||
   record.verification?.complete !== false ||
   record.verification?.state !== null ||
+  record.verification?.balance !== null ||
   record.verification?.mirrorOrigin !==
     "https://testnet.mirrornode.hedera.com" ||
   Object.keys(record.verification?.contractLinks ?? {}).length !== 0 ||

@@ -286,6 +286,11 @@ export function mirrorContract(address) {
   return `${DEFAULT_MIRROR_URL}/api/v1/contracts/${address}`;
 }
 
+export function mirrorAccountBalance(address) {
+  if (!ADDRESS_RE.test(address)) throw new Error("Invalid account address.");
+  return `${DEFAULT_MIRROR_URL}/api/v1/accounts/${address.toLowerCase()}?transactions=false`;
+}
+
 export function hashScanSchedule(scheduleId) {
   if (!ACCOUNT_ID_RE.test(scheduleId)) throw new Error("Invalid schedule ID.");
   return `https://hashscan.io/testnet/schedule/${scheduleId}`;
@@ -400,6 +405,63 @@ export async function fetchAllowedJson(
     throw new Error(`Remote request returned HTTP ${response.status}.`);
   }
   return safeJson(response, parsed.pathname);
+}
+
+export async function readCurrentMirrorBalance({
+  mirrorOrigin,
+  evmAddress,
+  fetchImpl = fetch,
+  checkedAt = new Date().toISOString(),
+}) {
+  if (!ADDRESS_RE.test(evmAddress ?? "")) {
+    throw new Error("Invalid rail address for Mirror balance verification.");
+  }
+  const origin = new URL(mirrorOrigin).origin;
+  const mirror = new URL(
+    `/api/v1/accounts/${evmAddress.toLowerCase()}?transactions=false`,
+    origin,
+  );
+  const payload = await fetchAllowedJson(mirror, origin, fetchImpl);
+  const accountId = payload?.account;
+  const returnedAddress = payload?.evm_address;
+  const balance = payload?.balance?.balance;
+  const balanceTimestamp = payload?.balance?.timestamp;
+  if (
+    !ACCOUNT_ID_RE.test(accountId ?? "") ||
+    typeof returnedAddress !== "string" ||
+    returnedAddress.toLowerCase() !== evmAddress.toLowerCase() ||
+    payload?.deleted !== false ||
+    !Number.isSafeInteger(balance) ||
+    balance < 0 ||
+    !CONSENSUS_TIMESTAMP_RE.test(balanceTimestamp ?? "") ||
+    !Number.isFinite(Date.parse(checkedAt))
+  ) {
+    throw new Error("Mirror returned an invalid current rail balance.");
+  }
+  return {
+    type: "balance",
+    basis: "current-mirror-account",
+    accountId,
+    evmAddress: evmAddress.toLowerCase(),
+    balanceTinybar: String(balance),
+    balanceTimestamp,
+    checkedAt,
+    mirror: mirror.toString(),
+  };
+}
+
+export function assertRailSolvency({ balanceTinybar, requiredBackingTinybar }) {
+  const balance = BigInt(balanceTinybar);
+  const requiredBacking = BigInt(requiredBackingTinybar);
+  if (balance < requiredBacking) {
+    throw new Error(
+      "Current Mirror balance does not cover liabilities and reserves.",
+    );
+  }
+  return {
+    balanceTinybar: balance,
+    requiredBackingTinybar: requiredBacking,
+  };
 }
 
 export async function fetchMirrorPages({
@@ -701,6 +763,23 @@ function validateStateProof(proof) {
     )
   ) {
     throw new Error("Evidence contains an incomplete state proof.");
+  }
+  return proof;
+}
+
+function validateBalanceProof(proof, railAddress) {
+  if (
+    proof?.type !== "balance" ||
+    proof?.basis !== "current-mirror-account" ||
+    !ACCOUNT_ID_RE.test(proof?.accountId ?? "") ||
+    !ADDRESS_RE.test(proof?.evmAddress ?? "") ||
+    proof.evmAddress.toLowerCase() !== railAddress.toLowerCase() ||
+    !isCanonicalUnsignedInteger(proof?.balanceTinybar) ||
+    !CONSENSUS_TIMESTAMP_RE.test(proof?.balanceTimestamp ?? "") ||
+    !Number.isFinite(Date.parse(proof?.checkedAt ?? "")) ||
+    proof?.mirror !== mirrorAccountBalance(railAddress)
+  ) {
+    throw new Error("Evidence contains an invalid current balance proof.");
   }
   return proof;
 }
@@ -1121,8 +1200,9 @@ export function validateEvidenceRecord(record) {
       throw new Error(`Evidence has an invalid ${name} Mirror source link.`);
     }
   }
-  const expectedPublicLinks =
+  const expectedHashScanLinks =
     record.transactions.length + record.schedules.length + 4;
+  const expectedMirrorLinks = expectedHashScanLinks + 1;
   const linkAudit = record.verification.linkAudit;
   if (
     !linkAudit ||
@@ -1140,9 +1220,9 @@ export function validateEvidenceRecord(record) {
       (linkAudit.checkedAt !== null || linkAudit.hashScanChecked !== 0)) ||
     (linkAudit.hashScanStatus !== "unchecked" &&
       (!Number.isFinite(Date.parse(linkAudit.checkedAt ?? "")) ||
-        linkAudit.hashScanChecked !== expectedPublicLinks)) ||
+        linkAudit.hashScanChecked !== expectedHashScanLinks)) ||
     (linkAudit.mirrorStatus === "verified" &&
-      linkAudit.mirrorChecked !== expectedPublicLinks) ||
+      linkAudit.mirrorChecked !== expectedMirrorLinks) ||
     (linkAudit.finding !== null &&
       (typeof linkAudit.finding !== "string" ||
         !/^docs\/findings\/[a-z0-9-]+\.md$/.test(linkAudit.finding)))
@@ -1190,10 +1270,15 @@ export function validateEvidenceRecord(record) {
       throw new Error(`Evidence accounting is missing ${field}.`);
     }
   }
+  const balanceProof = validateBalanceProof(
+    record.verification?.balance,
+    record.addresses.rail,
+  );
   if (
     BigInt(record.accounting.requiredBackingTinybar) !==
       BigInt(record.accounting.cashLiabilitiesTinybar) +
         BigInt(record.accounting.reservedAutomationTinybar) ||
+    balanceProof.balanceTinybar !== record.accounting.contractBalanceTinybar ||
     BigInt(record.accounting.contractBalanceTinybar) <
       BigInt(record.accounting.requiredBackingTinybar)
   ) {
@@ -1222,7 +1307,6 @@ export function validateEvidenceRecord(record) {
     "rail.reservedAutomationTinybar":
       record.accounting.reservedAutomationTinybar,
     "rail.requiredBackingTinybar": record.accounting.requiredBackingTinybar,
-    "rail.contractBalanceTinybar": record.accounting.contractBalanceTinybar,
     "rail.policy.maximumAdvanceBps": record.policy.maximumAdvanceBps,
     "rail.policy.maximumAnnualRateBps": record.policy.maximumAnnualRateBps,
     "rail.policy.maximumQuoteMovementBps":

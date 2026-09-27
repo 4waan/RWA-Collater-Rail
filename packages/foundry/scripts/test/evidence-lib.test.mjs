@@ -10,6 +10,7 @@ import {
   assertFundingBudget,
   assertHip475Availability,
   assertHssCapacity,
+  assertRailSolvency,
   categorizeBootstrapTransactions,
   classifyDefaultPath,
   confirmMirrorAccountIdentity,
@@ -18,11 +19,13 @@ import {
   hashScanContract,
   hashScanSchedule,
   hashScanTransaction,
+  mirrorAccountBalance,
   mirrorContract,
   mirrorSchedule,
   mirrorTransaction,
   parseHermesUpdate,
   proofForSemanticKind,
+  readCurrentMirrorBalance,
   sweepTemporaryActor,
   validateEvidenceRecord,
   validateRailPolicyEvidence,
@@ -132,7 +135,6 @@ function verifiedEvidence() {
       "rail.cashLiabilitiesTinybar": "0",
       "rail.reservedAutomationTinybar": "0",
       "rail.requiredBackingTinybar": "0",
-      "rail.contractBalanceTinybar": "1",
       "rail.policy.maximumAdvanceBps": 7_000,
       "rail.policy.maximumAnnualRateBps": 10_000,
       "rail.policy.maximumQuoteMovementBps": 100,
@@ -308,6 +310,16 @@ function verifiedEvidence() {
     verification: {
       complete: true,
       state,
+      balance: {
+        type: "balance",
+        basis: "current-mirror-account",
+        accountId: "0.0.106",
+        evmAddress: addresses.rail,
+        balanceTinybar: "1",
+        balanceTimestamp: "1700000122.000000001",
+        checkedAt: "2026-09-25T12:00:09.000Z",
+        mirror: mirrorAccountBalance(addresses.rail),
+      },
       mirrorOrigin: "https://testnet.mirrornode.hedera.com",
       contractLinks: Object.fromEntries(
         ["atsToken", "oracle", "rail", "acceptance"].map((name) => [
@@ -326,7 +338,7 @@ function verifiedEvidence() {
         hashScanStatus: "available",
         mirrorStatus: "verified",
         hashScanChecked: transactions.length + 6,
-        mirrorChecked: transactions.length + 6,
+        mirrorChecked: transactions.length + 7,
         finding: "docs/findings/test-proof-link-audit.md",
       },
     },
@@ -376,6 +388,67 @@ test("endpoint policy accepts only exact public testnet endpoints", () => {
     () => validatedEndpoint("mirror", "http://127.0.0.1"),
     /allowlist/,
   );
+});
+
+test("current Mirror balance proof validates identity and source", async () => {
+  const rail = `0x${"6".repeat(40)}`;
+  const proof = await readCurrentMirrorBalance({
+    mirrorOrigin: "https://testnet.mirrornode.hedera.com",
+    evmAddress: rail,
+    checkedAt: "2026-09-27T12:00:00.000Z",
+    fetchImpl: async () =>
+      response({
+        account: "0.0.106",
+        deleted: false,
+        evm_address: rail,
+        balance: {
+          balance: 9,
+          timestamp: "1700000122.000000001",
+          tokens: [],
+        },
+        transactions: [],
+        links: { next: null },
+      }),
+  });
+  assert.equal(proof.balanceTinybar, "9");
+  assert.equal(proof.mirror, mirrorAccountBalance(rail));
+});
+
+test("current balance verification fails closed on outage and malformed data", async () => {
+  const rail = `0x${"6".repeat(40)}`;
+  await assert.rejects(
+    readCurrentMirrorBalance({
+      mirrorOrigin: "https://testnet.mirrornode.hedera.com",
+      evmAddress: rail,
+      fetchImpl: async () => response({}, 503),
+    }),
+    /HTTP 503/,
+  );
+  await assert.rejects(
+    readCurrentMirrorBalance({
+      mirrorOrigin: "https://testnet.mirrornode.hedera.com",
+      evmAddress: rail,
+      fetchImpl: async () => response({ balance: { balance: 0 } }),
+    }),
+    /invalid current rail balance/,
+  );
+});
+
+test("current solvency rejects zero balance and permits changed solvent balances", () => {
+  assert.throws(
+    () =>
+      assertRailSolvency({
+        balanceTinybar: "0",
+        requiredBackingTinybar: "1",
+      }),
+    /does not cover/,
+  );
+  const result = assertRailSolvency({
+    balanceTinybar: "7",
+    requiredBackingTinybar: "5",
+  });
+  assert.equal(result.balanceTinybar, 7n);
+  assert.notEqual(result.balanceTinybar.toString(), "6");
 });
 
 test("recipe CLI parsing is explicit and rejects missing values", () => {
@@ -1085,7 +1158,7 @@ test("hold inspections bind both positions to exact block state", () => {
 test("state assertions and metrics must be complete and internally bound", () => {
   const missingAssertion = verifiedEvidence();
   delete missingAssertion.verification.state.assertions[
-    "rail.contractBalanceTinybar"
+    "rail.requiredBackingTinybar"
   ];
   assert.throws(
     () => validateEvidenceRecord(missingAssertion),
@@ -1099,4 +1172,21 @@ test("state assertions and metrics must be complete and internally bound", () =>
   const inconsistentElapsed = verifiedEvidence();
   inconsistentElapsed.metrics.elapsedMilliseconds = 9_999;
   assert.throws(() => validateEvidenceRecord(inconsistentElapsed), /metrics/);
+});
+
+test("accounting is bound to its current Mirror balance proof", () => {
+  const missing = verifiedEvidence();
+  missing.verification.balance = null;
+  assert.throws(() => validateEvidenceRecord(missing), /balance proof/);
+
+  const mismatched = verifiedEvidence();
+  mismatched.verification.balance.balanceTinybar = "2";
+  assert.throws(
+    () => validateEvidenceRecord(mismatched),
+    /insolvent rail balance/,
+  );
+
+  const historical = verifiedEvidence();
+  historical.verification.balance.mirror += "&timestamp=1";
+  assert.throws(() => validateEvidenceRecord(historical), /balance proof/);
 });

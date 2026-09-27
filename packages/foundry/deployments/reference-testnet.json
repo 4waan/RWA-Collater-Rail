@@ -286,7 +286,6 @@
         "rail.cashLiabilitiesTinybar": "0",
         "rail.reservedAutomationTinybar": "0",
         "rail.requiredBackingTinybar": "0",
-        "rail.contractBalanceTinybar": "936603529",
         "rail.policy.maximumAdvanceBps": 7000,
         "rail.policy.maximumAnnualRateBps": 10000,
         "rail.policy.maximumQuoteMovementBps": 100,
@@ -512,7 +511,6 @@
         "rail.cashLiabilitiesTinybar": "0",
         "rail.reservedAutomationTinybar": "0",
         "rail.requiredBackingTinybar": "0",
-        "rail.contractBalanceTinybar": "936603529",
         "rail.policy.maximumAdvanceBps": 7000,
         "rail.policy.maximumAnnualRateBps": 10000,
         "rail.policy.maximumQuoteMovementBps": 100,
@@ -526,6 +524,16 @@
         "positions.repaidState": "REPAID",
         "positions.defaultedState": "DEFAULTED"
       }
+    },
+    "balance": {
+      "type": "balance",
+      "basis": "current-mirror-account",
+      "accountId": "0.0.10730723",
+      "evmAddress": "0xbb038155597b01d38eb61af8a2d6117f79a14cb5",
+      "balanceTinybar": "936603529",
+      "balanceTimestamp": "1790433041.060326208",
+      "checkedAt": "2026-09-27T12:24:59Z",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/accounts/0xbb038155597b01d38eb61af8a2d6117f79a14cb5?transactions=false"
     },
     "mirrorOrigin": "https://testnet.mirrornode.hedera.com",
     "contractLinks": {
@@ -541,11 +549,11 @@
       "acceptance": "https://testnet.mirrornode.hedera.com/api/v1/contracts/0x9fF2B637d4f9bD750256C0D5D550FBfB5C19B9Aa"
     },
     "linkAudit": {
-      "checkedAt": "2026-09-27T02:12:33Z",
+      "checkedAt": "2026-09-27T12:24:59Z",
       "hashScanStatus": "unavailable",
       "mirrorStatus": "verified",
       "hashScanChecked": 23,
-      "mirrorChecked": 23,
+      "mirrorChecked": 24,
       "finding": "docs/findings/2026-09-27-public-proof-link-audit.md"
     }
   },
@@ -555,5 +563,5 @@
     "elapsedMilliseconds": 558580,
     "mirrorConfirmedTransactions": 17
   },
-  "notice": "Verified public Hedera testnet evidence. The record contains no signer material or raw transaction payloads."
+  "notice": "Verified public Hedera testnet evidence. Contract state is block-bound and rail solvency uses a separately typed current Mirror balance. The record contains no signer material or raw transaction payloads."
 }

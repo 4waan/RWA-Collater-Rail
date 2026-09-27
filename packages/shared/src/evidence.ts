@@ -37,6 +37,17 @@ export type StateProof = {
   assertions: Record<string, StateAssertion>;
 };
 
+export type BalanceProof = {
+  type: "balance";
+  basis: "current-mirror-account";
+  accountId: string;
+  evmAddress: string;
+  balanceTinybar: string;
+  balanceTimestamp: string;
+  checkedAt: string;
+  mirror: string;
+};
+
 export type ReferenceLifecycle = {
   atsBondDeployment: TransactionProof | null;
   ssiAndKycConfiguration: TransactionProof | null;
@@ -161,6 +172,7 @@ export type ReferenceDeployment = {
   verification: {
     complete: boolean;
     state: StateProof | null;
+    balance: BalanceProof | null;
     mirrorOrigin: string;
     contractLinks: Record<string, string>;
     contractMirrorLinks: Record<string, string>;

@@ -1,10 +1,15 @@
 import type {
+  BalanceProof,
   ScheduleProof,
   StateProof,
   TransactionProof,
 } from "@collateral-rail/shared/evidence";
 
-export type ReferenceProof = TransactionProof | ScheduleProof | StateProof;
+export type ReferenceProof =
+  | TransactionProof
+  | ScheduleProof
+  | StateProof
+  | BalanceProof;
 
 const TRANSACTION_HASH = /^0x[a-fA-F0-9]{64}$/;
 const EVM_ADDRESS = /^0x[a-fA-F0-9]{40}$/;
@@ -102,6 +107,33 @@ export function safeMirrorLink(
   }
 }
 
+export function mirrorAccountBalance(address: string | null | undefined) {
+  return address && EVM_ADDRESS.test(address)
+    ? `${MIRROR_ORIGIN}/api/v1/accounts/${address.toLowerCase()}?transactions=false`
+    : undefined;
+}
+
+export function safeMirrorBalanceLink(value: string | null | undefined) {
+  if (!value) return undefined;
+  try {
+    const parsed = new URL(value);
+    if (
+      parsed.protocol !== "https:" ||
+      parsed.origin !== MIRROR_ORIGIN ||
+      parsed.username ||
+      parsed.password ||
+      parsed.hash ||
+      !/^\/api\/v1\/accounts\/0x[a-f0-9]{40}$/.test(parsed.pathname) ||
+      parsed.search !== "?transactions=false"
+    ) {
+      return undefined;
+    }
+    return parsed.href;
+  } catch {
+    return undefined;
+  }
+}
+
 export function mirrorTransaction(hash: string | null | undefined) {
   return hash && TRANSACTION_HASH.test(hash)
     ? `${MIRROR_ORIGIN}/api/v1/contracts/results/${hash}`
@@ -190,5 +222,22 @@ export function isStateProof(
     origin === proof.rpcOrigin &&
     ALLOWED_STATE_ORIGINS.has(origin) &&
     assertionsValid
+  );
+}
+
+export function isBalanceProof(
+  proof: ReferenceProof | null | undefined,
+): proof is BalanceProof {
+  return Boolean(
+    proof &&
+      proof.type === "balance" &&
+      proof.basis === "current-mirror-account" &&
+      HEDERA_ID.test(proof.accountId) &&
+      EVM_ADDRESS.test(proof.evmAddress) &&
+      /^(?:0|[1-9]\d*)$/.test(proof.balanceTinybar) &&
+      CONSENSUS_TIMESTAMP.test(proof.balanceTimestamp) &&
+      Number.isFinite(Date.parse(proof.checkedAt)) &&
+      safeMirrorBalanceLink(proof.mirror) ===
+        mirrorAccountBalance(proof.evmAddress),
   );
 }

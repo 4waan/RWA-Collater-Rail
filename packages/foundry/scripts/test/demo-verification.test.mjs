@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { WEIBAR_PER_TINYBAR } from "@collateral-rail/shared/hedera";
 import { readVerifiedFinalState } from "../lib/demo-verification.ts";
 
 const address = (digit) => `0x${digit.repeat(40)}`;
@@ -13,7 +12,7 @@ const expectedPolicy = {
   maximumOfferLifetimeSeconds: 86_400,
 };
 
-function publicClientWithBalance(balanceWeibar) {
+function publicClientWithoutHistoricalBalance() {
   const responses = [
     true,
     true,
@@ -40,13 +39,15 @@ function publicClientWithBalance(balanceWeibar) {
   ];
   return {
     readContract: async () => responses.shift(),
-    getBalance: async () => balanceWeibar,
+    getBalance: async () => {
+      throw new Error("historical balance unavailable");
+    },
   };
 }
 
-function verificationOptions(balanceWeibar) {
+function verificationOptions() {
   return {
-    publicClient: publicClientWithBalance(balanceWeibar),
+    publicClient: publicClientWithoutHistoricalBalance(),
     atsToken: address("1"),
     oracle: address("2"),
     rail: address("3"),
@@ -58,20 +59,8 @@ function verificationOptions(balanceWeibar) {
   };
 }
 
-test("final solvency converts the JSON RPC balance from weibar", async () => {
-  const state = await readVerifiedFinalState(
-    verificationOptions(5n * WEIBAR_PER_TINYBAR),
-  );
-  assert.equal(state.railBalance, 5n);
-  await assert.rejects(
-    readVerifiedFinalState(verificationOptions(4n * WEIBAR_PER_TINYBAR)),
-    /does not cover/,
-  );
-});
-
-test("final solvency rejects fractional tinybar RPC balances", async () => {
-  await assert.rejects(
-    readVerifiedFinalState(verificationOptions(5n * WEIBAR_PER_TINYBAR + 1n)),
-    /exact tinybar/,
-  );
+test("final contract state does not depend on historical RPC balance retention", async () => {
+  const state = await readVerifiedFinalState(verificationOptions());
+  assert.equal(state.requiredBacking, 5n);
+  assert.equal("railBalance" in state, false);
 });

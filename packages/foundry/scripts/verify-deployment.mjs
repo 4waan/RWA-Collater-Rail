@@ -12,9 +12,11 @@ import { DEFAULT_PARTITION } from "@collateral-rail/shared/hedera";
 import {
   DEFAULT_MIRROR_URL,
   DEFAULT_RPC_URL,
+  assertRailSolvency,
   confirmMirrorAccountIdentity,
   confirmMirrorSchedule,
   fetchAllowedJson,
+  readCurrentMirrorBalance,
   validateEvidenceRecord,
   validatedEndpoint,
   waitForMirrorTransaction,
@@ -132,6 +134,8 @@ const acceptance = requireAddress("acceptance");
 const operator = requireActorAddress("issuer");
 const lender = requireActorAddress("lender");
 const borrower = requireActorAddress("borrower");
+let currentBalanceProof = null;
+let currentAccounting = null;
 
 for (const [name, address] of Object.entries({
   token,
@@ -351,6 +355,45 @@ if (record.status === "bootstrap-mined") {
     expectedPolicy: record.policy,
     blockNumber: verifiedBlock,
   });
+  currentBalanceProof = await readCurrentMirrorBalance({
+    mirrorOrigin,
+    evmAddress: rail,
+  });
+  assertEqual(
+    currentBalanceProof.accountId,
+    record.verification.balance.accountId,
+    "Rail Mirror account ID",
+  );
+  const [currentCashLiabilities, currentReservedAutomation, currentRequired] =
+    await Promise.all([
+      client.readContract({
+        address: rail,
+        abi: railAbi,
+        functionName: "cashLiabilities",
+      }),
+      client.readContract({
+        address: rail,
+        abi: railAbi,
+        functionName: "reservedAutomation",
+      }),
+      client.readContract({
+        address: rail,
+        abi: railAbi,
+        functionName: "requiredBacking",
+      }),
+    ]);
+  if (currentRequired !== currentCashLiabilities + currentReservedAutomation) {
+    throw new Error("Current rail accounting is internally inconsistent.");
+  }
+  assertRailSolvency({
+    balanceTinybar: currentBalanceProof.balanceTinybar,
+    requiredBackingTinybar: currentRequired.toString(),
+  });
+  currentAccounting = {
+    cashLiabilitiesTinybar: currentCashLiabilities.toString(),
+    reservedAutomationTinybar: currentReservedAutomation.toString(),
+    requiredBackingTinybar: currentRequired.toString(),
+  };
   assertEqual(finalState.internalKyc, record.ats.internalKyc, "ATS KYC mode");
   assertEqual(finalState.issuer, record.ats.issuer, "ATS issuer status");
   assertEqual(
@@ -430,11 +473,6 @@ if (record.status === "bootstrap-mined") {
     finalState.requiredBacking.toString(),
     record.accounting.requiredBackingTinybar,
     "Required backing",
-  );
-  assertEqual(
-    finalState.railBalance.toString(),
-    record.accounting.contractBalanceTinybar,
-    "Rail balance",
   );
   assertEqual(
     finalState.oraclePriceUsdE8.toString(),
@@ -763,6 +801,19 @@ console.log(
       receipts: record.transactions.length,
       schedules: record.schedules?.length ?? 0,
       verifiedBlock: verifiedBlock?.toString() ?? "latest",
+      currentBalance:
+        currentBalanceProof === null
+          ? null
+          : {
+              basis: currentBalanceProof.basis,
+              balanceTinybar: currentBalanceProof.balanceTinybar,
+              balanceTimestamp: currentBalanceProof.balanceTimestamp,
+              checkedAt: currentBalanceProof.checkedAt,
+              accounting: currentAccounting,
+              changedSinceEvidence:
+                currentBalanceProof.balanceTinybar !==
+                record.accounting.contractBalanceTinybar,
+            },
     },
     null,
     2,

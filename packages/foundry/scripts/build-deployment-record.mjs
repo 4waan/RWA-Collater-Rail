@@ -84,6 +84,7 @@ const record = {
   verification: {
     complete: false,
     state: null,
+    balance: null,
     mirrorOrigin: DEFAULT_MIRROR_URL,
     contractLinks: {},
     contractMirrorLinks: {},

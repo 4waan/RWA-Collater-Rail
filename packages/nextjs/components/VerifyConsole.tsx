@@ -190,12 +190,21 @@ export function VerifyConsole({ initialPosition }: VerifyConsoleProps) {
       proof: terminalProof,
     },
     {
-      claim: "Final state and solvency were read at an exact block.",
+      claim: "Final contract state was read at an exact block.",
       source: "Hedera JSON-RPC state proof",
       detail: referenceDeployment.verification.state
         ? `${Object.keys(referenceDeployment.verification.state.assertions).length} assertions`
         : "Awaiting verified publication",
       proof: referenceDeployment.verification.state,
+    },
+    {
+      claim:
+        "Dated lifecycle accounting was covered by a current Mirror balance.",
+      source: "Hedera Mirror account balance",
+      detail: referenceDeployment.verification.balance
+        ? `${formatUnits(BigInt(referenceDeployment.verification.balance.balanceTinybar), 8)} HBAR checked ${referenceDeployment.verification.balance.checkedAt}, balance timestamp ${referenceDeployment.verification.balance.balanceTimestamp}`
+        : "Awaiting verified publication",
+      proof: referenceDeployment.verification.balance,
     },
   ];
 
@@ -401,6 +410,14 @@ export function VerifyConsole({ initialPosition }: VerifyConsoleProps) {
             <dt>State read block</dt>
             <dd>
               {referenceDeployment.verification.state?.blockNumber ?? "Pending"}
+            </dd>
+          </div>
+          <div>
+            <dt>Current rail balance</dt>
+            <dd>
+              {referenceDeployment.verification.balance
+                ? `${formatUnits(BigInt(referenceDeployment.verification.balance.balanceTinybar), 8)} HBAR`
+                : "Pending"}
             </dd>
           </div>
         </dl>

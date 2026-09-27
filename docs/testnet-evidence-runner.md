@@ -132,6 +132,8 @@ The runner writes `packages/foundry/deployments/testnet.json` with mode `0600`. 
   ATS token, including offer, hold, repayment, and fallback identifiers;
 - both terminal hold reads prove that no position-tagged collateral remains;
 - the typed oracle values and final state reads are complete;
+- the current Mirror account balance identifies the rail, carries its own
+  balance timestamp, and covers exact-block liabilities plus HSS reserves;
 - HIP-475 evidence names system contract `0x168`, system file `0.0.112`, carries
   the network-rate caveat, and contains no Pyth update transaction;
 - Pyth evidence names its feed, price, confidence, publish time, and matching
@@ -146,13 +148,17 @@ contains its hash, consensus timestamp, result, exact Mirror source URL, and
 secondary HashScan URL. A schedule proof contains its EVM address, Hedera
 schedule ID, execution timestamp when executed, exact Mirror source URL, and
 secondary HashScan URL. A state proof contains the verified block number,
-approved RPC origin, and assertions read at that block.
+approved RPC origin, and assertions read at that block. A balance proof contains
+the rail account ID, EVM address, current tinybar balance, Mirror balance
+timestamp, check time, and exact current-account URL. It is never described as
+an exact-block RPC read.
 
 The runner records Mirror URLs directly from validated identifiers. It marks
 HashScan as unchecked until a maintainer completes the manual release audit.
 Explorer failure does not downgrade Mirror-confirmed evidence. The current
 [public proof link audit](findings/2026-09-27-public-proof-link-audit.md) records
-all 23 destinations and the explicit HashScan unavailable state.
+all 23 HashScan destinations, all 24 Mirror destinations, and the explicit
+HashScan unavailable state.
 
 Publication first validates the ignored candidate, runs the live Mirror and RPC
 verifier, and scans the deployment directory. Only then does it write a

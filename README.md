@@ -290,8 +290,11 @@ ledger. Publication requires the `term-credit` recipe, its complete deployed
 policy, two distinct ATS holds, one repaid position, one matured default, a real
 Mirror-confirmed HSS schedule, typed oracle evidence, live ATS roles and KYC,
 separate free and held balances, successful Mirror receipts, and solvent final
-accounting. The current record names HIP-475 and therefore contains no Pyth
-update transaction.
+accounting. Final contract reads are bound to Hashio block `41012411`. Rail
+solvency is bound separately to a typed current Mirror account balance so a
+provider's unavailable historical balance cannot be presented as block-bound
+proof. The current record names HIP-475 and therefore contains no Pyth update
+transaction.
 
 The evidence classes are deliberately separate. **Observed on testnet:** the
 committed default was executed by HSS schedule `0.0.10730732` and confirmed by a
@@ -303,10 +306,10 @@ a second funded lifecycle. See the
 [HSS observation and fallback assurance finding](docs/findings/2026-09-27-hss-observation-and-fallback-assurance.md).
 
 The [public proof link audit](docs/findings/2026-09-27-public-proof-link-audit.md)
-opened all 23 transaction, schedule, and contract links. Mirror returned every
-exact entity. HashScan deep links returned HTTP 404 during the dated audit, so
-the interface marks the explorer unavailable without weakening the verified
-Mirror or RPC evidence.
+opened all 23 HashScan links and all 24 Mirror links. Mirror returned every
+exact entity and the current rail balance. HashScan deep links returned HTTP
+404 during the dated audit, so the interface marks the explorer unavailable
+without weakening the verified Mirror or RPC evidence.
 
 The direct lifecycle runner is:
 

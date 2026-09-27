@@ -53,6 +53,9 @@ The committed reference record is publishable only when:
   receipt events from the expected contracts;
 - typed oracle data, source-specific proof, immutable policy, liabilities,
   reserves, and solvency are complete;
+- final contract state is bound to an exact RPC block, while rail balance is a
+  separately typed current Mirror account proof and solvency is evaluated
+  against that declared source;
 - HIP-475 evidence contains the network-rate caveat and no Pyth update
   transaction, while Pyth evidence contains its matching update transaction;
 - the candidate contains no private material and passes the secret scan.

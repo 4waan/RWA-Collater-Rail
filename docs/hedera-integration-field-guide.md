@@ -235,10 +235,10 @@ transaction and exposes response link metadata. Scripted verification follows
 
 **Status:** source-read
 
-**Failure mode:** Ethereum JSON RPC transaction values and `eth_getBalance` use
-18-decimal weibars. Hedera EVM `msg.value`, `address.balance`, and contract cash
-amounts use 8-decimal tinybars. Treating the boundary as one unit causes a
-10,000,000,000-fold error.
+**Failure mode:** Ethereum JSON RPC transaction values use 18-decimal weibars.
+Hedera EVM `msg.value`, `address.balance`, and contract cash amounts use
+8-decimal tinybars. Mirror account balances are already tinybars. Treating
+these boundaries as one unit causes a 10,000,000,000-fold error.
 
 **Template consequence:** Public fields and events use the `Tinybar` suffix. The
 constants name both sides. Client writes multiply tinybars by
@@ -246,8 +246,9 @@ constants name both sides. Client writes multiply tinybars by
 price values use an `E8` suffix.
 
 **Guard and test:** `testFuzzConversionAndInterestRoundUp` checks cash
-conversion and interest. Runner tests cover exact weibar round trips,
-fractional-tinybar rejection, and solvency after RPC balance conversion.
+conversion and interest. Runner tests keep block-bound contract reads separate
+from the current Mirror balance proof and reject malformed, unavailable, or
+insolvent balance responses.
 
 **Primary source:** Hedera
 [Ethereum transaction unit reference](https://docs.hedera.com/hedera/sdks-and-apis/sdks/smart-contracts/ethereum-transaction).

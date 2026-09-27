@@ -121,7 +121,15 @@ test("verification keeps financial claims and balances distinct", async ({
     page.getByText("State read block", { exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByText("Final state and solvency were read at an exact block."),
+    page.getByText("Final contract state was read at an exact block."),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      "Dated lifecycle accounting was covered by a current Mirror balance.",
+    ),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Current rail balance", { exact: true }),
   ).toBeVisible();
   await expect(
     page.getByText("DEFAULTED via hss, observed on testnet", { exact: true }),

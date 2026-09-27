@@ -51,11 +51,12 @@ external call, and a reentrancy lock protects the full path.
 The HSS reserve is not lender principal. `withdrawUnusedAutomation` can reach
 only balance above user liabilities and pending schedule reserves.
 
-Hedera has two native value units at this boundary. JSON RPC transaction
-values and `eth_getBalance` use 18-decimal weibars. Solidity `msg.value`,
-`address.balance`, and every rail cash amount use 8-decimal tinybars. Client
-and runner code converts by exactly 10,000,000,000 only when values cross the
-JSON RPC boundary. Contract accounting remains entirely in tinybars.
+Hedera has two native value units at this boundary. JSON RPC transaction values
+use 18-decimal weibars. Solidity `msg.value`, `address.balance`, and every rail
+cash amount use 8-decimal tinybars. Client writes convert by exactly
+10,000,000,000 at the JSON RPC boundary. The release verifier obtains current
+rail balance from the Mirror account endpoint, which reports tinybars directly.
+Contract accounting remains entirely in tinybars.
 
 ## Collateral accounting
 
@@ -98,7 +99,8 @@ HSS improves liveness.
 - The optional Pyth adapter is trusted only for HBAR/USD cash conversion within
   freshness and confidence bounds. Pyth mode must be explicitly configured.
 - HSS may fail or be saturated without blocking acceptance or recovery.
-- Mirror Node supplies historical evidence, but direct contract reads determine current state.
+- Hashio supplies block-bound contract reads. Mirror Node supplies transaction,
+  schedule, identity, and current rail-balance evidence.
 - The deployment operator controls ATS issuance and KYC setup, but cannot seize rail credits.
 
 ## Evidence model
@@ -111,7 +113,10 @@ Public evidence is typed by what the network actually proves:
   execution timestamp when applicable, an exact authoritative Mirror URL, and a
   secondary HashScan link;
 - a state proof contains the Hedera block number, approved RPC origin, and the
-  exact assertions read at that block.
+  exact contract assertions read at that block;
+- a balance proof contains a current Mirror account URL, account identity,
+  tinybar balance, balance timestamp, and check time. It is separate because the
+  public Hashio endpoint did not reproduce the historical rail balance.
 
 Oracle evidence is also discriminated by source. A HIP-475 record names system
 contract `0x168`, system file `0.0.112`, the observed settlement rate, its block
