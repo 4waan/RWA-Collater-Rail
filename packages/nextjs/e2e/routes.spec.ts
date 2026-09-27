@@ -119,6 +119,32 @@ test("verification keeps financial claims and balances distinct", async ({
   await expect(
     page.getByText("DEFAULTED via hss, observed on testnet", { exact: true }),
   ).toBeVisible();
+  await expect(
+    page.getByText(
+      "HashScan was unavailable on 2026-09-27. Mirror evidence remains authoritative.",
+      { exact: true },
+    ),
+  ).toHaveCount(4);
+  await expect(
+    page.getByRole("link", { name: "Open authoritative Mirror receipt" }),
+  ).toHaveCount(2);
+  await expect(
+    page.getByRole("link", { name: "Open authoritative Mirror schedule" }),
+  ).toHaveCount(2);
+  await expect(
+    page.getByRole("link", { name: "Retry schedule on HashScan" }),
+  ).toHaveCount(2);
+  const scheduleProof = page.locator('[data-proof-type="schedule"]').first();
+  await expect(scheduleProof).toContainText("HSS schedule");
+  await expect(scheduleProof).not.toContainText("Transaction receipt");
+  await expect(
+    scheduleProof.getByRole("link", {
+      name: "Open authoritative Mirror schedule",
+    }),
+  ).toHaveAttribute(
+    "href",
+    "https://testnet.mirrornode.hedera.com/api/v1/schedules/0.0.10730732",
+  );
 });
 
 test("shareable recipe state and mobile layout remain bounded", async ({

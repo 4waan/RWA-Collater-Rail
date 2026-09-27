@@ -680,6 +680,21 @@ select:focus {
   font-size: 11px;
 }
 
+.explorerSource {
+  display: grid;
+  gap: 4px;
+}
+
+.proofLinkSecondary {
+  margin-top: 0;
+  color: var(--muted);
+}
+
+.proofUnavailable {
+  color: var(--danger);
+  line-height: 1.45;
+}
+
 .typedProof {
   display: grid;
   gap: 4px;

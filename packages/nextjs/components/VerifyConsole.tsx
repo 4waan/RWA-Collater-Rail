@@ -344,7 +344,15 @@ export function VerifyConsole({ initialPosition }: VerifyConsoleProps) {
                 <p>{item.detail}</p>
                 <small>{item.source}</small>
               </div>
-              <ProofReference proof={item.proof} />
+              <ProofReference
+                explorerCheckedAt={
+                  referenceDeployment.verification.linkAudit.checkedAt
+                }
+                explorerStatus={
+                  referenceDeployment.verification.linkAudit.hashScanStatus
+                }
+                proof={item.proof}
+              />
             </li>
           ))}
         </ol>

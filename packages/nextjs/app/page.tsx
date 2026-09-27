@@ -49,8 +49,9 @@ export default function OverviewPage() {
           <h2>Every claim has a source.</h2>
           <p>
             The reference record separates contract state, ATS balances, the
-            {` ${oracleEvidence.label}, `}HSS schedules, Mirror receipts, and
-            HashScan links. Missing proof stays visibly pending.
+            {` ${oracleEvidence.label}, `}HSS schedules, authoritative Mirror
+            sources, and secondary HashScan links. Missing proof stays visibly
+            pending.
           </p>
           <dl className="proofStatus" aria-label="Reference evidence status">
             <div>

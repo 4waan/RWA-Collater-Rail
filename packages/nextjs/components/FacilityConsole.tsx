@@ -763,8 +763,28 @@ export function FacilityConsole({
             Cash liabilities and HSS reserves are proven as separate balances.
           </p>
         )}
-        {supportingProof && <ProofReference proof={supportingProof} />}
-        {step >= 2 && <ProofReference proof={primaryProof} />}
+        {supportingProof && (
+          <ProofReference
+            explorerCheckedAt={
+              referenceDeployment.verification.linkAudit.checkedAt
+            }
+            explorerStatus={
+              referenceDeployment.verification.linkAudit.hashScanStatus
+            }
+            proof={supportingProof}
+          />
+        )}
+        {step >= 2 && (
+          <ProofReference
+            explorerCheckedAt={
+              referenceDeployment.verification.linkAudit.checkedAt
+            }
+            explorerStatus={
+              referenceDeployment.verification.linkAudit.hashScanStatus
+            }
+            proof={primaryProof}
+          />
+        )}
         <button
           className="primaryButton"
           onClick={() => finishStep(step)}
