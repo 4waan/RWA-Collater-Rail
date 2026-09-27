@@ -433,6 +433,460 @@ export const oracleAbi = [
   },
 ] as const;
 
+export const htsRailAbi = [
+  {
+    type: "function",
+    name: "initializeSettlement",
+    stateMutability: "nonpayable",
+    inputs: [],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "previewOffer",
+    stateMutability: "view",
+    inputs: [
+      {
+        name: "terms",
+        type: "tuple",
+        components: [
+          { name: "borrower", type: "address" },
+          { name: "collateralAmount", type: "uint128" },
+          { name: "principalTokenUnits", type: "uint128" },
+          { name: "annualRateBps", type: "uint16" },
+          { name: "termSeconds", type: "uint64" },
+          { name: "offerExpiresAt", type: "uint64" },
+        ],
+      },
+    ],
+    outputs: [
+      { name: "maximumPrincipalUsdE8", type: "uint256" },
+      { name: "previewMaximumTokenUnits", type: "uint256" },
+      { name: "principalUsdE8", type: "uint256" },
+      { name: "previewRepaymentTokenUnits", type: "uint256" },
+      { name: "maturity", type: "uint64" },
+      { name: "priceUsdE8", type: "uint256" },
+      { name: "publishTime", type: "uint64" },
+    ],
+  },
+  {
+    type: "function",
+    name: "fundOffer",
+    stateMutability: "nonpayable",
+    inputs: [
+      {
+        name: "terms",
+        type: "tuple",
+        components: [
+          { name: "borrower", type: "address" },
+          { name: "collateralAmount", type: "uint128" },
+          { name: "principalTokenUnits", type: "uint128" },
+          { name: "annualRateBps", type: "uint16" },
+          { name: "termSeconds", type: "uint64" },
+          { name: "offerExpiresAt", type: "uint64" },
+        ],
+      },
+    ],
+    outputs: [{ name: "offerId", type: "bytes32" }],
+  },
+  {
+    type: "function",
+    name: "cancelOffer",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "offerId", type: "bytes32" }],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "acceptOffer",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "offerId", type: "bytes32" }],
+    outputs: [{ name: "positionId", type: "bytes32" }],
+  },
+  {
+    type: "function",
+    name: "repay",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "positionId", type: "bytes32" }],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "settle",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "positionId", type: "bytes32" }],
+    outputs: [{ name: "executed", type: "bool" }],
+  },
+  {
+    type: "function",
+    name: "withdraw",
+    stateMutability: "nonpayable",
+    inputs: [],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "fundAutomation",
+    stateMutability: "payable",
+    inputs: [],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "withdrawUnusedAutomation",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "recipient", type: "address" },
+      { name: "amount", type: "uint256" },
+    ],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "getOffer",
+    stateMutability: "view",
+    inputs: [{ name: "offerId", type: "bytes32" }],
+    outputs: [
+      {
+        name: "",
+        type: "tuple",
+        components: [
+          { name: "lender", type: "address" },
+          {
+            name: "terms",
+            type: "tuple",
+            components: [
+              { name: "borrower", type: "address" },
+              { name: "collateralAmount", type: "uint128" },
+              { name: "principalTokenUnits", type: "uint128" },
+              { name: "annualRateBps", type: "uint16" },
+              { name: "termSeconds", type: "uint64" },
+              { name: "offerExpiresAt", type: "uint64" },
+            ],
+          },
+          { name: "quotePriceUsdE8", type: "uint256" },
+          { name: "quotePublishTime", type: "uint64" },
+          { name: "exists", type: "bool" },
+        ],
+      },
+    ],
+  },
+  {
+    type: "function",
+    name: "getPosition",
+    stateMutability: "view",
+    inputs: [{ name: "positionId", type: "bytes32" }],
+    outputs: [
+      {
+        name: "",
+        type: "tuple",
+        components: [
+          { name: "lender", type: "address" },
+          { name: "borrower", type: "address" },
+          { name: "collateralAmount", type: "uint256" },
+          { name: "holdId", type: "uint256" },
+          { name: "principalTokenUnits", type: "uint256" },
+          { name: "repaymentTokenUnits", type: "uint256" },
+          { name: "openedAt", type: "uint64" },
+          { name: "maturity", type: "uint64" },
+          { name: "scheduleAddress", type: "address" },
+          { name: "state", type: "uint8" },
+          { name: "automation", type: "uint8" },
+        ],
+      },
+    ],
+  },
+  {
+    type: "function",
+    name: "policy",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "tuple",
+        components: [
+          { name: "maximumAdvanceBps", type: "uint16" },
+          { name: "maximumAnnualRateBps", type: "uint16" },
+          { name: "maximumQuoteMovementBps", type: "uint16" },
+          { name: "minimumTermSeconds", type: "uint64" },
+          { name: "maximumTermSeconds", type: "uint64" },
+          { name: "maximumOfferLifetimeSeconds", type: "uint64" },
+        ],
+      },
+    ],
+  },
+  {
+    type: "function",
+    name: "cashTokenLiabilities",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "reservedAutomation",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "settlementDecimals",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint8" }],
+  },
+  {
+    type: "function",
+    name: "offerSequence",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "atsToken",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "address" }],
+  },
+  {
+    type: "function",
+    name: "settlementToken",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "address" }],
+  },
+  {
+    type: "function",
+    name: "oracle",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "address" }],
+  },
+  {
+    type: "function",
+    name: "owner",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "address" }],
+  },
+  {
+    type: "function",
+    name: "partition",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "bytes32" }],
+  },
+  {
+    type: "function",
+    name: "settlementInitialized",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "bool" }],
+  },
+  {
+    type: "function",
+    name: "settlementKycNotApplicable",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "bool" }],
+  },
+  {
+    type: "function",
+    name: "settlementHasKycKey",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "bool" }],
+  },
+  {
+    type: "function",
+    name: "settlementHasFreezeKey",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "bool" }],
+  },
+  {
+    type: "function",
+    name: "credits",
+    stateMutability: "view",
+    inputs: [{ name: "account", type: "address" }],
+    outputs: [{ name: "tokenCredit", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "requiredBacking",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [
+      { name: "tokenLiabilities", type: "uint256" },
+      { name: "hbarAutomationReserve", type: "uint256" },
+    ],
+  },
+  {
+    type: "event",
+    name: "OfferFunded",
+    inputs: [
+      { indexed: true, name: "offerId", type: "bytes32" },
+      { indexed: true, name: "lender", type: "address" },
+      { indexed: true, name: "borrower", type: "address" },
+      { indexed: false, name: "principalTokenUnits", type: "uint256" },
+      { indexed: false, name: "quotePriceUsdE8", type: "uint256" },
+    ],
+  },
+  {
+    type: "event",
+    name: "PositionOpened",
+    inputs: [
+      { indexed: true, name: "positionId", type: "bytes32" },
+      { indexed: true, name: "lender", type: "address" },
+      { indexed: true, name: "borrower", type: "address" },
+      { indexed: false, name: "holdId", type: "uint256" },
+      { indexed: false, name: "maturity", type: "uint256" },
+    ],
+  },
+  {
+    type: "event",
+    name: "AutomationReserved",
+    inputs: [
+      { indexed: true, name: "positionId", type: "bytes32" },
+      { indexed: true, name: "scheduleAddress", type: "address" },
+      { indexed: false, name: "executionSecond", type: "uint64" },
+    ],
+  },
+  {
+    type: "event",
+    name: "PositionDefaulted",
+    inputs: [
+      { indexed: true, name: "positionId", type: "bytes32" },
+      { indexed: false, name: "collateralAmount", type: "uint256" },
+    ],
+  },
+  {
+    type: "event",
+    name: "PositionRepaid",
+    inputs: [
+      { indexed: true, name: "positionId", type: "bytes32" },
+      { indexed: false, name: "repaymentTokenUnits", type: "uint256" },
+    ],
+  },
+  {
+    type: "event",
+    name: "Withdrawal",
+    inputs: [
+      { indexed: true, name: "account", type: "address" },
+      { indexed: false, name: "amountTokenUnits", type: "uint256" },
+    ],
+  },
+] as const;
+
+export const htsTokenAbi = [
+  {
+    type: "function",
+    name: "approve",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "spender", type: "address" },
+      { name: "amount", type: "uint256" },
+    ],
+    outputs: [{ type: "bool" }],
+  },
+  {
+    type: "function",
+    name: "transfer",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "to", type: "address" },
+      { name: "amount", type: "uint256" },
+    ],
+    outputs: [{ type: "bool" }],
+  },
+  {
+    type: "function",
+    name: "balanceOf",
+    stateMutability: "view",
+    inputs: [{ name: "account", type: "address" }],
+    outputs: [{ type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "allowance",
+    stateMutability: "view",
+    inputs: [
+      { name: "owner", type: "address" },
+      { name: "spender", type: "address" },
+    ],
+    outputs: [{ type: "uint256" }],
+  },
+] as const;
+
+export const usdOracleAbi = [
+  {
+    type: "function",
+    name: "updatePrice",
+    stateMutability: "payable",
+    inputs: [{ name: "updateData", type: "bytes[]" }],
+    outputs: [
+      { name: "priceUsdE8", type: "uint256" },
+      { name: "confidenceUsdE8", type: "uint256" },
+      { name: "publishTime", type: "uint64" },
+    ],
+  },
+  {
+    type: "function",
+    name: "latestUsdPrice",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [
+      { name: "priceUsdE8", type: "uint256" },
+      { name: "confidenceUsdE8", type: "uint256" },
+      { name: "publishTime", type: "uint64" },
+    ],
+  },
+] as const;
+
+export const htsAcceptanceAbi = [
+  {
+    type: "function",
+    name: "rail",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ type: "address" }],
+  },
+  {
+    type: "function",
+    name: "inspect",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "account", type: "address" },
+      { name: "requiredTokenUnits", type: "uint256" },
+    ],
+    outputs: [
+      {
+        name: "result",
+        type: "tuple",
+        components: [
+          { name: "initialized", type: "bool" },
+          { name: "tokenPolicyReady", type: "bool" },
+          { name: "associationReady", type: "bool" },
+          { name: "kycReady", type: "bool" },
+          { name: "unfrozen", type: "bool" },
+          { name: "balanceReady", type: "bool" },
+          { name: "allowanceReady", type: "bool" },
+          { name: "balanceTokenUnits", type: "uint256" },
+          { name: "allowanceTokenUnits", type: "uint256" },
+          { name: "metadataResponse", type: "int64" },
+          { name: "feeResponse", type: "int64" },
+          { name: "frozenResponse", type: "int64" },
+          { name: "kycResponse", type: "int64" },
+          { name: "allowanceResponse", type: "int64" },
+        ],
+      },
+    ],
+  },
+] as const;
+
 export const positionStates = ["None", "Open", "Repaid", "Defaulted"] as const;
 export const automationStates = [
   "None",

@@ -2,6 +2,9 @@
   "id": "custom-facility",
   "name": "Custom Facility",
   "purpose": "A safe starting envelope for a developer-defined bilateral ATS financing pattern.",
+  "settlement": {
+    "kind": "hbar"
+  },
   "policy": {
     "maximumAdvanceBps": 7000,
     "maximumAnnualRateBps": 10000,

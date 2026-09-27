@@ -2,6 +2,9 @@
   "id": "term-credit",
   "name": "Term Credit",
   "purpose": "A fixed-term HBAR advance secured by an ATS-native hold, with repayment or collateral execution at maturity.",
+  "settlement": {
+    "kind": "hbar"
+  },
   "policy": {
     "maximumAdvanceBps": 7000,
     "maximumAnnualRateBps": 10000,
