@@ -107,13 +107,13 @@ export function safeMirrorLink(
   }
 }
 
-export function mirrorAccountBalance(address: string | null | undefined) {
+function mirrorAccountBalance(address: string | null | undefined) {
   return address && EVM_ADDRESS.test(address)
     ? `${MIRROR_ORIGIN}/api/v1/accounts/${address.toLowerCase()}?transactions=false`
     : undefined;
 }
 
-export function safeMirrorBalanceLink(value: string | null | undefined) {
+function safeMirrorBalanceLink(value: string | null | undefined) {
   if (!value) return undefined;
   try {
     const parsed = new URL(value);
