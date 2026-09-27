@@ -25,7 +25,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           {children}
           <footer>
             <span>Collateral Rail</span>
-            <span>Unaudited testnet software. Never expose operator keys.</span>
+            <span>
+              Verified Hedera testnet lifecycle. Invariant and Harness gated. No
+              independent production audit. Never expose operator keys.
+            </span>
           </footer>
         </Providers>
       </body>

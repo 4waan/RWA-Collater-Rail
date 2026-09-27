@@ -1,8 +1,34 @@
 # Security policy
 
-Collateral Rail is unaudited testnet software. Do not use it to custody valuable
-assets or operate a production credit facility without an independent audit,
-deployment review, operational controls, and legal review.
+Collateral Rail publishes a verified Hedera testnet lifecycle and passes unit,
+fuzz, invariant, runner, browser, fresh-scaffold, and Harness gates. Those are
+concrete assurance layers. They do not constitute an independent production
+audit or approval to custody valuable assets.
+
+Do not operate a production credit facility from this template without an
+independent audit, deployment review, operational controls, and legal review.
+The maintained reference deployment and its public evidence are limited to
+Hedera testnet.
+
+## Assurance model
+
+- **Tested:** deterministic unit, fuzz, invariant, runner, and browser tests
+  establish behavior inside their modeled and adversarial call sequences. A
+  passing test is not presented as a public network event.
+- **Verified on testnet:** the committed evidence record proves a dated,
+  two-position Hedera testnet lifecycle through typed Mirror, schedule, and
+  exact-block state evidence. It does not prove future network availability or
+  mainnet behavior.
+- **Independently audited:** no independent production audit is claimed.
+  Internal review, automated analysis, and invariant coverage remain distinct
+  from a third-party audit opinion.
+- **Production approved:** no production approval is claimed. A production
+  deployment requires its own audit, configuration review, operational and key
+  controls, legal analysis, and acceptance by the deploying organization.
+
+Public claims must preserve these distinctions. Use observed testnet evidence
+for network events and adversarial tests for modeled recovery properties. Never
+use either one to imply an independent audit or production authorization.
 
 ## Reporting
 

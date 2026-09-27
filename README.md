@@ -69,6 +69,12 @@ current committed record is verified. The homepage reports its transaction
 count, and the verification page links every claim to a typed transaction, HSS
 schedule, or state proof. The interface never invents proof.
 
+Assurance is layered. Automated and invariant tests establish behavior across
+modeled call sequences. The committed evidence establishes what was observed on
+Hedera testnet. Neither is presented as an independent production audit or
+production approval. The exact boundary and deployment requirements are in the
+[Security Policy](SECURITY.md).
+
 ## Choose a recipe
 
 List and validate the bundled recipes:

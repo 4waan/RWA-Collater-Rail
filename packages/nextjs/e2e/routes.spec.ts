@@ -24,6 +24,13 @@ test("home presents one promise, one recipe, and one proof frame", async ({
   await expect(
     page.getByText("hss observed on testnet", { exact: true }),
   ).toBeVisible();
+  await expect(
+    page.getByText(
+      "Verified Hedera testnet lifecycle. Invariant and Harness gated. No independent production audit. Never expose operator keys.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await expect(page.getByText("Unaudited testnet software.")).toHaveCount(0);
 });
 
 test("facility expands only one lifecycle step", async ({ page }) => {
