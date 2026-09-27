@@ -328,7 +328,7 @@ specifications in `.harness/` and the [Maintainer Guide](docs/maintainer-guide.m
 - [Maintenance roadmap](docs/roadmap.md)
 - [Decision record template](docs/templates/decision-record.md)
 - [Measured finding template](docs/templates/measured-finding.md)
-- [2026-09-26 local release validation](docs/findings/2026-09-26-release-validation.md)
+- [2026-09-26 release and lifecycle timings](docs/findings/2026-09-26-release-validation.md)
 - [2026-09-27 public proof link audit](docs/findings/2026-09-27-public-proof-link-audit.md)
 
 Version 1 uses one HBAR cash leg, one ATS asset per rail, and ATS internal KYC.
