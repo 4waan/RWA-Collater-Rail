@@ -19,7 +19,7 @@ contract EmptyFacadeRailHarness is AtsCollateralRailHts {
     {}
 
     function _htsFungibleMetadata() internal pure override returns (SettlementMetadata memory) {
-        return SettlementMetadata({decimals: 6, deleted: false, defaultKycStatus: true, paused: false});
+        return SettlementMetadata({decimals: 6, deleted: false, paused: false, hasKycKey: false, hasFreezeKey: false});
     }
 
     function _htsFeeCounts() internal pure override returns (uint256, uint256, uint256) {
@@ -65,6 +65,8 @@ contract AtsCollateralRailHtsTest is TestBase {
         assertTrue(rail.settlementInitialized());
         assertEq(rail.settlementDecimals(), 6);
         assertFalse(rail.settlementKycNotApplicable());
+        assertTrue(rail.settlementHasKycKey());
+        assertTrue(rail.settlementHasFreezeKey());
 
         vm.expectRevert(AtsCollateralRailHts.SettlementAlreadyInitialized.selector);
         rail.initializeSettlement();
@@ -76,6 +78,24 @@ contract AtsCollateralRailHtsTest is TestBase {
         AtsCollateralRailHtsHarness otherRail = _deploy(ats, otherToken, oracle);
         otherRail.initializeSettlement();
         assertTrue(otherRail.settlementInitialized());
+    }
+
+    function testTokensWithoutKycOrFreezeKeysSkipInapplicableQueries() public {
+        MockHtsToken openToken = new MockHtsToken();
+        openToken.setComplianceKeys(false, false);
+        openToken.setResponses(22, 22, 172, 177, 22, 22);
+        AtsCollateralRailHtsHarness openRail = _deploy(ats, openToken, oracle);
+        openRail.initializeSettlement();
+
+        assertTrue(openRail.settlementKycNotApplicable());
+        assertFalse(openRail.settlementHasKycKey());
+        assertFalse(openRail.settlementHasFreezeKey());
+
+        openToken.setBalance(LENDER, PRINCIPAL);
+        openToken.setAllowance(LENDER, address(openRail), PRINCIPAL);
+        vm.prank(LENDER);
+        openRail.fundOffer(_terms());
+        assertEq(openRail.cashTokenLiabilities(), PRINCIPAL);
     }
 
     function testInitializeRejectsFailedTokenInfoFeeInfoAndAssociation() public {
@@ -334,6 +354,72 @@ contract AtsCollateralRailHtsTest is TestBase {
         assertEq(rail.cashTokenLiabilities(), 0);
     }
 
+    function testBalanceAndComplianceQueryFailuresDoNotFund() public {
+        _prepareFunding();
+        token.setBalance(LENDER, PRINCIPAL - 1);
+        vm.prank(LENDER);
+        vm.expectRevert(
+            abi.encodeWithSelector(AtsCollateralRailHts.InsufficientTokenBalance.selector, PRINCIPAL - 1, PRINCIPAL)
+        );
+        rail.fundOffer(_terms());
+
+        token.setBalance(LENDER, PRINCIPAL * 2);
+        token.setResponses(22, 7, 22, 22, 22, 22);
+        vm.prank(LENDER);
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                AtsCollateralRailHts.HtsCallFailed.selector, IHederaTokenService.allowance.selector, int64(7)
+            )
+        );
+        rail.fundOffer(_terms());
+
+        token.setResponses(22, 22, 7, 22, 22, 22);
+        vm.prank(LENDER);
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                AtsCollateralRailHts.HtsCallFailed.selector, IHederaTokenService.isFrozen.selector, int64(7)
+            )
+        );
+        rail.fundOffer(_terms());
+
+        token.setResponses(22, 22, 22, 7, 22, 22);
+        vm.prank(LENDER);
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                AtsCollateralRailHts.HtsCallFailed.selector, IHederaTokenService.isKyc.selector, int64(7)
+            )
+        );
+        rail.fundOffer(_terms());
+        assertEq(rail.cashTokenLiabilities(), 0);
+        assertEq(token.balanceOf(address(rail)), 0);
+    }
+
+    function testMinimumAndMaximumTransferAmountsAreRepresentable() public {
+        AtsCollateralRailHts.OfferTerms memory minimumTerms = _terms();
+        minimumTerms.principalTokenUnits = 1;
+        token.setBalance(LENDER, 1);
+        token.setAllowance(LENDER, address(rail), 1);
+        vm.prank(LENDER);
+        rail.fundOffer(minimumTerms);
+
+        MockHtsToken maximumToken = new MockHtsToken();
+        AtsCollateralRailHtsHarness maximumRail = new AtsCollateralRailHtsHarness(
+            ats, PARTITION, maximumToken, oracle, 2, type(uint128).max, _policy(), address(this)
+        );
+        maximumRail.initializeSettlement();
+        uint256 maximum = maximumRail.MAX_TRANSFER_AMOUNT();
+        maximumToken.setKyc(LENDER, true);
+        maximumToken.setBalance(LENDER, maximum);
+        maximumToken.setAllowance(LENDER, address(maximumRail), maximum);
+        AtsCollateralRailHts.OfferTerms memory maximumTerms = _terms();
+        maximumTerms.principalTokenUnits = uint128(maximum);
+        maximumTerms.annualRateBps = 0;
+        vm.prank(LENDER);
+        maximumRail.fundOffer(maximumTerms);
+        assertEq(maximumRail.cashTokenLiabilities(), maximum);
+        assertEq(maximumToken.balanceOf(address(maximumRail)), maximum);
+    }
+
     function testWrongHtsResponseAndInboundDeltaMismatchRollbackFunding() public {
         _prepareFunding();
         token.setResponses(22, 22, 22, 22, 7, 22);
@@ -392,6 +478,58 @@ contract AtsCollateralRailHtsTest is TestBase {
         assertEq(rail.cashTokenLiabilities(), liabilitiesBefore);
         assertEq(uint256(rail.getPosition(positionId).state), uint256(AtsCollateralRailHts.PositionState.OPEN));
         assertEq(ats.holdAmount(PARTITION, BORROWER, 1), COLLATERAL);
+    }
+
+    function testMalformedCreatedHoldRollsBackAcceptance() public {
+        bytes32 offerId = _fund();
+        ats.setCorruptNextHold(true);
+        vm.prank(BORROWER);
+        vm.expectRevert(AtsCollateralRailHts.InvalidHold.selector);
+        rail.acceptOffer(offerId);
+
+        assertTrue(rail.getOffer(offerId).exists);
+        assertEq(rail.credits(BORROWER), 0);
+        assertEq(ats.holdsCreated(), 0);
+        assertEq(ats.getHeldAmountForByPartition(PARTITION, BORROWER), 0);
+    }
+
+    function testUpwardAndMalformedHoldAdjustmentsAreHandledConservatively() public {
+        bytes32 upwardPositionId = _fundAndAccept();
+        AtsCollateralRailHts.Position memory upward = rail.getPosition(upwardPositionId);
+        ats.setAdjustedHoldAmount(PARTITION, BORROWER, upward.holdId, COLLATERAL + 1);
+        vm.warp(upward.maturity);
+        rail.settle(upwardPositionId);
+        assertEq(ats.balanceOfByPartition(PARTITION, LENDER), COLLATERAL + 1);
+
+        setUp();
+        bytes32 malformedPositionId = _fundAndAccept();
+        AtsCollateralRailHts.Position memory malformed = rail.getPosition(malformedPositionId);
+        ats.setHoldData(PARTITION, BORROWER, malformed.holdId, bytes("wrong-position"));
+        uint256 repayment = malformed.repaymentTokenUnits;
+        token.setBalance(BORROWER, repayment);
+        token.setAllowance(BORROWER, address(rail), repayment);
+        vm.prank(BORROWER);
+        vm.expectRevert(AtsCollateralRailHts.InvalidHold.selector);
+        rail.repay(malformedPositionId);
+        assertEq(uint256(rail.getPosition(malformedPositionId).state), uint256(AtsCollateralRailHts.PositionState.OPEN));
+        assertEq(token.balanceOf(BORROWER), repayment);
+    }
+
+    function testSchedulingFailureLeavesPermissionlessSettlementAvailable() public {
+        vm.deal(address(this), rail.HSS_RESERVE_TINYBAR());
+        rail.fundAutomation{value: rail.HSS_RESERVE_TINYBAR()}();
+        rail.configureSchedule(1, 7, address(0));
+        bytes32 positionId = _fundAndAccept();
+        AtsCollateralRailHts.Position memory position = rail.getPosition(positionId);
+        assertEq(rail.scheduleAttempts(), 3);
+        assertEq(uint256(position.automation), uint256(AtsCollateralRailHts.AutomationState.UNAVAILABLE));
+        assertEq(position.scheduleAddress, address(0));
+        assertEq(rail.reservedAutomation(), 0);
+
+        vm.warp(position.maturity);
+        assertTrue(rail.settle(positionId));
+        assertFalse(rail.settle(positionId));
+        assertEq(uint256(rail.getPosition(positionId).state), uint256(AtsCollateralRailHts.PositionState.DEFAULTED));
     }
 
     function testQuoteMovementBoundary() public {

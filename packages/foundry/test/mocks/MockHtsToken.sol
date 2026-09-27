@@ -8,6 +8,8 @@ contract MockHtsToken {
     bool public deleted;
     bool public defaultKycStatus;
     bool public paused;
+    bool public hasKycKey = true;
+    bool public hasFreezeKey = true;
     uint256 public fixedFees;
     uint256 public fractionalFees;
     uint256 public royaltyFees;
@@ -32,6 +34,11 @@ contract MockHtsToken {
         deleted = deleted_;
         defaultKycStatus = defaultKycStatus_;
         paused = paused_;
+    }
+
+    function setComplianceKeys(bool hasKycKey_, bool hasFreezeKey_) external {
+        hasKycKey = hasKycKey_;
+        hasFreezeKey = hasFreezeKey_;
     }
 
     function setFeeCounts(uint256 fixedFees_, uint256 fractionalFees_, uint256 royaltyFees_) external {

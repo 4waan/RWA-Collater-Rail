@@ -89,8 +89,9 @@ contract AtsCollateralRailHtsHarness is AtsCollateralRailHts {
         return SettlementMetadata({
             decimals: token.decimals(),
             deleted: token.deleted(),
-            defaultKycStatus: token.defaultKycStatus(),
-            paused: token.paused()
+            paused: token.paused(),
+            hasKycKey: token.hasKycKey(),
+            hasFreezeKey: token.hasFreezeKey()
         });
     }
 

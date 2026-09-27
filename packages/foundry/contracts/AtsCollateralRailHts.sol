@@ -73,8 +73,9 @@ contract AtsCollateralRailHts is HederaScheduleService, HederaTokenService, Reen
     struct SettlementMetadata {
         int32 decimals;
         bool deleted;
-        bool defaultKycStatus;
         bool paused;
+        bool hasKycKey;
+        bool hasFreezeKey;
     }
 
     uint256 public constant BPS = 10_000;
@@ -91,6 +92,8 @@ contract AtsCollateralRailHts is HederaScheduleService, HederaTokenService, Reen
     int64 public constant HEDERA_SUCCESS = 22;
     int64 public constant TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT = 194;
     uint8 private constant ATS_AUTHORIZED_HOLD = 1;
+    uint256 private constant HTS_KYC_KEY = 1 << 1;
+    uint256 private constant HTS_FREEZE_KEY = 1 << 2;
 
     IAtsCollateralToken public immutable atsToken;
     address public immutable settlementToken;
@@ -109,6 +112,8 @@ contract AtsCollateralRailHts is HederaScheduleService, HederaTokenService, Reen
     bool public settlementInitialized;
     uint8 public settlementDecimals;
     bool public settlementKycNotApplicable;
+    bool public settlementHasKycKey;
+    bool public settlementHasFreezeKey;
     uint256 public offerSequence;
     uint256 public cashTokenLiabilities;
     uint256 public reservedAutomation;
@@ -239,7 +244,9 @@ contract AtsCollateralRailHts is HederaScheduleService, HederaTokenService, Reen
         }
 
         settlementDecimals = uint8(uint32(metadata.decimals));
-        settlementKycNotApplicable = metadata.defaultKycStatus;
+        settlementHasKycKey = metadata.hasKycKey;
+        settlementHasFreezeKey = metadata.hasFreezeKey;
+        settlementKycNotApplicable = !metadata.hasKycKey;
         settlementInitialized = true;
         _tokenBalance(address(this));
         emit SettlementInitialized(settlementToken, settlementDecimals, settlementKycNotApplicable);
@@ -555,13 +562,15 @@ contract AtsCollateralRailHts is HederaScheduleService, HederaTokenService, Reen
 
     function _assertSettlementAccount(address account, uint256 amount, bool inbound) internal {
         SettlementMetadata memory metadata = _assertCurrentTokenPolicy();
-        (int64 frozenResponseCode, bool frozen) = _htsFrozen(account);
-        if (frozenResponseCode != HEDERA_SUCCESS) {
-            revert HtsCallFailed(IHederaTokenService.isFrozen.selector, frozenResponseCode);
+        if (metadata.hasFreezeKey) {
+            (int64 frozenResponseCode, bool frozen) = _htsFrozen(account);
+            if (frozenResponseCode != HEDERA_SUCCESS) {
+                revert HtsCallFailed(IHederaTokenService.isFrozen.selector, frozenResponseCode);
+            }
+            if (frozen) revert SettlementAccountFrozen(account);
         }
-        if (frozen) revert SettlementAccountFrozen(account);
 
-        if (!metadata.defaultKycStatus) {
+        if (metadata.hasKycKey) {
             (int64 kycResponseCode, bool kycGranted) = _htsKyc(account);
             if (kycResponseCode != HEDERA_SUCCESS) {
                 revert HtsCallFailed(IHederaTokenService.isKyc.selector, kycResponseCode);
@@ -606,9 +615,21 @@ contract AtsCollateralRailHts is HederaScheduleService, HederaTokenService, Reen
         metadata = SettlementMetadata({
             decimals: tokenInfo.decimals,
             deleted: tokenInfo.tokenInfo.deleted,
-            defaultKycStatus: tokenInfo.tokenInfo.defaultKycStatus,
-            paused: tokenInfo.tokenInfo.pauseStatus
+            paused: tokenInfo.tokenInfo.pauseStatus,
+            hasKycKey: _tokenHasKey(tokenInfo.tokenInfo.token.tokenKeys, HTS_KYC_KEY),
+            hasFreezeKey: _tokenHasKey(tokenInfo.tokenInfo.token.tokenKeys, HTS_FREEZE_KEY)
         });
+    }
+
+    function _tokenHasKey(IHederaTokenService.TokenKey[] memory tokenKeys, uint256 keyType)
+        internal
+        pure
+        returns (bool)
+    {
+        for (uint256 i = 0; i < tokenKeys.length; ++i) {
+            if ((tokenKeys[i].keyType & keyType) != 0) return true;
+        }
+        return false;
     }
 
     function _htsFeeCounts() internal virtual returns (uint256 fixedFees, uint256 fractionalFees, uint256 royaltyFees) {

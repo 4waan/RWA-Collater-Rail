@@ -60,6 +60,29 @@ targeted handler selector. Fail when the mutating contract selector inventory,
 declared coverage map, or `targetSelector` list drifts. Do not use broad handler
 targeting that silently includes helper or setup selectors.
 
+For `AtsCollateralRailHts`, maintain this separate mutation matrix. Do not merge
+token liability and HBAR automation accounting into one backing value.
+
+```text
+Selector                    | Protected properties                         | External surfaces
+initializeSettlement        | token metadata, association, readiness       | HTS info, fees, associate, balance
+fundOffer                   | offer, sequence, token balance, liability     | ATS KYC, oracle, HTS policy and pull
+cancelOffer                 | offer, lender token credit                    | none
+acceptOffer                 | offer, position, credit, ATS hold, reserve    | ATS, oracle, self-call, HSS
+repay                       | position, credit, liability, token, hold      | HTS pull, ATS release
+settle, public or HSS       | position, reserve, ATS hold                   | ATS KYC, ATS execute
+withdraw                    | token credit, liability, token balance        | HTS policy and push
+fundAutomation              | HBAR balance                                  | none
+withdrawUnusedAutomation    | unreserved HBAR                               | recipient callback
+schedulePosition, self only | external HSS schedule                         | self-call gate, HSS system contract
+receive                     | HBAR balance                                  | must always revert
+```
+
+Initialization is setup-only. Exercise it directly in deterministic tests, but
+exclude it from a post-initialization invariant handler. Every other public
+mutating selector must appear in the HTS handler selector inventory or have a
+documented boundary reason.
+
 ### Accounting and conservation
 
 - Preserve `address(this).balance >= cashLiabilities + reservedAutomation`
@@ -82,6 +105,17 @@ targeting that silently includes helper or setup selectors.
 - The terms on the right are ghost values, never values derived from the state
   under test. Solvency is an inequality. Do not weaken the other equalities to
   inequalities.
+- For the HTS rail, maintain independent ghost values and assert:
+  - `cashTokenLiabilities == fundedOfferPrincipal + tokenCredits`
+  - `reservedAutomation == pendingSchedules * HSS_RESERVE_TINYBAR`
+  - `railHoldsCreated == acceptedPositions`
+  - `terminalActions == repaidPositions + defaultedPositions`
+  - `openPositions == acceptedPositions - repaidPositions - defaultedPositions`
+  - `railTokenBalance >= cashTokenLiabilities`
+  - `railHbarBalance >= reservedAutomation`
+- Token balance can never satisfy an HBAR reserve, and HBAR can never satisfy a
+  token liability. Assert each solvency inequality independently after every
+  successful and reverted handler call.
 
 ### Custody and ATS holds
 
@@ -171,6 +205,13 @@ satisfy the proof or reserve ghost.
   reentry into every mutation-matrix selector wherever the EVM permits it, plus
   short returns, malformed returns, explicit reverts, and successful calls with
   false or wrong response data. Assert both rollback and unchanged ghost state.
+- Preserve these Audit Box regressions as named requirements:
+  - AB-037: empty returndata and facade bytecode never establish successful HTS
+    interface behavior.
+  - AB-039: an ATS failure after an HTS transfer reverts the transfer, offer or
+    position mutation, credits, liabilities, and holds in one transaction.
+  - AB-042: reject fixed, fractional, and royalty fee schedules. Never estimate
+    around a custom fee or assume the schedule cannot change after setup.
 
 ### Invariant test construction
 
@@ -191,6 +232,10 @@ satisfy the proof or reserve ghost.
 - For any suspected exploit path, record its preconditions and the shortest
   reachable call sequence. Do not describe a path as covered until the handler
   actually reaches it and the post-state is asserted.
+- HTS post-seed anti-vacuity counters must each increase for funding,
+  cancellation, acceptance, repayment, token withdrawal, automation funding,
+  HSS default, public fallback, terminal no-op, compliance rejection and retry,
+  fee rejection, transfer rollback, and ATS adjustment.
 
 ## Integration maintenance
 
@@ -219,6 +264,18 @@ satisfy the proof or reserve ghost.
   timestamp before attributing a terminal action to HSS.
 - Never persist an address returned by a simulation as a real schedule address.
 - Keep HSS funds separate from user cash liabilities.
+- For HTS settlement, pin the token ID, long-zero address, decimals, token type,
+  deletion state, compliance key capabilities, pause state, freeze default, and
+  all custom fee counts. Re-read mutable policy before each transfer.
+- HTS response code 22 is success. Association initialization may also accept
+  code 194. Low-level call success, facade bytecode, or empty returndata is not
+  an acceptable substitute for the expected response and shape.
+- Measure the rail token balance before and after every HTS pull and push. The
+  delta must equal the requested amount exactly, or the whole transition must
+  revert.
+- Circle testnet USDC support is bound to token `0.0.429274`, six decimals, and
+  the pinned Pyth USDC/USD feed. Revalidate live Mirror metadata before spending.
+  The controlled token and `FixedTestUsdOracle` prove mechanics only.
 - Name contract values as tinybar and JSON RPC values as weibar. Test the exact
   conversion independently of the production helper.
 - Mirror queries must enforce the exact origin, timeouts, response-size limits,
