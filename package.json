@@ -54,7 +54,7 @@
     "@hiero-ledger/sdk": "2.88.0",
     "hedera-harness": "1.2.2",
     "knip": "6.38.0",
-    "playwright": "1.61.1",
-    "prettier": "3.6.2"
+    "playwright": "1.63.0",
+    "prettier": "3.9.9"
   }
 }

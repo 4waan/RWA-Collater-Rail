@@ -22,12 +22,12 @@
   "dependencies": {
     "@collateral-rail/shared": "workspace:*",
     "@hiero-ledger/hiero-contracts": "0.2.0",
-    "viem": "2.56.8"
+    "viem": "2.56.9"
   },
   "devDependencies": {
     "@hiero-ledger/sdk": "2.88.0",
-    "@types/node": "22.18.6",
-    "tsx": "4.20.6",
-    "typescript": "5.8.2"
+    "@types/node": "26.6.2",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
   }
 }
