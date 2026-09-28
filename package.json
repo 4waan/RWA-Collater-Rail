@@ -51,7 +51,7 @@
     "release:check": "yarn release:validate"
   },
   "devDependencies": {
-    "@hiero-ledger/sdk": "2.86.2",
+    "@hiero-ledger/sdk": "2.88.0",
     "hedera-harness": "1.2.2",
     "knip": "6.38.0",
     "playwright": "1.61.1",
