@@ -214,6 +214,25 @@ export async function writeHtsEvidenceCandidateAtomic(
   }
 }
 
+export async function bestEffortSweepTokenBalance({
+  accountId,
+  readBalance,
+  sweep,
+}: {
+  accountId: string;
+  readBalance: () => Promise<bigint>;
+  sweep: (amount: bigint) => Promise<unknown>;
+}) {
+  try {
+    const amount = await readBalance();
+    if (amount < 0n) throw new Error("Negative token balance.");
+    if (amount > 0n) await sweep(amount);
+    return { accountId, amountTokenUnits: amount.toString(), swept: true };
+  } catch {
+    return { accountId, amountTokenUnits: null, swept: false };
+  }
+}
+
 export async function runHtsFoundry(environment: NodeJS.ProcessEnv) {
   await new Promise<void>((resolve, reject) => {
     const output: Buffer[] = [];

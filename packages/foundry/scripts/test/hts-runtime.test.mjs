@@ -3,6 +3,7 @@ import test from "node:test";
 import { HtsEvidenceJournal } from "../lib/hts-proof-runtime.mjs";
 import {
   assertCircleUsdcPreflight,
+  bestEffortSweepTokenBalance,
   htsFoundryEnvironment,
   htsOutputPath,
   selectedHtsProfile,
@@ -94,6 +95,39 @@ test("atomic HTS candidate writes reject every noncanonical path", async () => {
     ),
     /ignored candidate path/,
   );
+});
+
+test("best-effort token cleanup sweeps positive balances without key material", async () => {
+  const swept = [];
+  const result = await bestEffortSweepTokenBalance({
+    accountId: "0.0.123",
+    readBalance: async () => 42n,
+    sweep: async (amount) => swept.push(amount),
+  });
+  assert.deepEqual(swept, [42n]);
+  assert.deepEqual(result, {
+    accountId: "0.0.123",
+    amountTokenUnits: "42",
+    swept: true,
+  });
+  assert.equal("privateKey" in result, false);
+});
+
+test("best-effort token cleanup reports failure without throwing", async () => {
+  const result = await bestEffortSweepTokenBalance({
+    accountId: "0.0.456",
+    readBalance: async () => {
+      throw new Error("network failure with internal details");
+    },
+    sweep: async () => {
+      throw new Error("not reached");
+    },
+  });
+  assert.deepEqual(result, {
+    accountId: "0.0.456",
+    amountTokenUnits: null,
+    swept: false,
+  });
 });
 
 function circleMetadata(overrides = {}) {

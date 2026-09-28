@@ -61,6 +61,7 @@ import {
   HTS_PRINCIPAL_TOKEN_UNITS,
   assertCircleUsdcPreflight,
   assertWritableHtsArtifactPath,
+  bestEffortSweepTokenBalance,
   htsAddressesPath,
   htsBroadcastPath,
   htsFoundryEnvironment,
@@ -192,7 +193,10 @@ async function main() {
   const journal = new HtsEvidenceJournal();
   const actors = [];
   const sweepResults = [];
+  const tokenSweepResults = [];
   const tokenTransfers = [];
+  let settlementTokenId = null;
+  let settlementTokenAddress = null;
 
   async function nativeSuccess(kind, response) {
     const confirmed = await waitForNativeProof({
@@ -316,8 +320,6 @@ async function main() {
       borrower.evmAddress,
     );
 
-    let settlementTokenId;
-    let settlementTokenAddress;
     let settlementTokenCreation = null;
     if (profile === "controlled") {
       const creation = await nativeSuccess(
@@ -1266,6 +1268,23 @@ async function main() {
     );
     console.log(`Verified HTS evidence written to ${outputPath}.`);
   } finally {
+    if (settlementTokenId && settlementTokenAddress) {
+      for (const actor of actors) {
+        tokenSweepResults.push(
+          await bestEffortSweepTokenBalance({
+            accountId: actor.accountId,
+            readBalance: () =>
+              publicClient.readContract({
+                address: settlementTokenAddress,
+                abi: htsTokenAbi,
+                functionName: "balanceOf",
+                args: [actor.evmAddress],
+              }),
+            sweep: (amount) => sweepToken(settlementTokenId, actor, amount),
+          }),
+        );
+      }
+    }
     for (const actor of actors.reverse()) {
       sweepResults.push(
         await sweepTemporaryActor({
@@ -1277,6 +1296,15 @@ async function main() {
       );
     }
     sdkClient.close();
+    for (const result of tokenSweepResults) {
+      if (!result.swept) {
+        console.log(`Best-effort token sweep failed for ${result.accountId}.`);
+      } else if (result.amountTokenUnits !== "0") {
+        console.log(
+          `Swept ${result.amountTokenUnits} token units from ${result.accountId}.`,
+        );
+      }
+    }
     for (const result of sweepResults) {
       console.log(
         result.swept
