@@ -9,9 +9,9 @@ import "@fontsource/ibm-plex-mono/500.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Collateral Rail",
+  title: "RWA Credit Rail",
   description:
-    "Finance an ATS security without rebuilding custody, compliance ordering, oracle safety, maturity automation, or public proof.",
+    "Bilateral HBAR financing against Hedera ATS securities with partition holds, HSS maturity settlement, and Mirror-verifiable evidence.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -24,7 +24,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </Suspense>
           {children}
           <footer>
-            <span>Collateral Rail</span>
+            <span>RWA Credit Rail</span>
             <span>
               Verified Hedera testnet lifecycle. Invariant and Harness gated. No
               independent production audit. Never expose operator keys.

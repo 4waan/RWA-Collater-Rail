@@ -20,20 +20,20 @@ export default function OverviewPage() {
       <section className="homeFrame promiseFrame">
         <div className="frameIndex">01 / Promise</div>
         <div className="promiseCopy">
-          <span className="kicker">A reusable financing kernel for Hedera</span>
-          <h1>Finance an ATS security.</h1>
+          <span className="kicker">Secured credit for tokenized assets</span>
+          <h1>Finance ATS securities on Hedera.</h1>
           <p>
-            Start without rebuilding custody, compliance ordering, oracle
-            safety, maturity automation, or public proof. Change the financing
-            policy, not the safety model.
+            Originate bilateral HBAR loans against securities issued with Asset
+            Tokenization Studio. ATS partition holds secure the collateral, HSS
+            handles maturity, and Mirror records prove the lifecycle.
           </p>
           <Link className="primaryButton" href="#recipes">
             Explore a financing recipe
           </Link>
         </div>
         <p className="frameAside">
-          One tested kernel combines ATS holds, exact HBAR accounting, typed
-          settlement conversion, HSS automation, and Mirror evidence.
+          Configure the facility terms through a recipe. Keep custody,
+          accounting, automation, and evidence rules unchanged.
         </p>
       </section>
 

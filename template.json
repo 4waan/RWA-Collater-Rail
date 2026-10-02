@@ -1,6 +1,6 @@
 {
-  "name": "collateral-rail",
-  "description": "Finance an ATS security without rebuilding custody, compliance ordering, oracle safety, maturity automation, or public proof.",
+  "name": "rwa-credit-rail",
+  "description": "Originate bilateral HBAR loans against Hedera ATS securities with partition holds, HSS maturity settlement, and Mirror-verifiable lifecycle evidence.",
   "version": "1.0.0",
   "create-scaffold-hbar": {
     "requirements": {

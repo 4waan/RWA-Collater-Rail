@@ -1,4 +1,4 @@
-# Collateral Rail maintenance PRD
+# RWA Credit Rail maintenance PRD
 
 ## Goal
 

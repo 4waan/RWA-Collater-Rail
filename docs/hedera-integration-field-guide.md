@@ -1,6 +1,6 @@
 # Hedera Integration Field Guide
 
-This guide contains only findings that change the Collateral Rail design. A
+This guide contains only findings that change the RWA Credit Rail design. A
 status tells you how strong the claim is:
 
 - `source-read`: confirmed in the upstream implementation or official API.

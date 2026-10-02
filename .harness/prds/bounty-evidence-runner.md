@@ -1,6 +1,6 @@
 # Increment: bounty evidence runner
 
-Build a secure, repeatable Hedera testnet lifecycle command for Collateral Rail.
+Build a secure, repeatable Hedera testnet lifecycle command for RWA Credit Rail.
 
 ## Outcome
 

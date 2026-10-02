@@ -1,12 +1,13 @@
-# Collateral Rail
+# RWA Credit Rail
 
-Finance an ATS security without rebuilding custody, compliance ordering, oracle
-safety, maturity automation, or public proof.
+Originate bilateral loans against securities issued with Hedera Asset
+Tokenization Studio.
 
-Collateral Rail is a developer-first Scaffold-HBAR template for bilateral HBAR
-financing against Asset Tokenization Studio securities. It gives a new project
-one narrow, tested financing kernel and declarative recipes for changing product
-policy without changing the safety model.
+RWA Credit Rail is a Scaffold-HBAR template for bilateral HBAR financing against
+Asset Tokenization Studio securities. It locks collateral in ATS partition
+holds, schedules maturity through Hedera Schedule Service, and publishes a
+Mirror-verifiable record of funding, repayment, and default. Declarative recipes
+change facility policy without changing the custody or accounting model.
 
 Use it to start a term facility, maturity bridge, treasury advance, receivables
 facility, or another bilateral secured-credit pattern. The recipe can change.
@@ -34,11 +35,11 @@ value.
 Requirements: Node 22, Corepack, Foundry, and Git.
 
 ```sh
-npm create scaffold-hbar@latest collateral-rail-app -- \
+npm create scaffold-hbar@latest rwa-credit-rail-app -- \
   --template 4waan/scaffold-hbar-ats-finance \
   --yes \
   --skip-hedera-skills
-cd collateral-rail-app
+cd rwa-credit-rail-app
 yarn dev
 ```
 

@@ -23,9 +23,9 @@ export function SiteHeader() {
     <header className="siteHeader">
       <Link className="wordmark" href="/">
         <span className="mark" aria-hidden="true">
-          C/R
+          R/C
         </span>
-        <span>Collateral Rail</span>
+        <span>RWA Credit Rail</span>
       </Link>
       <nav aria-label="Primary navigation">
         <Link href="/">Recipes</Link>

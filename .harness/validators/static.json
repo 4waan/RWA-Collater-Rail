@@ -1,6 +1,6 @@
 {
   "jsonAssertions": [
-    { "file": "template.json", "path": "name", "equals": "collateral-rail" },
+    { "file": "template.json", "path": "name", "equals": "rwa-credit-rail" },
     {
       "file": "template.json",
       "path": "create-scaffold-hbar.capabilities.frontend",

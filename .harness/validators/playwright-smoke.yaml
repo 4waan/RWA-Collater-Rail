@@ -1,4 +1,4 @@
-name: collateral-rail-routes
+name: rwa-credit-rail-routes
 server:
   command: yarn workspace @collateral-rail/nextjs start -p 3211 -H 127.0.0.1
   url: http://127.0.0.1:3211

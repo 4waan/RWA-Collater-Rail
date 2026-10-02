@@ -2,7 +2,7 @@
 
 ## Product boundary
 
-Collateral Rail is a bilateral HBAR financing scaffold. It is not an exchange,
+RWA Credit Rail is a bilateral HBAR financing scaffold. It is not an exchange,
 an order book, a pooled lender, or a valuation engine. The configured oracle
 converts the USD cash terms to HBAR. HIP-475 is the default and exposes a network
 settlement conversion rate, not a live market price. Pyth is optional and must

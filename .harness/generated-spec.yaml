@@ -1,7 +1,7 @@
 schemaVersion: 2
 
-name: generated-collateral-rail
-description: Validate a generated Collateral Rail application without source-template metadata.
+name: generated-rwa-credit-rail
+description: Validate a generated RWA Credit Rail application without source-template metadata.
 prd: .harness/prds/bounty-evidence-runner.md
 agent: claude
 maxAttempts: 2

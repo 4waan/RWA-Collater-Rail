@@ -5,7 +5,9 @@ test("home presents one promise, one recipe, and one proof frame", async ({
 }) => {
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: "Finance an ATS security." }),
+    page.getByRole("heading", {
+      name: "Finance ATS securities on Hedera.",
+    }),
   ).toBeVisible();
   await expect(page.getByText("Reference mode", { exact: true })).toBeVisible();
   await expect(
