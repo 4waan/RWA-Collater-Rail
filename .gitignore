@@ -26,3 +26,4 @@ packages/foundry/deployments/latest-addresses.json
 .skill-cache/
 .harness-skills/
 .harness-context/
+.vercel
