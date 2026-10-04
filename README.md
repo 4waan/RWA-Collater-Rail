@@ -36,7 +36,7 @@ Requirements: Node 22, Corepack, Foundry, and Git.
 
 ```sh
 npm create scaffold-hbar@latest rwa-credit-rail-app -- \
-  --template 4waan/scaffold-hbar-ats-finance \
+  --template 4waan/RWA-Collater-Rail \
   --yes \
   --skip-hedera-skills
 cd rwa-credit-rail-app
