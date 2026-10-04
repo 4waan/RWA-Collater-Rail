@@ -4,6 +4,7 @@ import {
   htsEvidenceConstants,
   validateHtsEvidenceRecord,
 } from "../lib/hts-evidence-lib.mjs";
+import { toMirrorNativeTransactionId } from "../lib/native-transaction-id.mjs";
 
 const MIRROR = htsEvidenceConstants.MIRROR_ORIGIN;
 const HASHSCAN = "https://hashscan.io";
@@ -38,6 +39,7 @@ function evmTransaction(value, kind, result = "SUCCESS") {
 
 function nativeTransaction(value, kind) {
   const transactionId = `0.0.${100 + value}@1700000${String(value).padStart(3, "0")}.000000001`;
+  const mirrorId = toMirrorNativeTransactionId(transactionId);
   return {
     type: "hedera-transaction",
     kind,
@@ -45,7 +47,7 @@ function nativeTransaction(value, kind) {
     transactionHash: nativeHash(10_000 + value),
     consensusTimestamp: `1700000${String(value).padStart(3, "0")}.123456789`,
     result: "SUCCESS",
-    mirror: `${MIRROR}/api/v1/transactions/${encodeURIComponent(transactionId)}`,
+    mirror: `${MIRROR}/api/v1/transactions/${mirrorId}`,
     hashScan: `${HASHSCAN}/testnet/transaction/${transactionId}`,
   };
 }
@@ -91,6 +93,7 @@ function controlledEvidence() {
   const tokenCreation = nativeTransaction(1, "settlement-token-creation");
   const atsDeployment = evmTransaction(2, "ats-bond-deployment-1");
   const initialization = evmTransaction(3, "settlement-initialization");
+  const automationFunding = evmTransaction(12, "automation-funding");
   const provisionIssuer = nativeTransaction(4, "provision-issuer");
   const provisionLender = nativeTransaction(5, "provision-lender");
   const provisionBorrower = nativeTransaction(6, "provision-borrower");
@@ -116,6 +119,7 @@ function controlledEvidence() {
     tokenCreation,
     atsDeployment,
     initialization,
+    automationFunding,
     provisionIssuer,
     provisionLender,
     provisionBorrower,
@@ -330,6 +334,7 @@ function controlledEvidence() {
       atsBondDeployment: atsDeployment,
       settlementTokenCreation: tokenCreation,
       settlementInitialization: initialization,
+      automationFunding,
       actorProvisioning: [provisionIssuer, provisionLender, provisionBorrower],
       oracleUpdate: null,
       fundedOffer: fundOffer,

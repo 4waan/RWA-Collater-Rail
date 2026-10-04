@@ -5,6 +5,10 @@ import {
   fetchAllowedJson,
   fetchMirrorPages,
 } from "./evidence-lib.mjs";
+import {
+  toMirrorEvmBaseTransactionPath,
+  toMirrorNativeTransactionId,
+} from "./native-transaction-id.mjs";
 
 const HASH_RE = /^0x[a-fA-F0-9]{64}$/;
 const TRANSACTION_ID_RE = /^0\.0\.\d+@\d+\.\d{9}$/;
@@ -18,7 +22,7 @@ function hashScanEvm(hash) {
 }
 
 function mirrorNative(transactionId, mirrorOrigin = DEFAULT_MIRROR_URL) {
-  return `${mirrorOrigin}/api/v1/transactions/${encodeURIComponent(transactionId)}`;
+  return `${mirrorOrigin}/api/v1/transactions/${toMirrorNativeTransactionId(transactionId)}`;
 }
 
 function hashScanNative(transactionId) {
@@ -71,7 +75,7 @@ export async function waitForNativeProof({
     try {
       const transactions = await fetchMirrorPages({
         mirrorOrigin,
-        pathname: `/api/v1/transactions/${encodeURIComponent(transactionId)}`,
+        pathname: `/api/v1/transactions/${toMirrorNativeTransactionId(transactionId)}`,
         collectionKey: "transactions",
       });
       const matches = transactions.filter(
@@ -136,6 +140,9 @@ export async function waitForEvmProof({
       ) {
         throw new Error("Mirror returned a different contract result.");
       }
+      const baseTransactionPath = toMirrorEvmBaseTransactionPath(
+        contractResult.timestamp,
+      );
       const succeeded =
         contractResult.status === "0x1" &&
         contractResult.error_message === null;
@@ -146,7 +153,7 @@ export async function waitForEvmProof({
       }
       const transactions = await fetchMirrorPages({
         mirrorOrigin,
-        pathname: `/api/v1/transactions/${encodeURIComponent(hash)}`,
+        pathname: baseTransactionPath,
         collectionKey: "transactions",
       });
       const matches = transactions.filter(

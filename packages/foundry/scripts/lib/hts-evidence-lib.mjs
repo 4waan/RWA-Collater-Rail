@@ -4,6 +4,7 @@ import {
   mirrorContract,
   validateRailPolicyEvidence,
 } from "./evidence-lib.mjs";
+import { toMirrorNativeTransactionId } from "./native-transaction-id.mjs";
 
 const CHAIN_ID = 296;
 const MIRROR_ORIGIN = "https://testnet.mirrornode.hedera.com";
@@ -43,7 +44,7 @@ function hashScanTransactionUrl(hash) {
 }
 
 function nativeTransactionUrl(transactionId) {
-  return `${MIRROR_ORIGIN}/api/v1/transactions/${encodeURIComponent(transactionId)}`;
+  return `${MIRROR_ORIGIN}/api/v1/transactions/${toMirrorNativeTransactionId(transactionId)}`;
 }
 
 function hashScanNativeTransactionUrl(transactionId) {
@@ -469,6 +470,7 @@ export function validateHtsEvidenceRecord(record) {
   const lifecycleKinds = {
     atsBondDeployment: /^ats-bond-deployment-\d+$/,
     settlementInitialization: /^settlement-initialization$/,
+    automationFunding: /^automation-funding$/,
     fundedOffer: /^fund-offer-1$/,
     holdCreation: /^accept-offer-1$/,
     repaidFacility: /^repay-position$/,

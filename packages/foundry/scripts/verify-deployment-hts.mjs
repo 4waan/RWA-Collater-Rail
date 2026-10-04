@@ -34,6 +34,10 @@ import {
   htsEvidenceConstants,
   validateHtsEvidenceRecord,
 } from "./lib/hts-evidence-lib.mjs";
+import {
+  toMirrorEvmBaseTransactionPath,
+  toMirrorNativeTransactionId,
+} from "./lib/native-transaction-id.mjs";
 import { ROLE_ISSUER, ROLE_KYC, ROLE_SSI_MANAGER } from "./lib/demo-runtime.ts";
 
 const recordPath = path.resolve(
@@ -95,9 +99,12 @@ function nativeHash(value) {
 async function readMirrorTransaction(identifier, consensusTimestamp) {
   const key = `${identifier}:${consensusTimestamp}`;
   if (transactionRecords.has(key)) return transactionRecords.get(key);
+  const pathname = identifier.startsWith("0x")
+    ? toMirrorEvmBaseTransactionPath(consensusTimestamp)
+    : `/api/v1/transactions/${toMirrorNativeTransactionId(identifier)}`;
   const values = await fetchMirrorPages({
     mirrorOrigin,
-    pathname: `/api/v1/transactions/${encodeURIComponent(identifier)}`,
+    pathname,
     collectionKey: "transactions",
   });
   const matches = values.filter(
