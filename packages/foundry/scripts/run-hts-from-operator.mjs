@@ -57,7 +57,8 @@ async function readCredentials() {
     );
   }
   const values = {};
-  for (const line of (await readFile(credentialFile, "utf8")).split(/\r?\n/u)) {
+  const lines = (await readFile(credentialFile, "utf8")).split(/\r?\n/u);
+  for (const [index, line] of lines.entries()) {
     if (!line.trim()) continue;
     const match =
       /^(HEDERA_OPERATOR_ID|HEDERA_OPERATOR_KEY|PYTH_API_KEY)=(.*)$/u.exec(
@@ -65,7 +66,7 @@ async function readCredentials() {
       );
     if (!match || Object.hasOwn(values, match[1])) {
       throw new Error(
-        "The HTS credential file contains an unknown or duplicate field.",
+        `The HTS credential file has an unknown or duplicate field on line ${index + 1}.`,
       );
     }
     values[match[1]] = match[2].trim();
