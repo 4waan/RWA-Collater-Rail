@@ -60,8 +60,8 @@ export const htsBroadcastPath = path.join(
   "296",
   "run-latest.json",
 );
-export const HTS_PRINCIPAL_TOKEN_UNITS = 50_000_000n;
-export const HTS_ACTOR_TOKEN_UNITS = 120_000_000n;
+export const HTS_PRINCIPAL_TOKEN_UNITS = 4_000_000n;
+export const HTS_ACTOR_TOKEN_UNITS = 9_000_000n;
 export const HTS_GAS = {
   initialize: 1_500_000n,
   oracleUpdate: 750_000n,
@@ -128,7 +128,7 @@ export function assertCircleUsdcPreflight(
   }
   if (BigInt(balance) < HTS_ACTOR_TOKEN_UNITS * 2n) {
     throw new Error(
-      "The funded operator needs at least 240 Circle testnet USDC for this lifecycle.",
+      "The funded operator needs at least 18 Circle testnet USDC for this lifecycle.",
     );
   }
 }

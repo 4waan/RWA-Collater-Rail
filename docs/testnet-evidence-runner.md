@@ -132,11 +132,13 @@ stablecoin or market-value claim.
 The Circle profile first re-reads token `0.0.429274` through Mirror and requires
 the pinned long-zero address, fungible type, six decimals, no deletion, and no
 custom fees. The authorized operator must already be associated and hold at
-least 240 testnet USDC. Faucet funding is manual. The runner creates and
-associates two temporary actors, provisions 120 USDC to each, uses exact
-allowances, submits a fresh Pyth USDC/USD update, and sweeps remaining actor
-tokens back when possible. `PYTH_API_KEY` is used only as an in-memory Hermes
-authorization header.
+least 18 testnet USDC. Faucet funding is manual. The runner creates and
+associates two temporary actors, provisions 9 USDC to each, funds two 4 USDC
+facilities, uses exact allowances, submits a fresh Pyth USDC/USD update, and
+sweeps remaining actor tokens back when possible. One 20 USDC request from
+[Circle's public testnet faucet](https://faucet.circle.com/) covers the current
+18 USDC runner requirement after the operator account has associated with the
+token. `PYTH_API_KEY` is used only as an in-memory Hermes authorization header.
 
 Both profiles deploy a new ATS bond, the profile-specific oracle, the isolated
 HTS rail, and the read-only acceptance verifier. They initialize the rail,

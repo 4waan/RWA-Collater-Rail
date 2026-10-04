@@ -154,7 +154,7 @@ function operatorRelationship(overrides = {}) {
     tokens: [
       {
         token_id: "0.0.429274",
-        balance: 240_000_000,
+        balance: 18_000_000,
         kyc_status: "NOT_APPLICABLE",
         freeze_status: "UNFROZEN",
         ...overrides,
@@ -190,9 +190,9 @@ test("Circle preflight pins token controls and operator readiness", () => {
     () =>
       assertCircleUsdcPreflight(
         circleMetadata(),
-        operatorRelationship({ balance: 239_999_999 }),
+        operatorRelationship({ balance: 17_999_999 }),
       ),
-    /at least 240 Circle testnet USDC/,
+    /at least 18 Circle testnet USDC/,
   );
 });
 
