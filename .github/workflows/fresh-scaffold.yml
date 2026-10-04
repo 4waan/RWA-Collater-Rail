@@ -26,7 +26,7 @@ jobs:
           git config --global user.name "Collateral Rail CI"
           git config --global user.email "ci@collateral-rail.invalid"
       - name: Generate from the public template
-        run: npm create scaffold-hbar@latest gate-check -- --template 4waan/scaffold-hbar-ats-finance --yes --skip-hedera-skills
+        run: npm create scaffold-hbar@latest gate-check -- --template 4waan/RWA-Collater-Rail --yes --skip-hedera-skills
       - name: Install generated project
         working-directory: gate-check
         run: yarn install --immutable
