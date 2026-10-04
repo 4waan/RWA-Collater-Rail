@@ -122,6 +122,28 @@ allowlisted Hedera endpoints. Neither command searches for a key, reads an
 undocumented credential file, or places a key in a command argument. Run one
 only after explicitly authorizing the capped testnet signer for that lifecycle.
 
+For an operator account above the 250 HBAR signer cap, the local wrapper creates
+a separate 150 HBAR signer and passes it to the same runner. Its explicit
+credential file lives outside the repository at
+`/private/tmp/rwa-credit-rail-hts/credentials.env`. Create the parent directory
+with mode 700 and the file with mode 600. It contains only
+`HEDERA_OPERATOR_ID`, `HEDERA_OPERATOR_KEY`, and, for Circle USDC,
+`PYTH_API_KEY`. The wrapper checks the file mode before reading it and never
+passes the source key to the child runner. It keeps the temporary signer's
+recovery file under a private temporary directory until its HBAR and token
+balances are swept. A failed sweep leaves that file for explicit recovery.
+
+```sh
+yarn run:testnet:hts:controlled
+yarn prepare:testnet:hts:usdc
+yarn run:testnet:hts:usdc
+```
+
+The preparation command associates the source account with Circle testnet USDC.
+Request the faucet allocation only after that association is confirmed. The
+Circle run provisions the new capped signer from the source account and returns
+remaining token and HBAR balances afterward.
+
 The controlled profile creates a six-decimal token with KYC, freeze, and pause
 keys. It deliberately omits a fee-schedule key, associates the temporary actors
 and rail, proves KYC loss and recovery, freeze and recovery, pause and recovery,
