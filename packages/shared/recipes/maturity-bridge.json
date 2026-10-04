@@ -2,6 +2,9 @@
   "id": "maturity-bridge",
   "name": "Maturity Bridge",
   "purpose": "Short-duration HBAR liquidity that must resolve before the underlying ATS security matures.",
+  "settlement": {
+    "kind": "hbar"
+  },
   "policy": {
     "maximumAdvanceBps": 5000,
     "maximumAnnualRateBps": 5000,

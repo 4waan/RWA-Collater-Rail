@@ -88,6 +88,28 @@ test("facility preserves only validated workflow identifiers", async ({
   expect(url.searchParams.get("terminal")).toBe("settle");
 });
 
+test("HTS recipe cannot enter the HBAR wallet workflow", async ({ page }) => {
+  await page.goto("/facility?recipe=hts-usdc-term-credit&mode=live");
+  await expect(
+    page.getByRole("heading", {
+      name: "One isolated rail, pending public proof.",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("HTS wallet actions are intentionally unavailable here."),
+  ).toBeVisible();
+  await expect(
+    page.getByText("No wallet requested", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("USDC · 0.0.429274", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Live wallet" })).toHaveCount(
+    0,
+  );
+  await expect(page.getByText(/Fund exact HBAR/i)).toHaveCount(0);
+});
+
 test("verification keeps financial claims and balances distinct", async ({
   page,
 }) => {

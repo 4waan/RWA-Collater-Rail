@@ -1,27 +1,30 @@
 # Maintenance roadmap
 
-## Submission core
+## Immutable HBAR fallback
 
-Version 1 is the HBAR settlement template being prepared for submission: one ATS
-security, one partition, one bilateral obligation, internal ATS KYC, HIP-475
-cash conversion by default, explicitly configured Pyth conversion, HSS
-liveness, and typed public evidence. Security invariants take priority over
-feature count.
+Version 1.0 is the tagged HBAR settlement template: one ATS security, one
+partition, one bilateral obligation, internal ATS KYC, HIP-475 cash conversion
+by default, explicitly configured Pyth conversion, HSS liveness, and typed
+public evidence. It remains the submission fallback and is not generalized in
+place.
 
-## Next extension: HTS settlement
+## Version 1.1 candidate: HTS settlement
 
-After the HBAR release is tagged and submitted, develop a separate
-`AtsCollateralRailHts` contract. It will bind one HTS fungible settlement token,
-reject custom fees, measure exact transfer deltas, keep token liabilities apart
-from HBAR automation reserves, and preserve the same ATS terminal guarantees.
-It will have independent tests, deployment scripts, UI support, and evidence.
+The separate `AtsCollateralRailHts` contract is implemented on
+`feat/hts-settlement-rail`. It binds one HTS fungible settlement token, rejects
+custom fees, measures exact transfer deltas, keeps token liabilities apart from
+HBAR automation reserves, and preserves the ATS terminal guarantees.
 
-The HBAR contract will not be generalized in place.
+Deterministic, fuzz, invariant, Audit Box regression, independent arithmetic,
+recipe, ABI, and evidence-schema tests are implemented. The controlled-token
+and Circle USDC runners publish separate records. Both funded testnet records,
+manual link audits, clean-scaffold validation, and the release decision remain
+gates. The HBAR contract is unchanged.
 
 The accepted accounting and compliance design is recorded in the
 [HTS settlement rail RFC](rfc/hts-settlement-rail.md).
 
-## External KYC reference
+## Later: external KYC reference
 
 The current ATS external KYC read interface is confirmed. Implementation remains
 gated until after version 1. The adapter will be separate from the version 1
@@ -31,7 +34,7 @@ compliance role, and carry an explicit non-production warning.
 The confirmed interface and proposed safety boundary are recorded in the
 [external KYC reference RFC](rfc/external-kyc-reference.md).
 
-## Experimental CLPR mobility
+## Later: experimental CLPR mobility
 
 Start with an architecture and threat-model RFC. Any prototype must verify
 protocol-defined remote state, prevent replay, handle timeouts and asymmetric

@@ -108,6 +108,66 @@ not a live market price oracle. Pyth mode uses a fresh market feed. Both sources
 convert the HBAR cash leg only. The collateral limit remains a configured
 advance against ATS nominal value.
 
+## HTS settlement profiles
+
+The version 1.1 candidate adds two isolated runners:
+
+```sh
+yarn demo:testnet:hts:controlled
+yarn demo:testnet:hts:usdc
+```
+
+They consume the same three ephemeral `HARNESS_SIGNER_` values and the same
+allowlisted Hedera endpoints. Neither command searches for a key, reads an
+undocumented credential file, or places a key in a command argument. Run one
+only after explicitly authorizing the capped testnet signer for that lifecycle.
+
+The controlled profile creates a six-decimal token with KYC, freeze, and pause
+keys. It deliberately omits a fee-schedule key, associates the temporary actors
+and rail, proves KYC loss and recovery, freeze and recovery, pause and recovery,
+and insufficient allowance and recovery. `FixedTestUsdOracle` is fixed at a
+labeled test value. This profile proves mechanics and never supports a
+stablecoin or market-value claim.
+
+The Circle profile first re-reads token `0.0.429274` through Mirror and requires
+the pinned long-zero address, fungible type, six decimals, no deletion, and no
+custom fees. The authorized operator must already be associated and hold at
+least 240 testnet USDC. Faucet funding is manual. The runner creates and
+associates two temporary actors, provisions 120 USDC to each, uses exact
+allowances, submits a fresh Pyth USDC/USD update, and sweeps remaining actor
+tokens back when possible. `PYTH_API_KEY` is used only as an in-memory Hermes
+authorization header.
+
+Both profiles deploy a new ATS bond, the profile-specific oracle, the isolated
+HTS rail, and the read-only acceptance verifier. They initialize the rail,
+complete two facilities, repay one, and require HSS itself to default the other.
+The live record is rejected if HSS does not win. Permissionless settlement is
+still exercised through deterministic and invariant recovery tests, but it is
+not mislabeled as an observed HSS lifecycle.
+
+Candidate records remain ignored:
+
+```text
+packages/foundry/deployments/testnet-hts-controlled.json
+packages/foundry/deployments/testnet-hts-usdc.json
+```
+
+Publication uses separate atomic commands:
+
+```sh
+yarn publish:testnet:hts:controlled
+yarn publish:testnet:hts:usdc
+```
+
+The publisher validates the profile, typed native and EVM proofs, exact token
+transfers, compliance probes, ATS holds, executed schedules, terminal states,
+independent token and HBAR solvency, exact-block state, current Mirror token
+relationships, and public URLs. It then runs the live verifier and gitleaks
+before renaming a temporary file over that profile's public record. The Circle
+verifier additionally binds the deployed oracle to the pinned Pyth contract and
+feed. The controlled verifier binds the deployed fixed value. Neither path can
+overwrite the HBAR schema version 3 record.
+
 ## Local encrypted-keystore path
 
 `yarn bootstrap:testnet` remains available to developers who prefer an encrypted Foundry account. It uses `HEDERA_OPERATOR_ADDRESS`, `LENDER_ADDRESS`, and `BORROWER_ADDRESS`. With no keystore environment values it selects the named `hedera-operator` account and allows Foundry to prompt. For unattended use, set both `HEDERA_KEYSTORE_PATH` and `HEDERA_KEYSTORE_PASSWORD_FILE`. The keystore path never crosses into the frontend.

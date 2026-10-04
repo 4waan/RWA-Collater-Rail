@@ -50,6 +50,49 @@ export function validateRecipe(recipe, source = "recipe") {
     }
   }
 
+  const settlement = requirePlainObject(
+    recipe.settlement,
+    `${source}.settlement`,
+  );
+  if (settlement.kind === "hbar") {
+    if (Object.keys(settlement).join(",") !== "kind") {
+      throw new Error(`${source}.settlement contains unsupported HBAR fields.`);
+    }
+  } else if (settlement.kind === "hts") {
+    const requiredKeys = [
+      "decimals",
+      "kind",
+      "oracle",
+      "priceFeedId",
+      "profile",
+      "symbol",
+      "tokenAddress",
+      "tokenId",
+    ];
+    if (Object.keys(settlement).sort().join(",") !== requiredKeys.join(",")) {
+      throw new Error(
+        `${source}.settlement must contain the complete HTS identity and oracle binding.`,
+      );
+    }
+    if (
+      settlement.profile !== "circle-usdc" ||
+      settlement.tokenId !== "0.0.429274" ||
+      settlement.tokenAddress.toLowerCase() !==
+        "0x0000000000000000000000000000000000068cda" ||
+      settlement.symbol !== "USDC" ||
+      settlement.decimals !== 6 ||
+      settlement.oracle !== "pyth-usdc-usd" ||
+      settlement.priceFeedId.toLowerCase() !==
+        "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
+    ) {
+      throw new Error(
+        `${source}.settlement must match the pinned Circle testnet USDC and Pyth profile.`,
+      );
+    }
+  } else {
+    throw new Error(`${source}.settlement.kind must be hbar or hts.`);
+  }
+
   const policy = requirePlainObject(recipe.policy, `${source}.policy`);
   if (
     Object.keys(policy).sort().join(",") !== [...policyKeys].sort().join(",")

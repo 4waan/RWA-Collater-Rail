@@ -1,6 +1,6 @@
 # RFC: HTS settlement rail
 
-Status: design accepted, implementation starts after the version 1 HBAR release
+Status: version 1.1 candidate implemented, funded testnet evidence pending
 
 ## Versioning decision
 
@@ -36,11 +36,11 @@ token. It associates the rail through the HTS system contract and accepts only
 success or already-associated response codes. It then validates fungible type,
 decimals, and an empty custom-fee schedule.
 
-The rail does not hold KYC, freeze, pause, fee, supply, or admin keys. Readiness
-views report association, KYC, freeze, pause, allowance, and balance so a caller
-can fix configuration before submitting a transaction. A later compliance
-change remains authoritative: an HTS transfer failure reverts the complete rail
-transition.
+The rail does not hold KYC, freeze, pause, fee, supply, or admin keys. The
+separate `HtsRailAcceptance` verifier reports token policy, association, KYC,
+freeze, allowance, and balance readiness without gaining mutation authority. A
+later compliance change remains authoritative: an HTS transfer failure reverts
+the complete rail transition.
 
 ## Lifecycle compatibility
 
@@ -49,9 +49,15 @@ repayment release, matured execution, terminal idempotence, HSS scheduling, and
 permissionless settlement preserve the HBAR rail semantics. HSS fees remain an
 explicit HBAR reserve and cannot be paid from settlement-token liabilities.
 
-The HTS rail receives its own ABI, deployment script, acceptance verifier,
-recipe, frontend execution path, invariant suite, and public evidence record.
-Its evidence never replaces the canonical HBAR record.
+The HTS rail has its own ABI, deployment script, acceptance verifier, recipe,
+invariant suite, candidate runners, live verifier, and evidence schema. Its two
+public evidence records remain separate from the canonical HBAR record.
+
+The controlled profile creates a six-decimal test token with KYC, freeze, and
+pause keys and no fee-schedule key. It uses `FixedTestUsdOracle` and proves only
+mechanics. The Circle profile pins testnet USDC `0.0.429274` and Pyth feed
+`0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a`.
+Only that second profile supports market-valued settlement language.
 
 ## Required tests
 
@@ -64,3 +70,7 @@ Its evidence never replaces the canonical HBAR record.
 - token solvency and HBAR automation reserve invariants;
 - repayment and default exclusivity;
 - HSS failure with public settlement recovery.
+
+The current suites also preserve Audit Box regressions AB-037, AB-039, and
+AB-042. Independent arithmetic verification covers constructed rounding and
+overflow boundaries without importing production helpers.

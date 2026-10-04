@@ -1118,6 +1118,89 @@ export function FacilityConsole({
   }
 
   const transactionLink = hashScanTransaction(transactionHash);
+  const htsSettlement =
+    recipe.settlement.kind === "hts" ? recipe.settlement : undefined;
+
+  if (htsSettlement) {
+    return (
+      <div className="workbenchShell">
+        <header className="workbenchIntro">
+          <div>
+            <span className="kicker">HTS settlement candidate</span>
+            <h1>One isolated rail, pending public proof.</h1>
+          </div>
+        </header>
+
+        <div className="workbenchContext">
+          <span>{recipe.name}</span>
+          <span>Hedera testnet · 296</span>
+          <span>No wallet requested</span>
+        </div>
+
+        <div className="inlineNotice" role="note">
+          <b>HTS wallet actions are intentionally unavailable here.</b>
+          <span>
+            This recipe cannot reuse the HBAR workflow. Enable it only after
+            both HTS evidence profiles pass their live verification and
+            publication gates.
+          </span>
+        </div>
+
+        <div className="stepBody">
+          <label className="fieldLabel">
+            Financing recipe
+            <select
+              value={recipe.id}
+              onChange={(event) => chooseRecipe(event.target.value)}
+            >
+              {facilityRecipes.map((candidate) => (
+                <option key={candidate.id} value={candidate.id}>
+                  {candidate.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <p>{recipe.purpose}</p>
+          <dl className="proofMiniLedger">
+            <div>
+              <dt>Settlement token</dt>
+              <dd>
+                {htsSettlement.symbol} · {htsSettlement.tokenId}
+              </dd>
+            </div>
+            <div>
+              <dt>Token decimals</dt>
+              <dd>{htsSettlement.decimals}</dd>
+            </div>
+            <div>
+              <dt>Valuation oracle</dt>
+              <dd>Live Pyth USDC/USD</dd>
+            </div>
+            <div>
+              <dt>Accounting boundary</dt>
+              <dd>HTS liabilities and HBAR automation reserves</dd>
+            </div>
+          </dl>
+          <p className="monoLine">
+            Public Circle evidence: pending · Controlled mechanics evidence:
+            pending
+          </p>
+          <details className="technicalDetails">
+            <summary>Candidate verification commands</summary>
+            <p>
+              <code>yarn demo:testnet:hts:controlled</code>
+            </p>
+            <p>
+              <code>yarn demo:testnet:hts:usdc</code>
+            </p>
+            <p>
+              <code>yarn verify:deployment:hts</code>
+            </p>
+          </details>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="workbenchShell">

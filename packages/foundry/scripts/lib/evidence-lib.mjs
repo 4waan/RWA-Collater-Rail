@@ -311,12 +311,19 @@ function semanticBootstrapCategory(transaction) {
   if (functionName.startsWith("fundautomation(")) return "automation-funding";
   if (
     contractName === "pythhbarusdoracle" ||
-    contractName === "hederaexchangerateoracle"
+    contractName === "hederaexchangerateoracle" ||
+    contractName === "pythusdoracle" ||
+    contractName === "fixedtestusdoracle"
   ) {
     return "oracle-deployment";
   }
-  if (contractName === "atscollateralrail") return "rail-deployment";
-  if (contractName === "railacceptance") return "acceptance-deployment";
+  if (
+    contractName === "atscollateralrail" ||
+    contractName === "atscollateralrailhts"
+  )
+    return "rail-deployment";
+  if (contractName === "railacceptance" || contractName === "htsrailacceptance")
+    return "acceptance-deployment";
   return "bootstrap-call";
 }
 

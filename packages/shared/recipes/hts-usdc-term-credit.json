@@ -1,0 +1,39 @@
+{
+  "id": "hts-usdc-term-credit",
+  "name": "HTS USDC Term Credit",
+  "purpose": "A fixed-term Circle testnet USDC advance secured by an ATS-native hold, valued with the live Pyth USDC/USD feed.",
+  "settlement": {
+    "kind": "hts",
+    "profile": "circle-usdc",
+    "tokenId": "0.0.429274",
+    "tokenAddress": "0x0000000000000000000000000000000000068cda",
+    "symbol": "USDC",
+    "decimals": 6,
+    "oracle": "pyth-usdc-usd",
+    "priceFeedId": "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
+  },
+  "policy": {
+    "maximumAdvanceBps": 6000,
+    "maximumAnnualRateBps": 5000,
+    "maximumQuoteMovementBps": 100,
+    "minimumTermSeconds": 120,
+    "maximumTermSeconds": 31536000,
+    "maximumOfferLifetimeSeconds": 3600
+  },
+  "defaultTerms": {
+    "collateralAmount": "10",
+    "principalUsd": "60",
+    "annualRateBps": 800,
+    "termSeconds": 2592000
+  },
+  "editableFields": [
+    "collateralAmount",
+    "principalUsd",
+    "annualRateBps",
+    "termSeconds"
+  ],
+  "extensionNotes": [
+    "The on-chain principal is denominated in USDC token units and is valued with Pyth only for collateral coverage.",
+    "The recipe names Circle testnet USDC specifically and does not claim that arbitrary HTS assets hold a dollar peg."
+  ]
+}

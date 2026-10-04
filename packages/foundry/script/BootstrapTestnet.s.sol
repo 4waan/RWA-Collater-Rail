@@ -60,7 +60,7 @@ contract BootstrapTestnet {
 
     event BootstrapCompleted(address indexed token, address indexed oracle, address indexed rail);
 
-    function run() external {
+    function run() external virtual {
         BootstrapConfig memory config = _readConfig();
         _validateDependencies(config.resolver, config.factory, config.pyth, config.usePythOracle);
 
