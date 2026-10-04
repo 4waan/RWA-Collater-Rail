@@ -123,7 +123,7 @@ undocumented credential file, or places a key in a command argument. Run one
 only after explicitly authorizing the capped testnet signer for that lifecycle.
 
 For an operator account above the 250 HBAR signer cap, the local wrapper creates
-a separate 150 HBAR signer and passes it to the same runner. Its explicit
+a separate 225 HBAR signer and passes it to the same runner. Its explicit
 credential file lives outside the repository at
 `/private/tmp/rwa-credit-rail-hts/credentials.env`. Create the parent directory
 with mode 700 and the file with mode 600. It contains only

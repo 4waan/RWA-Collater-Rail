@@ -39,7 +39,7 @@ const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 const foundryRoot = path.resolve(scriptDirectory, "..");
 const mode = process.argv[2];
 const MIRROR = DEFAULT_MIRROR_URL;
-const CAPPED_HBAR = 150;
+const CAPPED_HBAR = 225;
 const credentialFile =
   process.env.HTS_CREDENTIAL_FILE ??
   "/private/tmp/rwa-credit-rail-hts/credentials.env";
@@ -86,7 +86,12 @@ function requireSource() {
       "HEDERA_OPERATOR_KEY must be a raw ECDSA key in the private local environment file.",
     );
   }
-  const key = PrivateKey.fromStringECDSA(sourceKeyHex);
+  let key;
+  try {
+    key = PrivateKey.fromStringECDSA(sourceKeyHex);
+  } catch {
+    throw new Error("The operator ECDSA key could not be parsed.");
+  }
   return { key, address: `0x${key.publicKey.toEvmAddress()}` };
 }
 
@@ -217,9 +222,9 @@ async function runLifecycle(client, source) {
     accountId: sourceAccountId,
     evmAddress: source.address,
   });
-  if (sourceMirror.balanceTinybar < 175n * 100_000_000n) {
+  if (sourceMirror.balanceTinybar < 250n * 100_000_000n) {
     throw new Error(
-      "The operator needs at least 175 HBAR to fund a capped signer and fees.",
+      "The operator needs at least 250 HBAR to fund a capped signer and fees.",
     );
   }
 
@@ -229,6 +234,7 @@ async function runLifecycle(client, source) {
   );
   await chmod(recoveryDirectory, 0o700);
   const recoveryPath = path.join(recoveryDirectory, "signer.json");
+  const accountIdPath = path.join(recoveryDirectory, "account-id.txt");
   await writeFile(
     recoveryPath,
     JSON.stringify({
@@ -237,6 +243,9 @@ async function runLifecycle(client, source) {
       privateKey: `0x${signerKey.toStringRaw()}`,
     }),
     { mode: 0o600, flag: "wx" },
+  );
+  console.log(
+    `Temporary signer recovery material is private at ${recoveryDirectory}.`,
   );
 
   let signerAccountId;
@@ -251,9 +260,10 @@ async function runLifecycle(client, source) {
     if (!/^0\.0\.\d+$/u.test(signerAccountId ?? "")) {
       throw new Error("The capped signer creation returned no account ID.");
     }
-    const recovery = JSON.parse(await readFile(recoveryPath, "utf8"));
-    recovery.accountId = signerAccountId;
-    await writeFile(recoveryPath, JSON.stringify(recovery), { mode: 0o600 });
+    await writeFile(accountIdPath, `${signerAccountId}\n`, {
+      mode: 0o600,
+      flag: "wx",
+    });
     console.log(
       `Created capped signer ${signerAccountId} with ${CAPPED_HBAR} HBAR.`,
     );
@@ -359,6 +369,7 @@ async function runLifecycle(client, source) {
     }
     if (swept) {
       await unlink(recoveryPath);
+      await unlink(accountIdPath);
       await rmdir(recoveryDirectory);
     } else {
       console.error(
