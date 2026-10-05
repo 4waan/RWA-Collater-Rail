@@ -46,6 +46,14 @@
     "check:secrets": "node scripts/check-secrets.mjs",
     "check:ats-abi": "yarn workspace @collateral-rail/foundry check:ats-abi",
     "check:compatibility": "node scripts/check-compatibility.mjs",
+    "check:balance-query-compat": "node scripts/check-balance-query-compat.mjs",
+    "clpr:check-upstream": "node scripts/check-clpr-upstream.mjs",
+    "clpr:test": "yarn workspace @collateral-rail/foundry test:clpr",
+    "clpr:invariant": "yarn workspace @collateral-rail/foundry invariant:clpr",
+    "clpr:e2e:besu": "node scripts/run-clpr-upstream.mjs besu",
+    "clpr:e2e:solo-inbound": "node scripts/run-clpr-upstream.mjs solo-inbound",
+    "clpr:e2e:hosted": "node scripts/run-clpr-upstream.mjs hosted",
+    "clpr:verify-evidence": "node scripts/check-clpr-evidence.mjs",
     "harness:doctor": "hedera-harness doctor .harness/spec.yaml",
     "harness:doctor:recipe": "hedera-harness doctor .harness/spec.yaml --recipe-only",
     "harness:validate": "node scripts/harness-validate.mjs",
@@ -58,7 +66,7 @@
     "release:check": "yarn release:validate"
   },
   "devDependencies": {
-    "@hiero-ledger/sdk": "2.86.2",
+    "@hiero-ledger/sdk": "2.88.0",
     "hedera-harness": "1.2.2",
     "knip": "6.38.0",
     "playwright": "1.61.1",

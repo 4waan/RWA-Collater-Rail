@@ -12,7 +12,9 @@ decision rather than a blind dependency update.
 - Solidity: 0.8.24
 - EVM execution target: Cancun, matching the pinned ATS v8 deployment
 - Hedera network: testnet, chain ID 296
-- Hiero SDK: 2.86.2
+- Hiero SDK: 2.88.0
+- Consensus Node: v0.77 compatible. Account balances are read from Mirror
+  Node, never through the removed consensus `AccountBalanceQuery`.
 - Hiero contracts: 0.2.0
 - Next.js, React, wagmi, viem, and Playwright: exact manifest versions
 - ATS: `v.8.0.0-ats` reduced runtime surface
@@ -30,7 +32,7 @@ decision rather than a blind dependency update.
 
 - HBAR contract and HBAR evidence: unchanged from version 1.0
 - HTS system contract helper: pinned Hiero contracts 0.2.0
-- Hiero JavaScript SDK for native token operations: 2.86.2
+- Hiero JavaScript SDK for native token operations: 2.88.0
 - Circle testnet USDC token ID: `0.0.429274`
 - Circle testnet USDC long-zero address:
   `0x0000000000000000000000000000000000068cda`
@@ -49,6 +51,20 @@ Every live run revalidates token metadata through Mirror before spending. A
 change to Circle token controls, the Pyth feed, HTS response semantics, or
 HIP-719 facade behavior blocks publication until the compatibility decision and
 regressions are updated.
+
+## Consensus Node v0.77 balance reads
+
+Canonical evidence continues to use allowlisted Mirror REST requests. Account
+identity reads use `/api/v1/accounts/{accountId}` so the runner can verify the
+numeric account ID, EVM address, deletion state, balance, and Mirror timestamp.
+Token balances use the corresponding Mirror token endpoints.
+
+`MirrorNodeAccountBalanceQuery` is permitted only for ordinary SDK-facing HBAR
+balance helpers. It is not an evidence source because it does not provide all
+of the identity and provenance fields required by the evidence schema. Project
+code may not use `AccountBalanceQuery`, `getAccountBalance`, `Client.ping`, or
+`Client.pingAll`, since those surfaces can depend on the removed consensus
+query. `yarn check:balance-query-compat` enforces the call-site and version pin.
 
 ## Upgrade policy
 
@@ -72,3 +88,20 @@ HIP-475 system contract for a positive default-mode conversion, and confirms
 optional Pyth bytecode. The pinned ATS ABI fixture makes reviewed ATS surface
 changes explicit. None of these automations makes a live transaction or
 replaces the funded lifecycle gate.
+
+## Experimental CLPR compatibility
+
+- Specification commit: `945082d69e65dd0fd9e9bdf8d59cb8121579f6fd`
+- Smart-contract commit: `276c8d524e6ce3b5ef01da9d68ce3e8f27798a44`
+- Endpoint commit: `2ccd48d2d5d0d2f15d0829b1a057f27d88fd085e`
+- Upstream license: Apache-2.0
+- Upstream contract toolchain: Solidity 0.8.28 and Node 24 or newer
+- Collateral Rail toolchain: Solidity 0.8.24 and Node 22
+- Observed upstream path: Besu QBFT proof delivery into Solo
+- Not demonstrated upstream: Solo-to-Besu state proof, blocked by the referenced
+  Solo Block Node ProofService
+
+`packages/foundry/abi/clpr-upstream.json` pins reviewed source digests. The
+weekly CLPR workflow checks those sources without moving the pins. Heavy Besu
+and Solo jobs are manually selected. Upstream contracts are never compiled into
+the core rail package.

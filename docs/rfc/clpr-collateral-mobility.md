@@ -1,6 +1,6 @@
 # RFC: CLPR collateral mobility
 
-Status: research only
+Status: experimental implementation
 
 ## Objective
 
@@ -21,21 +21,22 @@ asset, beneficiary, expiry, and monotonic replay nonce.
 
 ## State transitions
 
-1. Lock ATS collateral and create a local pending obligation.
-2. Commit the exact remote settlement intent.
-3. Verify remote finality and bind the proof to the pending obligation.
-4. Activate the local financed position only once.
-5. At maturity, accept either a verified remote repayment proof or the local
-   default path.
-6. Expire an unfulfilled remote intent through a public local recovery action.
+1. Fund a remote cash offer and deliver its state-proven message to Hedera.
+2. Lock ATS collateral and record a retryable `COLLATERAL_LOCKED` outbox item.
+3. Credit and withdraw principal remotely only after the lock proof arrives.
+4. Activate the Hedera position only after a verified principal-withdrawal
+   message. Derive maturity from the proven withdrawal time.
+5. Accept either a verified repayment-escrow message or the local default path.
+6. Record terminal messages in a local outbox and dispatch them separately.
 
 ## Failure requirements
 
 - Duplicate, reordered, expired, or wrong-domain proofs fail closed.
 - Remote success without local activation remains retryable from the same proof.
 - Local activation cannot be replayed against another position.
-- A remote outage cannot trap ATS collateral indefinitely.
 - A relayer outage cannot block any public timeout or default action.
+- A peer ledger or proof-service outage freezes an ambiguous position when cash
+  may have moved. A timeout alone never unlocks the collateral.
 - A ledger reorganization inside the remote finality window cannot activate the
   local position.
 - Proof verifier upgrades require a new rail version or an explicit delayed
@@ -43,7 +44,17 @@ asset, beneficiary, expiry, and monotonic replay nonce.
 
 ## Prototype exit criteria
 
-Do not implement the production path until a stable public proof specification,
-test environment, verifier interface, finality definition, and recovery model
-exist. The prototype must include adversarial replay, invalid-finality, timeout,
-relayer-censorship, and asymmetric-failure tests before any public demo claim.
+The maintained prototype remains isolated until a stable public proof
+specification, bidirectional Hiero test environment, verifier interface,
+finality definition, and recovery model exist. It must include adversarial
+replay, invalid-finality, timeout, relayer-censorship, and asymmetric-failure
+tests before any public demo claim.
+
+## Demonstration boundary
+
+The pinned upstream harness currently implements QBFT proof delivery from Besu
+into Solo. Its Solo-to-Besu state-proof case is skipped because the referenced
+Block Node does not implement the required ProofService. The first acceptance
+target is therefore a bidirectional two-Besu lifecycle plus an observed
+Besu-to-Solo delivery. Bidirectional Hedera claims require a later supported
+environment and separate evidence.

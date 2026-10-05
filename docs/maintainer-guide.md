@@ -35,6 +35,20 @@ For the HTS rail, add these non-substitutable requirements:
 - An ATS failure after an HTS transfer reverts the token movement and every rail
   state change in the same transaction.
 
+For the experimental CLPR extension, preserve these separate requirements:
+
+- Remote token balance covers remote cash liabilities.
+- Hedera HBAR balance covers HSS automation reserves independently.
+- The CLPR service, channel, stamped peer application, ledger domains, message
+  version, terms hash, expiry, and semantic replay key are checked before state
+  mutation.
+- Financial state never depends on `onClprResponse`.
+- Repayment release, default execution, and locked-offer cancellation are the
+  only terminal ATS hold actions and are mutually exclusive per hold.
+- An endpoint or relayer outage leaves outbox dispatch retryable. Unavailable
+  peer proofs freeze ambiguous collateral instead of authorizing a timeout
+  release.
+
 ## Testnet evidence procedure
 
 1. Supply the capped funded operator only to the manual Harness testnet run.
@@ -108,6 +122,30 @@ shapes before rendering links or evidence. Construct Mirror and HashScan paths
 only after identifier validation. Never trust a stored origin, query string,
 redirect, or path suffix.
 
+## Consensus Node v0.77
+
+`AccountBalanceQuery` is removed in Consensus Node v0.77. Keep the JavaScript
+SDK pinned at 2.88.0 or a separately reviewed successor. Canonical evidence
+continues to use direct Mirror REST account and token reads because those reads
+include the identity and provenance fields required by the evidence schema.
+
+Run `yarn check:balance-query-compat` after changing any SDK helper. Project
+code may not call `AccountBalanceQuery`, `getAccountBalance`, `Client.ping`, or
+`Client.pingAll`.
+
+## CLPR compatibility and evidence
+
+Run `yarn clpr:check-upstream` weekly and before changing a CLPR claim. This
+checks pinned LFDT source digests but never advances a commit automatically.
+Use the manual CLPR workflow for the heavy two-Besu and Besu-to-Solo jobs.
+
+Do not copy an upstream run artifact into the repository. First convert it into
+the typed CLPR evidence record, scan it for secrets, and run
+`yarn clpr:verify-evidence <candidate-path>`. Publish only after both directions
+of the local Besu lifecycle and the one supported Besu-to-Solo path are present.
+Keep Solo-to-Besu in `notDemonstrated` until the upstream ProofService path is
+actually observed.
+
 ## Release checklist
 
 Run `yarn release:validate` from a clean checkout. Then scaffold the public
@@ -158,7 +196,7 @@ operator supplied only to the manual Harness run.
 ## Extension order
 
 The HBAR rail remains the version 1.0 reference and immutable fallback. The
-isolated HTS settlement rail is the version 1.1 candidate. An external KYC
-adapter follows only after compatibility and security review of the confirmed
-upstream interface. CLPR remains an experimental RFC until its proof and
-recovery contracts are stable.
+isolated HTS settlement rail is the version 1.1 candidate. CLPR is an isolated
+experimental implementation and merges only after its deterministic and
+upstream proof gates pass. An external KYC adapter follows only after
+compatibility and security review of the confirmed upstream interface.

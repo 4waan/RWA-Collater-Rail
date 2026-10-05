@@ -289,6 +289,111 @@ satisfy the proof or reserve ghost.
 - When adding a recipe, validate its schema, deploy its exact immutable policy,
   and keep `term-credit` as the committed public evidence recipe.
 
+## Experimental CLPR mobility
+
+CLPR is an isolated application extension. It may move verified messages between
+the experimental ATS collateral application and a peer-ledger cash escrow, but
+it must never become a correctness dependency of `AtsCollateralRail` or
+`AtsCollateralRailHts`.
+
+Treat every cross-ledger invariant as a property plus the local call stacks and
+inbound messages that can mutate it. Maintain a CLPR mutation matrix covering
+remote offer funding and cancellation, Hedera collateral acceptance, principal
+withdrawal activation, repayment escrow, ATS release, ATS execution, remote
+credit withdrawal, message dispatch, HSS settlement, public settlement, and
+duplicate delivery.
+
+Keep these selector and inbound-message matrices synchronized with both CLPR
+contracts and the invariant handler. Every added mutating selector or accepted
+message kind must update the relevant row, deterministic adversarial tests,
+targeted handler selector inventory, and independent ghost accounting in the
+same change.
+
+```text
+RemoteCashEscrow selector | Protected properties                         | External surfaces
+initializePeerApplication | one-time peer binding                        | configuration owner
+fundOffer                 | offer, funded principal, token liabilities   | token pull, outbox
+cancelOffer               | offer, funded principal, token credits       | outbox
+withdrawPrincipal         | offer, funded principal, token balance       | token push, outbox
+escrowRepayment           | offer, pending repayment, token liabilities  | token pull, outbox
+withdrawCredit            | token credits, token liabilities, balance    | token push
+dispatchMessage           | outbox delivery metadata                     | CLPR service
+retryMessage              | attempt identity, logical replay binding     | none
+onClprMessage             | offer, pending repayment, token credits      | authenticated CLPR callback
+onClprResponse            | telemetry only                               | authenticated CLPR callback
+```
+
+```text
+AtsCollateralMobility selector | Protected properties                     | External surfaces
+initializePeerApplication      | one-time peer binding                    | configuration owner
+acceptOffer                    | pending offer, position, ATS hold        | ATS reads and hold creation, outbox
+settle, public                 | position, reserve, ATS hold              | ATS KYC and hold execution, outbox
+settle, scheduled HSS          | position, reserve, ATS hold              | HSS callback, ATS hold execution, outbox
+fundAutomation                 | HBAR balance                             | none
+withdrawUnusedAutomation       | unreserved HBAR                          | recipient callback
+schedulePosition, self only    | external HSS schedule                    | self-call gate, HSS system contract
+dispatchMessage                | outbox delivery metadata                 | CLPR service
+retryMessage                   | attempt identity, logical replay binding | none
+onClprMessage                  | offers, positions, holds, reserve        | authenticated CLPR callback, ATS, HSS
+onClprResponse                 | telemetry only                           | authenticated CLPR callback
+receive                        | HBAR balance                             | must always revert
+```
+
+For `RemoteCashEscrow.onClprMessage`, cover `COLLATERAL_LOCKED`,
+`REPAYMENT_ACCEPTED`, and `DEFAULT_CONFIRMED`. For
+`AtsCollateralMobility.onClprMessage`, cover `OFFER_FUNDED`,
+`PRINCIPAL_WITHDRAWN`, `REPAYMENT_ESCROWED`, and `OFFER_CANCELLED`. Unsupported
+kinds, invalid envelopes, exact duplicates, same-logical-content retries, and
+semantic conflicts are mandatory rejection or idempotency cases.
+
+Preserve these exact relationships with independent ghost state:
+
+```text
+remoteCashLiabilities == fundedPrincipal + pendingRepayment + tokenCredits
+reservedAutomation == pendingSchedules * HSS_RESERVE_TINYBAR
+holdsCreated == collateralAccepted
+terminalActions == repaidPositions + defaultedPositions + cancelledLockedPositions
+openPositions == activatedPositions - repaidPositions - defaultedPositions
+repaymentPayouts + repaymentRefunds == finalizedRepaymentEscrows
+remoteTokenBalance >= remoteCashLiabilities
+hederaHbarBalance >= reservedAutomation
+```
+
+- Accept callbacks only from the immutable CLPR service and channel. Require the
+  CLPR-stamped source application bytes to equal the one-time sealed peer
+  application.
+- Bind each payload to the protocol version, both ledger domains, both
+  applications, mobility ID, kind, attempt, terms hash, and expiry.
+- Exact duplicate delivery is idempotent. A semantic replay with different
+  bytes must revert without changing positions, holds, liabilities, credits, or
+  outboxes.
+- `onClprResponse` is telemetry only. Its success, failure, omission, or order
+  can never change a financial state or discharge an obligation.
+- Local financial transitions create durable outbox entries. Dispatch is a
+  separate permissionless action, so CLPR failure cannot roll back an ATS
+  release, ATS execution, or token escrow transition.
+- A relayer outage remains recoverable through permissionless bundle
+  submission. If the peer ledger or proof service cannot prove whether cash
+  moved, freeze the ambiguous position. Never unlock collateral from a timeout
+  or trusted assertion.
+- Existing positions remain bound to their original service, channel, verifier,
+  one-time sealed peer application, domains, and terms hash. Configuration drift
+  requires a new deployment or explicit versioned migration and cannot
+  reinterpret live state.
+- Test both terminal orders, late proofs, duplicate and conflicting messages,
+  connector censorship, endpoint failure, invalid proofs, source spoofing,
+  callback reentry, and permanent proof unavailability.
+
+Pin LFDT CLPR specification, contract, and endpoint commits plus reviewed file
+digests. Keep the Solidity 0.8.28 and Node 24 upstream toolchain outside this
+Solidity 0.8.24 and Node 22 workspace. Run the weekly source check and manual
+upstream integration workflows before changing a support claim.
+
+Public CLPR evidence must distinguish `observed-local-besu`,
+`observed-besu-to-solo`, `observed-hosted-testnet`, and `not-demonstrated`.
+Never imply that the current public harness proves Solo-to-Besu delivery while
+its required ProofService remains unavailable.
+
 ## Key safety
 
 - Privileged issuer setup belongs in Foundry scripts and encrypted keystores.

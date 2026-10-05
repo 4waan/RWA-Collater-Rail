@@ -1,0 +1,4 @@
+interface:
+  display_name: "CLPR Collateral Mobility"
+  short_description: "Build state-proven cross-ledger collateral flows"
+  default_prompt: "Use $clpr-collateral-mobility to design or verify a safe CLPR collateral workflow."

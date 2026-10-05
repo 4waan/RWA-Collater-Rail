@@ -34,13 +34,19 @@ compliance role, and carry an explicit non-production warning.
 The confirmed interface and proposed safety boundary are recorded in the
 [external KYC reference RFC](rfc/external-kyc-reference.md).
 
-## Later: experimental CLPR mobility
+## Experimental CLPR mobility
 
-Start with an architecture and threat-model RFC. Any prototype must verify
-protocol-defined remote state, prevent replay, handle timeouts and asymmetric
-failure, and keep a local permissionless recovery path. No trusted relayer may
-unlock ATS collateral by itself. CLPR will not become a core dependency while
-its public interface or test environment remains unstable.
+The implementation is isolated from both settlement rails and pins the LFDT
+CLPR specification, contract, and endpoint commits. It keeps ATS collateral on
+Hedera while a controlled test-token cash leg is escrowed on a peer EVM ledger.
+Every remote transition requires a protocol-verified message, and no trusted
+relayer may unlock ATS collateral by itself.
+
+The release gate requires a bidirectional two-Besu lifecycle and the currently
+supported Besu-to-Solo proof path. Solo-to-Besu and hosted testnet behavior stay
+explicitly `not-demonstrated` until the upstream proof service and environment
+support them. A permanent peer proof outage freezes ambiguous collateral rather
+than choosing an unsafe timeout release.
 
 ## Deliberate exclusions
 

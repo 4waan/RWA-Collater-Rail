@@ -1,0 +1,99 @@
+name: CLPR upstream compatibility
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_besu:
+        description: Run the upstream bidirectional Besu suite
+        required: false
+        default: false
+        type: boolean
+      run_solo_inbound:
+        description: Run the upstream Besu to Solo proof suite
+        required: false
+        default: false
+        type: boolean
+  schedule:
+    - cron: "41 7 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  source-compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - name: Activate Yarn 3.2.3
+        run: corepack enable && corepack prepare yarn@3.2.3 --activate
+      - name: Install
+        run: yarn install --immutable
+      - name: Verify pinned CLPR sources
+        run: yarn clpr:check-upstream
+
+  besu-integration:
+    if: ${{ inputs.run_besu }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: LFDT-CLPR/clpr-smart-contracts
+          ref: 276c8d524e6ce3b5ef01da9d68ce3e8f27798a44
+          path: clpr-smart-contracts
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+      - uses: foundry-rs/foundry-toolchain@908c540300062bd5a7e473851cdb4282204cee09 # v1
+      - name: Install pinned upstream Forge dependencies
+        working-directory: clpr-smart-contracts
+        run: |
+          forge install --no-git forge-std=foundry-rs/forge-std@rev=0844d7e1fc5e60d77b68e469bff60265f236c398
+          forge install --no-git openzeppelin-contracts=OpenZeppelin/openzeppelin-contracts@rev=cab19933c33c2ad1d4c7a84864a3601dddfd16f3
+          forge install --no-git safe-smart-account=safe-fndn/safe-smart-account@rev=dc437e8fba8b4805d76bcbd1c668c9fd3d1e83be
+      - name: Install upstream CLPR
+        working-directory: clpr-smart-contracts
+        run: npm ci
+      - name: Run bidirectional Besu suite
+        working-directory: clpr-smart-contracts
+        run: npm run test:e2e:besu -- --maxWorkers=1 --no-file-parallelism
+
+  solo-inbound:
+    if: ${{ inputs.run_solo_inbound }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: LFDT-CLPR/clpr-smart-contracts
+          ref: 276c8d524e6ce3b5ef01da9d68ce3e8f27798a44
+          path: clpr-smart-contracts
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+      - uses: foundry-rs/foundry-toolchain@908c540300062bd5a7e473851cdb4282204cee09 # v1
+      - name: Install pinned upstream Forge dependencies
+        working-directory: clpr-smart-contracts
+        run: |
+          forge install --no-git forge-std=foundry-rs/forge-std@rev=0844d7e1fc5e60d77b68e469bff60265f236c398
+          forge install --no-git openzeppelin-contracts=OpenZeppelin/openzeppelin-contracts@rev=cab19933c33c2ad1d4c7a84864a3601dddfd16f3
+          forge install --no-git safe-smart-account=safe-fndn/safe-smart-account@rev=dc437e8fba8b4805d76bcbd1c668c9fd3d1e83be
+      - name: Install upstream CLPR
+        working-directory: clpr-smart-contracts
+        run: npm ci
+      - name: Start Besu and Solo
+        working-directory: clpr-smart-contracts
+        run: npm run e2e:up:besu:solo
+      - name: Run observed Besu to Solo proof suite
+        working-directory: clpr-smart-contracts
+        run: npm run test:e2e:besu:solo
+      - name: Stop Besu and Solo
+        if: always()
+        working-directory: clpr-smart-contracts
+        run: npm run e2e:down:besu:solo
