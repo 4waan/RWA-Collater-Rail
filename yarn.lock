@@ -99,7 +99,7 @@ __metadata:
   dependencies:
     "@collateral-rail/shared": "workspace:*"
     "@hiero-ledger/hiero-contracts": 0.2.0
-    "@hiero-ledger/sdk": 2.88.0
+    "@hiero-ledger/sdk": 2.89.1
     "@types/node": 22.18.6
     tsx: 4.20.6
     typescript: 5.8.2
@@ -534,9 +534,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hiero-ledger/cryptography@npm:1.21.0":
-  version: 1.21.0
-  resolution: "@hiero-ledger/cryptography@npm:1.21.0"
+"@hiero-ledger/cryptography@npm:1.22.0":
+  version: 1.22.0
+  resolution: "@hiero-ledger/cryptography@npm:1.22.0"
   dependencies:
     "@noble/ciphers": 2.2.0
     "@noble/curves": 2.2.0
@@ -554,7 +554,7 @@ __metadata:
   peerDependenciesMeta:
     expo-crypto:
       optional: true
-  checksum: 19e9fc8e668e84685f9d7b5e52ec6a6f3dfa8b66a7911f3747969c7d9cad907c82084e8ff4f3b15887555936f39bc1a37c6086ea157e60da49f5bc059504d641
+  checksum: e4594a67fd0343bd98ece162adff8eb630b63a16657ba6776e772215fff8b8633e3459735f7ee99a3d08fdae9bc654d244054e86392d33797f3b6e5478823497
   languageName: node
   linkType: hard
 
@@ -583,12 +583,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hiero-ledger/sdk@npm:2.88.0":
-  version: 2.88.0
-  resolution: "@hiero-ledger/sdk@npm:2.88.0"
+"@hiero-ledger/sdk@npm:2.89.1":
+  version: 2.89.1
+  resolution: "@hiero-ledger/sdk@npm:2.89.1"
   dependencies:
     "@grpc/grpc-js": 1.12.7
-    "@hiero-ledger/cryptography": 1.21.0
+    "@hiero-ledger/cryptography": 1.22.0
     "@hiero-ledger/proto": 2.31.0
     ansi-regex: 6.2.2
     ansi-styles: 7.0.0
@@ -607,7 +607,7 @@ __metadata:
     utf8: 3.0.0
   peerDependencies:
     bn.js: 5.2.3
-  checksum: 68d6163b4a4236282be0e618d65328d7ae8f55a47f2b2f6b5c80020bfe49e8dc880c03b7c06c5ae4a1203f75fb9a51373308ed84a9ebc05fd5dc0620a6a2e74b
+  checksum: 417f32b28fe40c1a18dfacdc5f05e455bba4b12f74652eb2dd2ac77dc6da9be38f0031bd73dc7dfe9359d0ce0c02ac987897a5f142a93b5d7667cd83886373e0
   languageName: node
   linkType: hard
 
@@ -8157,7 +8157,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "scaffold-hbar-ats-finance@workspace:."
   dependencies:
-    "@hiero-ledger/sdk": 2.88.0
+    "@hiero-ledger/sdk": 2.89.1
     hedera-harness: 1.2.2
     knip: 6.38.0
     playwright: 1.61.1
