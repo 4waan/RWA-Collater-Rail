@@ -1,0 +1,1257 @@
+{
+  "schemaVersion": 1,
+  "evidenceKind": "hts-settlement",
+  "settlementProfile": "controlled-test",
+  "network": "hedera-testnet",
+  "chainId": 296,
+  "status": "verified",
+  "generatedAt": "2026-10-04T21:27:15.160Z",
+  "recipeId": null,
+  "policy": {
+    "maximumAdvanceBps": 6000,
+    "maximumAnnualRateBps": 5000,
+    "maximumQuoteMovementBps": 100,
+    "minimumTermSeconds": 120,
+    "maximumTermSeconds": 31536000,
+    "maximumOfferLifetimeSeconds": 3600
+  },
+  "addresses": {
+    "factory": "0xd1F118A40f3b02883D35909eF2517e7EDd78379d",
+    "resolver": "0xBA2D5FC2083A0b8f164c50e65d782087fBA18E0a",
+    "atsToken": "0x6d6097885dD60cD6967e46D352420aE8EFB2aaBF",
+    "settlementToken": "0x0000000000000000000000000000000000a5bf88",
+    "oracle": "0x722591Ba4c62726621bbBBD1e4135FC501e6C17E",
+    "rail": "0x0b112a48342f01648244E2D1c4C342309a40A4eF",
+    "acceptance": "0x19d46d5b006682a524cB24ceb17CE05198A948b0",
+    "pyth": null
+  },
+  "actors": {
+    "issuer": {
+      "accountId": "0.0.10862468",
+      "evmAddress": "0x99dccbdb643569ef2802481f30f473c91fa8444d"
+    },
+    "lender": {
+      "accountId": "0.0.10862470",
+      "evmAddress": "0x7a959025e71cda98643676c05a99d069bef7558c"
+    },
+    "borrower": {
+      "accountId": "0.0.10862471",
+      "evmAddress": "0x849b38ee24c752a946840cef63b081f042ebc83b"
+    }
+  },
+  "settlementToken": {
+    "tokenId": "0.0.10862472",
+    "evmAddress": "0x0000000000000000000000000000000000a5bf88",
+    "name": "Collateral Rail Controlled Test Dollar",
+    "symbol": "CRTD",
+    "decimals": 6,
+    "type": "FUNGIBLE_COMMON",
+    "deleted": false,
+    "freezeDefault": false,
+    "pauseStatus": "UNPAUSED",
+    "kycKey": true,
+    "freezeKey": true,
+    "pauseKey": true,
+    "feeScheduleKey": false,
+    "fixedFeeCount": 0,
+    "fractionalFeeCount": 0,
+    "royaltyFeeCount": 0,
+    "mirror": "https://testnet.mirrornode.hedera.com/api/v1/tokens/0.0.10862472",
+    "verifiedAt": "2026-10-04T21:27:14.712Z"
+  },
+  "oracle": {
+    "kind": "fixed-test",
+    "priceUsdE8": "100000000",
+    "confidenceUsdE8": "0",
+    "observedAt": 1791149210,
+    "purpose": "controlled mechanics only",
+    "limitation": "This fixed test value proves mechanics only and is not evidence of market value."
+  },
+  "transactions": [
+    {
+      "type": "hedera-transaction",
+      "kind": "settlement-token-creation",
+      "transactionId": "0.0.10862468@1791148553.153770327",
+      "transactionHash": "0x5b72020b387afb004ffa0aa8ef49ef74f50cc6b6a5339e5f6ec80103a784c25da6daff520ecbc5aeb4ffe25265a023ee",
+      "consensusTimestamp": "1791148559.928488400",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148553-153770327",
+      "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148553.153770327"
+    },
+    {
+      "type": "transaction",
+      "kind": "ats-bond-deployment-1",
+      "hash": "0xf02dc2a081fb38afb88a21c02f7e969573bf72e3eeb2f6d606eab3fb3f07bf9f",
+      "consensusTimestamp": "1791148883.586038104",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0xf02dc2a081fb38afb88a21c02f7e969573bf72e3eeb2f6d606eab3fb3f07bf9f",
+      "hashScan": "https://hashscan.io/testnet/transaction/0xf02dc2a081fb38afb88a21c02f7e969573bf72e3eeb2f6d606eab3fb3f07bf9f"
+    },
+    {
+      "type": "transaction",
+      "kind": "issuer-configuration-1",
+      "hash": "0x27df908c9f00237e8393c53f8732238edb23835edd4b47dcf4b9d22ed8aa748b",
+      "consensusTimestamp": "1791148888.265831104",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x27df908c9f00237e8393c53f8732238edb23835edd4b47dcf4b9d22ed8aa748b",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x27df908c9f00237e8393c53f8732238edb23835edd4b47dcf4b9d22ed8aa748b"
+    },
+    {
+      "type": "transaction",
+      "kind": "kyc-grant-1",
+      "hash": "0x609845d4e3cc861c1d51a45869c22e18a16b4cb2d36380c8456a7648bcdc4782",
+      "consensusTimestamp": "1791148895.458455104",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x609845d4e3cc861c1d51a45869c22e18a16b4cb2d36380c8456a7648bcdc4782",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x609845d4e3cc861c1d51a45869c22e18a16b4cb2d36380c8456a7648bcdc4782"
+    },
+    {
+      "type": "transaction",
+      "kind": "kyc-grant-2",
+      "hash": "0x615fb0e07bbab676b206b33e54c3fe9dcadf60e079e9307c5aff3e4d6e82bd09",
+      "consensusTimestamp": "1791148899.278080761",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x615fb0e07bbab676b206b33e54c3fe9dcadf60e079e9307c5aff3e4d6e82bd09",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x615fb0e07bbab676b206b33e54c3fe9dcadf60e079e9307c5aff3e4d6e82bd09"
+    },
+    {
+      "type": "transaction",
+      "kind": "collateral-issuance-1",
+      "hash": "0x27ccb1da75f4851d4467665f0368662daef5b9e2b40b49a1c40a80d95e4d4095",
+      "consensusTimestamp": "1791148903.505957104",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x27ccb1da75f4851d4467665f0368662daef5b9e2b40b49a1c40a80d95e4d4095",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x27ccb1da75f4851d4467665f0368662daef5b9e2b40b49a1c40a80d95e4d4095"
+    },
+    {
+      "type": "transaction",
+      "kind": "oracle-deployment-1",
+      "hash": "0x7d1514b95a7a4054562634508aa4934a37ee15303941a1b674e0abd28ea597f9",
+      "consensusTimestamp": "1791148907.738098847",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x7d1514b95a7a4054562634508aa4934a37ee15303941a1b674e0abd28ea597f9",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x7d1514b95a7a4054562634508aa4934a37ee15303941a1b674e0abd28ea597f9"
+    },
+    {
+      "type": "transaction",
+      "kind": "rail-deployment-1",
+      "hash": "0x2e716c8df321ea79abe27047a88c0ae10002b433e303fd6503bd1b0750d84d87",
+      "consensusTimestamp": "1791148913.748382108",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x2e716c8df321ea79abe27047a88c0ae10002b433e303fd6503bd1b0750d84d87",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x2e716c8df321ea79abe27047a88c0ae10002b433e303fd6503bd1b0750d84d87"
+    },
+    {
+      "type": "transaction",
+      "kind": "acceptance-deployment-1",
+      "hash": "0xe6b92debaa509fc047be276603e7c5dbb009cb5af2c427b20eadc3548eeec7b5",
+      "consensusTimestamp": "1791148919.698393036",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0xe6b92debaa509fc047be276603e7c5dbb009cb5af2c427b20eadc3548eeec7b5",
+      "hashScan": "https://hashscan.io/testnet/transaction/0xe6b92debaa509fc047be276603e7c5dbb009cb5af2c427b20eadc3548eeec7b5"
+    },
+    {
+      "type": "transaction",
+      "kind": "settlement-initialization",
+      "hash": "0x23624e14239b5e57c89847aa703fe5b4bc6513888788082b9f2b1b17c4a71de8",
+      "consensusTimestamp": "1791148934.578268791",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x23624e14239b5e57c89847aa703fe5b4bc6513888788082b9f2b1b17c4a71de8",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x23624e14239b5e57c89847aa703fe5b4bc6513888788082b9f2b1b17c4a71de8"
+    },
+    {
+      "type": "transaction",
+      "kind": "automation-funding",
+      "hash": "0x8475e73c8e60c15ec5971baf017454621c9646849a87928d82af98b57997d491",
+      "consensusTimestamp": "1791148941.365473117",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x8475e73c8e60c15ec5971baf017454621c9646849a87928d82af98b57997d491",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x8475e73c8e60c15ec5971baf017454621c9646849a87928d82af98b57997d491"
+    },
+    {
+      "type": "transaction",
+      "kind": "probe-association",
+      "hash": "0x870a8933e4fe5ad4de913ee396ea562a4f698dc4321a49c730052a3aa1b8ba3a",
+      "consensusTimestamp": "1791148949.578395104",
+      "result": "CONTRACT_REVERT_EXECUTED",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x870a8933e4fe5ad4de913ee396ea562a4f698dc4321a49c730052a3aa1b8ba3a",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x870a8933e4fe5ad4de913ee396ea562a4f698dc4321a49c730052a3aa1b8ba3a"
+    },
+    {
+      "type": "hedera-transaction",
+      "kind": "associate-lender",
+      "transactionId": "0.0.10862468@1791148949.765855670",
+      "transactionHash": "0xdaa5ad664f421c4e0839d3c4924c1cae2fb5cdc3bcbe2bfbf1626c1b17634ffed8677c7a8778d3bfc1e047475df7eb59",
+      "consensusTimestamp": "1791148956.058360640",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148949-765855670",
+      "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148949.765855670"
+    },
+    {
+      "type": "hedera-transaction",
+      "kind": "associate-borrower",
+      "transactionId": "0.0.10862468@1791148955.285139112",
+      "transactionHash": "0x7b0f163e0b9f0bf31009a00a0f91e1f7103173aedb5f3bdfa8953cd0fbdf6121aac92ca87d2498cc85aa39b485075ab4",
+      "consensusTimestamp": "1791148960.265838065",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148955-285139112",
+      "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148955.285139112"
+    },
+    {
+      "type": "hedera-transaction",
+      "kind": "grant-settlement-kyc-lender-initial",
+      "transactionId": "0.0.10862468@1791148960.746839254",
+      "transactionHash": "0x9bfdfb89f342773d5ba816758012717d1bb2f2e3a7f5b83f23cd004d8105198b04c209218f8451fb05e22f96b49b8fa1",
+      "consensusTimestamp": "1791148964.438170791",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148960-746839254",
+      "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148960.746839254"
+    },
+    {
+      "type": "hedera-transaction",
+      "kind": "grant-settlement-kyc-borrower",
+      "transactionId": "0.0.10862468@1791148961.160306694",
+      "transactionHash": "0x271fcd6a22ac25aaa89f3f48bdd4a4f895f1ac90482e3291d67c3ebf5b2180ce4d9172c621ad7a4567a2a91cee28cd0a",
+      "consensusTimestamp": "1791148968.588471238",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148961-160306694",
+      "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148961.160306694"
+    },
+    {
+      "type": "hedera-transaction",
+      "kind": "grant-settlement-kyc-rail",
+      "transactionId": "0.0.10862468@1791148969.831153073",
+      "transactionHash": "0xeb98fd69147921493474c733471318aee5884f11bea026fb3cc88f361512973b25f933cd794fa3b330678bf7f88ef48e",
+      "consensusTimestamp": "1791148975.258487138",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148969-831153073",
+      "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148969.831153073"
+    },
+    {
+      "type": "hedera-transaction",
+      "kind": "revoke-settlement-kyc-lender",
+      "transactionId": "0.0.10862468@1791148972.694792640",
+      "transactionHash": "0xd0e937d5d8fbc469e759a06961a3f6fc69f96b829d26ef0277479d93bf16c0e80b9c166282588d6ddc2872eeb9f6f495",
+      "consensusTimestamp": "1791148979.345447104",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148972-694792640",
+      "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148972.694792640"
+    },
+    {
+      "type": "transaction",
+      "kind": "probe-kyc-revoked",
+      "hash": "0x3fd17bcdab73e4587035bb2499b45528905a4be0d78858d3799da3224c6d7182",
+      "consensusTimestamp": "1791148984.865574122",
+      "result": "CONTRACT_REVERT_EXECUTED",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x3fd17bcdab73e4587035bb2499b45528905a4be0d78858d3799da3224c6d7182",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x3fd17bcdab73e4587035bb2499b45528905a4be0d78858d3799da3224c6d7182"
+    },
+    {
+      "type": "hedera-transaction",
+      "kind": "regrant-settlement-kyc-lender",
+      "transactionId": "0.0.10862468@1791148985.004865749",
+      "transactionHash": "0x3701c5a33b3adf7fbc00298fdc65db3ebabfdeb48164fd75ad74316fd73e7dff4a89fcdb5e3b0d454782cddf44fed6bf",
+      "consensusTimestamp": "1791148990.357955626",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148985-004865749",
+      "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148985.004865749"
+    },
+    {
+      "type": "hedera-transaction",
+      "kind": "provision-lender-token",
+      "transactionId": "0.0.10862468@1791148989.122138850",
+      "transactionHash": "0x25756e1e75110ddbd35110900d77ccf6aca8a8bcaff12f4dbad4e88e8567b5cb169e6d106ba86fa348669d1f9d57aeac",
+      "consensusTimestamp": "1791148994.508375104",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148989-122138850",
+      "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148989.122138850"
+    },
+    {
+      "type": "hedera-transaction",
+      "kind": "provision-borrower-token",
+      "transactionId": "0.0.10862468@1791148992.368096335",
+      "transactionHash": "0x826056d4c968ef57899a7a2f62b475f92989c0ce408a438934b6648809a0fbf1119c248deb4990f61f870f0db0bb6667",
+      "consensusTimestamp": "1791148998.168543024",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148992-368096335",
+      "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148992.368096335"
+    },
+    {
+      "type": "hedera-transaction",
+      "kind": "freeze-lender",
+      "transactionId": "0.0.10862468@1791148997.428620691",
+      "transactionHash": "0xaffad9c19a7aa5507d7ade5fa6ca1adac1f374add961c3c881d0269b4e7bdf7881d69623e10f9f7aecb52ea1e93af46f",
+      "consensusTimestamp": "1791149004.178664701",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148997-428620691",
+      "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148997.428620691"
+    },
+    {
+      "type": "transaction",
+      "kind": "probe-account-frozen",
+      "hash": "0x1859530748f5c66d98977b76f615205e9561af4612f70e7d1346815a5eec9962",
+      "consensusTimestamp": "1791149011.908188546",
+      "result": "CONTRACT_REVERT_EXECUTED",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x1859530748f5c66d98977b76f615205e9561af4612f70e7d1346815a5eec9962",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x1859530748f5c66d98977b76f615205e9561af4612f70e7d1346815a5eec9962"
+    },
+    {
+      "type": "hedera-transaction",
+      "kind": "unfreeze-lender",
+      "transactionId": "0.0.10862468@1791149008.945602296",
+      "transactionHash": "0x0194d4699dd7d84900c3a02916bcfea10d862a510ff95d2083eabcceecef31b5036ecd7c7c7e0ed351fa49eeb83a4df1",
+      "consensusTimestamp": "1791149016.348916104",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791149008-945602296",
+      "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791149008.945602296"
+    },
+    {
+      "type": "hedera-transaction",
+      "kind": "pause-settlement-token",
+      "transactionId": "0.0.10862468@1791149013.066625447",
+      "transactionHash": "0x3bd0f48a2b87eaa786fc6cef5fdc758d9cc304e046e90baf36285de79793062af8238946aefefd581126ba9f4e28c5d9",
+      "consensusTimestamp": "1791149020.258347104",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791149013-066625447",
+      "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791149013.066625447"
+    },
+    {
+      "type": "transaction",
+      "kind": "probe-token-paused",
+      "hash": "0x0f379925e746a5f9ec4708ed087989b869d159668c16e552364c8745fc9bb73c",
+      "consensusTimestamp": "1791149025.298374104",
+      "result": "CONTRACT_REVERT_EXECUTED",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x0f379925e746a5f9ec4708ed087989b869d159668c16e552364c8745fc9bb73c",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x0f379925e746a5f9ec4708ed087989b869d159668c16e552364c8745fc9bb73c"
+    },
+    {
+      "type": "hedera-transaction",
+      "kind": "unpause-settlement-token",
+      "transactionId": "0.0.10862468@1791149027.927585358",
+      "transactionHash": "0x67fc865353b5334e03412030f7e2a19e39b17f5b7f11da2610cd6ef51fefb0c1bcbe38755da618d29696d212ea6d5d7b",
+      "consensusTimestamp": "1791149033.095493104",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791149027-927585358",
+      "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791149027.927585358"
+    },
+    {
+      "type": "transaction",
+      "kind": "probe-insufficient-allowance",
+      "hash": "0x07bfb5502f55bb5cc4db1c5e98877ce5d067575c3a7bee3e924174e97e34f9b9",
+      "consensusTimestamp": "1791149037.775536104",
+      "result": "CONTRACT_REVERT_EXECUTED",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x07bfb5502f55bb5cc4db1c5e98877ce5d067575c3a7bee3e924174e97e34f9b9",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x07bfb5502f55bb5cc4db1c5e98877ce5d067575c3a7bee3e924174e97e34f9b9"
+    },
+    {
+      "type": "transaction",
+      "kind": "approve-lender-token",
+      "hash": "0x132b686333a0141022efa9360f2861e90bd0715dc5c5aebcd031a449162497a1",
+      "consensusTimestamp": "1791149045.035416104",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x132b686333a0141022efa9360f2861e90bd0715dc5c5aebcd031a449162497a1",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x132b686333a0141022efa9360f2861e90bd0715dc5c5aebcd031a449162497a1"
+    },
+    {
+      "type": "transaction",
+      "kind": "ats-allowance",
+      "hash": "0x01258b8ed247b325bc19a658308f579bb27476f75a0380450eb0f7fcba4c192f",
+      "consensusTimestamp": "1791149054.183089228",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x01258b8ed247b325bc19a658308f579bb27476f75a0380450eb0f7fcba4c192f",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x01258b8ed247b325bc19a658308f579bb27476f75a0380450eb0f7fcba4c192f"
+    },
+    {
+      "type": "transaction",
+      "kind": "fund-offer-1",
+      "hash": "0xc724b115542acbecdbc0f3032e51decb421aeed809e79ef7c550ea5b1dc87e14",
+      "consensusTimestamp": "1791149061.478483646",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0xc724b115542acbecdbc0f3032e51decb421aeed809e79ef7c550ea5b1dc87e14",
+      "hashScan": "https://hashscan.io/testnet/transaction/0xc724b115542acbecdbc0f3032e51decb421aeed809e79ef7c550ea5b1dc87e14"
+    },
+    {
+      "type": "transaction",
+      "kind": "accept-offer-1",
+      "hash": "0x4cc28a1192253cd1ebe682799eb54fdf314c4c85ed09967f09cfc9f482b45821",
+      "consensusTimestamp": "1791149068.555941104",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x4cc28a1192253cd1ebe682799eb54fdf314c4c85ed09967f09cfc9f482b45821",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x4cc28a1192253cd1ebe682799eb54fdf314c4c85ed09967f09cfc9f482b45821"
+    },
+    {
+      "type": "transaction",
+      "kind": "fund-offer-2",
+      "hash": "0x2af99e17cc4611d972db1696c5f0e585bae7f737ba29497d754e321baa0dbb41",
+      "consensusTimestamp": "1791149076.958712668",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x2af99e17cc4611d972db1696c5f0e585bae7f737ba29497d754e321baa0dbb41",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x2af99e17cc4611d972db1696c5f0e585bae7f737ba29497d754e321baa0dbb41"
+    },
+    {
+      "type": "transaction",
+      "kind": "accept-offer-2",
+      "hash": "0xadaad64538f022113ea1ea2f6e2d8ba4317e9c81f85702edddf05abf91eda1dd",
+      "consensusTimestamp": "1791149083.795717104",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0xadaad64538f022113ea1ea2f6e2d8ba4317e9c81f85702edddf05abf91eda1dd",
+      "hashScan": "https://hashscan.io/testnet/transaction/0xadaad64538f022113ea1ea2f6e2d8ba4317e9c81f85702edddf05abf91eda1dd"
+    },
+    {
+      "type": "transaction",
+      "kind": "borrower-withdrawal",
+      "hash": "0x60d94d26630ec74a3af9bb4ad8e982e54797ec7b2a968c638a8b1e4e5275f910",
+      "consensusTimestamp": "1791149093.098013209",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x60d94d26630ec74a3af9bb4ad8e982e54797ec7b2a968c638a8b1e4e5275f910",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x60d94d26630ec74a3af9bb4ad8e982e54797ec7b2a968c638a8b1e4e5275f910"
+    },
+    {
+      "type": "transaction",
+      "kind": "approve-borrower-repayment",
+      "hash": "0x2d4ab47de8888cc3046e5e89f509c28952828c42aa403d6ef0ee6c22d4967861",
+      "consensusTimestamp": "1791149099.578309104",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x2d4ab47de8888cc3046e5e89f509c28952828c42aa403d6ef0ee6c22d4967861",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x2d4ab47de8888cc3046e5e89f509c28952828c42aa403d6ef0ee6c22d4967861"
+    },
+    {
+      "type": "transaction",
+      "kind": "repay-position",
+      "hash": "0x164131875d350c99d1c5767622f3de36bc0cc4a22f2d100491d0396319158909",
+      "consensusTimestamp": "1791149105.275549104",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x164131875d350c99d1c5767622f3de36bc0cc4a22f2d100491d0396319158909",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x164131875d350c99d1c5767622f3de36bc0cc4a22f2d100491d0396319158909"
+    },
+    {
+      "type": "transaction",
+      "kind": "lender-withdrawal",
+      "hash": "0x991f14607e7f8ee5a254d2a724e8868b63c8993c19292664468d0b9873245394",
+      "consensusTimestamp": "1791149111.618351813",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x991f14607e7f8ee5a254d2a724e8868b63c8993c19292664468d0b9873245394",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x991f14607e7f8ee5a254d2a724e8868b63c8993c19292664468d0b9873245394"
+    },
+    {
+      "type": "hedera-transaction",
+      "kind": "sweep-lender-tokens",
+      "transactionId": "0.0.10862468@1791149216.618979793",
+      "transactionHash": "0x44f1a7c869ab7aa359be8a214f1282a59cf4ff31a0cdbe1e348ec881c7e5efa9e50bb1d2d1fcad63c808ca09825eb5da",
+      "consensusTimestamp": "1791149224.043123451",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791149216-618979793",
+      "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791149216.618979793"
+    },
+    {
+      "type": "hedera-transaction",
+      "kind": "sweep-borrower-tokens",
+      "transactionId": "0.0.10862468@1791149220.357316039",
+      "transactionHash": "0x483cc55efbb9a32154f0946a9ebe8df3fafd7d0d262d34ec033bdf81dfc6efbc0747635255ac85e513c740d1921d21df",
+      "consensusTimestamp": "1791149228.018037823",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791149220-357316039",
+      "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791149220.357316039"
+    }
+  ],
+  "tokenTransfers": [
+    {
+      "type": "token-transfer",
+      "transaction": {
+        "type": "hedera-transaction",
+        "kind": "provision-lender-token",
+        "transactionId": "0.0.10862468@1791148989.122138850",
+        "transactionHash": "0x25756e1e75110ddbd35110900d77ccf6aca8a8bcaff12f4dbad4e88e8567b5cb169e6d106ba86fa348669d1f9d57aeac",
+        "consensusTimestamp": "1791148994.508375104",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148989-122138850",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148989.122138850"
+      },
+      "tokenId": "0.0.10862472",
+      "from": "0x99dccbdb643569ef2802481f30f473c91fa8444d",
+      "to": "0x7a959025e71cda98643676c05a99d069bef7558c",
+      "amount": "9000000",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148989-122138850"
+    },
+    {
+      "type": "token-transfer",
+      "transaction": {
+        "type": "hedera-transaction",
+        "kind": "provision-borrower-token",
+        "transactionId": "0.0.10862468@1791148992.368096335",
+        "transactionHash": "0x826056d4c968ef57899a7a2f62b475f92989c0ce408a438934b6648809a0fbf1119c248deb4990f61f870f0db0bb6667",
+        "consensusTimestamp": "1791148998.168543024",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148992-368096335",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148992.368096335"
+      },
+      "tokenId": "0.0.10862472",
+      "from": "0x99dccbdb643569ef2802481f30f473c91fa8444d",
+      "to": "0x849b38ee24c752a946840cef63b081f042ebc83b",
+      "amount": "9000000",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148992-368096335"
+    },
+    {
+      "type": "token-transfer",
+      "transaction": {
+        "type": "transaction",
+        "kind": "fund-offer-1",
+        "hash": "0xc724b115542acbecdbc0f3032e51decb421aeed809e79ef7c550ea5b1dc87e14",
+        "consensusTimestamp": "1791149061.478483646",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0xc724b115542acbecdbc0f3032e51decb421aeed809e79ef7c550ea5b1dc87e14",
+        "hashScan": "https://hashscan.io/testnet/transaction/0xc724b115542acbecdbc0f3032e51decb421aeed809e79ef7c550ea5b1dc87e14"
+      },
+      "tokenId": "0.0.10862472",
+      "from": "0x7a959025e71cda98643676c05a99d069bef7558c",
+      "to": "0x0b112a48342f01648244E2D1c4C342309a40A4eF",
+      "amount": "4000000",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0xc724b115542acbecdbc0f3032e51decb421aeed809e79ef7c550ea5b1dc87e14"
+    },
+    {
+      "type": "token-transfer",
+      "transaction": {
+        "type": "transaction",
+        "kind": "fund-offer-2",
+        "hash": "0x2af99e17cc4611d972db1696c5f0e585bae7f737ba29497d754e321baa0dbb41",
+        "consensusTimestamp": "1791149076.958712668",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x2af99e17cc4611d972db1696c5f0e585bae7f737ba29497d754e321baa0dbb41",
+        "hashScan": "https://hashscan.io/testnet/transaction/0x2af99e17cc4611d972db1696c5f0e585bae7f737ba29497d754e321baa0dbb41"
+      },
+      "tokenId": "0.0.10862472",
+      "from": "0x7a959025e71cda98643676c05a99d069bef7558c",
+      "to": "0x0b112a48342f01648244E2D1c4C342309a40A4eF",
+      "amount": "4000000",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x2af99e17cc4611d972db1696c5f0e585bae7f737ba29497d754e321baa0dbb41"
+    },
+    {
+      "type": "token-transfer",
+      "transaction": {
+        "type": "transaction",
+        "kind": "borrower-withdrawal",
+        "hash": "0x60d94d26630ec74a3af9bb4ad8e982e54797ec7b2a968c638a8b1e4e5275f910",
+        "consensusTimestamp": "1791149093.098013209",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x60d94d26630ec74a3af9bb4ad8e982e54797ec7b2a968c638a8b1e4e5275f910",
+        "hashScan": "https://hashscan.io/testnet/transaction/0x60d94d26630ec74a3af9bb4ad8e982e54797ec7b2a968c638a8b1e4e5275f910"
+      },
+      "tokenId": "0.0.10862472",
+      "from": "0x0b112a48342f01648244E2D1c4C342309a40A4eF",
+      "to": "0x849b38ee24c752a946840cef63b081f042ebc83b",
+      "amount": "8000000",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x60d94d26630ec74a3af9bb4ad8e982e54797ec7b2a968c638a8b1e4e5275f910"
+    },
+    {
+      "type": "token-transfer",
+      "transaction": {
+        "type": "transaction",
+        "kind": "repay-position",
+        "hash": "0x164131875d350c99d1c5767622f3de36bc0cc4a22f2d100491d0396319158909",
+        "consensusTimestamp": "1791149105.275549104",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x164131875d350c99d1c5767622f3de36bc0cc4a22f2d100491d0396319158909",
+        "hashScan": "https://hashscan.io/testnet/transaction/0x164131875d350c99d1c5767622f3de36bc0cc4a22f2d100491d0396319158909"
+      },
+      "tokenId": "0.0.10862472",
+      "from": "0x849b38ee24c752a946840cef63b081f042ebc83b",
+      "to": "0x0b112a48342f01648244E2D1c4C342309a40A4eF",
+      "amount": "4000001",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x164131875d350c99d1c5767622f3de36bc0cc4a22f2d100491d0396319158909"
+    },
+    {
+      "type": "token-transfer",
+      "transaction": {
+        "type": "transaction",
+        "kind": "lender-withdrawal",
+        "hash": "0x991f14607e7f8ee5a254d2a724e8868b63c8993c19292664468d0b9873245394",
+        "consensusTimestamp": "1791149111.618351813",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x991f14607e7f8ee5a254d2a724e8868b63c8993c19292664468d0b9873245394",
+        "hashScan": "https://hashscan.io/testnet/transaction/0x991f14607e7f8ee5a254d2a724e8868b63c8993c19292664468d0b9873245394"
+      },
+      "tokenId": "0.0.10862472",
+      "from": "0x0b112a48342f01648244E2D1c4C342309a40A4eF",
+      "to": "0x7a959025e71cda98643676c05a99d069bef7558c",
+      "amount": "4000001",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x991f14607e7f8ee5a254d2a724e8868b63c8993c19292664468d0b9873245394"
+    },
+    {
+      "type": "token-transfer",
+      "transaction": {
+        "type": "hedera-transaction",
+        "kind": "sweep-lender-tokens",
+        "transactionId": "0.0.10862468@1791149216.618979793",
+        "transactionHash": "0x44f1a7c869ab7aa359be8a214f1282a59cf4ff31a0cdbe1e348ec881c7e5efa9e50bb1d2d1fcad63c808ca09825eb5da",
+        "consensusTimestamp": "1791149224.043123451",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791149216-618979793",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791149216.618979793"
+      },
+      "tokenId": "0.0.10862472",
+      "from": "0x7a959025e71cda98643676c05a99d069bef7558c",
+      "to": "0x99dccbdb643569ef2802481f30f473c91fa8444d",
+      "amount": "5000001",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791149216-618979793"
+    },
+    {
+      "type": "token-transfer",
+      "transaction": {
+        "type": "hedera-transaction",
+        "kind": "sweep-borrower-tokens",
+        "transactionId": "0.0.10862468@1791149220.357316039",
+        "transactionHash": "0x483cc55efbb9a32154f0946a9ebe8df3fafd7d0d262d34ec033bdf81dfc6efbc0747635255ac85e513c740d1921d21df",
+        "consensusTimestamp": "1791149228.018037823",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791149220-357316039",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791149220.357316039"
+      },
+      "tokenId": "0.0.10862472",
+      "from": "0x849b38ee24c752a946840cef63b081f042ebc83b",
+      "to": "0x99dccbdb643569ef2802481f30f473c91fa8444d",
+      "amount": "12999999",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791149220-357316039"
+    }
+  ],
+  "lifecycle": {
+    "atsBondDeployment": {
+      "type": "transaction",
+      "kind": "ats-bond-deployment-1",
+      "hash": "0xf02dc2a081fb38afb88a21c02f7e969573bf72e3eeb2f6d606eab3fb3f07bf9f",
+      "consensusTimestamp": "1791148883.586038104",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0xf02dc2a081fb38afb88a21c02f7e969573bf72e3eeb2f6d606eab3fb3f07bf9f",
+      "hashScan": "https://hashscan.io/testnet/transaction/0xf02dc2a081fb38afb88a21c02f7e969573bf72e3eeb2f6d606eab3fb3f07bf9f"
+    },
+    "settlementTokenCreation": {
+      "type": "hedera-transaction",
+      "kind": "settlement-token-creation",
+      "transactionId": "0.0.10862468@1791148553.153770327",
+      "transactionHash": "0x5b72020b387afb004ffa0aa8ef49ef74f50cc6b6a5339e5f6ec80103a784c25da6daff520ecbc5aeb4ffe25265a023ee",
+      "consensusTimestamp": "1791148559.928488400",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148553-153770327",
+      "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148553.153770327"
+    },
+    "settlementInitialization": {
+      "type": "transaction",
+      "kind": "settlement-initialization",
+      "hash": "0x23624e14239b5e57c89847aa703fe5b4bc6513888788082b9f2b1b17c4a71de8",
+      "consensusTimestamp": "1791148934.578268791",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x23624e14239b5e57c89847aa703fe5b4bc6513888788082b9f2b1b17c4a71de8",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x23624e14239b5e57c89847aa703fe5b4bc6513888788082b9f2b1b17c4a71de8"
+    },
+    "automationFunding": {
+      "type": "transaction",
+      "kind": "automation-funding",
+      "hash": "0x8475e73c8e60c15ec5971baf017454621c9646849a87928d82af98b57997d491",
+      "consensusTimestamp": "1791148941.365473117",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x8475e73c8e60c15ec5971baf017454621c9646849a87928d82af98b57997d491",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x8475e73c8e60c15ec5971baf017454621c9646849a87928d82af98b57997d491"
+    },
+    "actorProvisioning": [
+      {
+        "type": "hedera-transaction",
+        "kind": "associate-lender",
+        "transactionId": "0.0.10862468@1791148949.765855670",
+        "transactionHash": "0xdaa5ad664f421c4e0839d3c4924c1cae2fb5cdc3bcbe2bfbf1626c1b17634ffed8677c7a8778d3bfc1e047475df7eb59",
+        "consensusTimestamp": "1791148956.058360640",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148949-765855670",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148949.765855670"
+      },
+      {
+        "type": "hedera-transaction",
+        "kind": "associate-borrower",
+        "transactionId": "0.0.10862468@1791148955.285139112",
+        "transactionHash": "0x7b0f163e0b9f0bf31009a00a0f91e1f7103173aedb5f3bdfa8953cd0fbdf6121aac92ca87d2498cc85aa39b485075ab4",
+        "consensusTimestamp": "1791148960.265838065",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148955-285139112",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148955.285139112"
+      },
+      {
+        "type": "hedera-transaction",
+        "kind": "grant-settlement-kyc-lender-initial",
+        "transactionId": "0.0.10862468@1791148960.746839254",
+        "transactionHash": "0x9bfdfb89f342773d5ba816758012717d1bb2f2e3a7f5b83f23cd004d8105198b04c209218f8451fb05e22f96b49b8fa1",
+        "consensusTimestamp": "1791148964.438170791",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148960-746839254",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148960.746839254"
+      },
+      {
+        "type": "hedera-transaction",
+        "kind": "grant-settlement-kyc-borrower",
+        "transactionId": "0.0.10862468@1791148961.160306694",
+        "transactionHash": "0x271fcd6a22ac25aaa89f3f48bdd4a4f895f1ac90482e3291d67c3ebf5b2180ce4d9172c621ad7a4567a2a91cee28cd0a",
+        "consensusTimestamp": "1791148968.588471238",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148961-160306694",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148961.160306694"
+      },
+      {
+        "type": "hedera-transaction",
+        "kind": "grant-settlement-kyc-rail",
+        "transactionId": "0.0.10862468@1791148969.831153073",
+        "transactionHash": "0xeb98fd69147921493474c733471318aee5884f11bea026fb3cc88f361512973b25f933cd794fa3b330678bf7f88ef48e",
+        "consensusTimestamp": "1791148975.258487138",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148969-831153073",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148969.831153073"
+      },
+      {
+        "type": "hedera-transaction",
+        "kind": "revoke-settlement-kyc-lender",
+        "transactionId": "0.0.10862468@1791148972.694792640",
+        "transactionHash": "0xd0e937d5d8fbc469e759a06961a3f6fc69f96b829d26ef0277479d93bf16c0e80b9c166282588d6ddc2872eeb9f6f495",
+        "consensusTimestamp": "1791148979.345447104",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148972-694792640",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148972.694792640"
+      },
+      {
+        "type": "hedera-transaction",
+        "kind": "regrant-settlement-kyc-lender",
+        "transactionId": "0.0.10862468@1791148985.004865749",
+        "transactionHash": "0x3701c5a33b3adf7fbc00298fdc65db3ebabfdeb48164fd75ad74316fd73e7dff4a89fcdb5e3b0d454782cddf44fed6bf",
+        "consensusTimestamp": "1791148990.357955626",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148985-004865749",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148985.004865749"
+      },
+      {
+        "type": "hedera-transaction",
+        "kind": "provision-lender-token",
+        "transactionId": "0.0.10862468@1791148989.122138850",
+        "transactionHash": "0x25756e1e75110ddbd35110900d77ccf6aca8a8bcaff12f4dbad4e88e8567b5cb169e6d106ba86fa348669d1f9d57aeac",
+        "consensusTimestamp": "1791148994.508375104",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148989-122138850",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148989.122138850"
+      },
+      {
+        "type": "hedera-transaction",
+        "kind": "provision-borrower-token",
+        "transactionId": "0.0.10862468@1791148992.368096335",
+        "transactionHash": "0x826056d4c968ef57899a7a2f62b475f92989c0ce408a438934b6648809a0fbf1119c248deb4990f61f870f0db0bb6667",
+        "consensusTimestamp": "1791148998.168543024",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148992-368096335",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148992.368096335"
+      },
+      {
+        "type": "hedera-transaction",
+        "kind": "freeze-lender",
+        "transactionId": "0.0.10862468@1791148997.428620691",
+        "transactionHash": "0xaffad9c19a7aa5507d7ade5fa6ca1adac1f374add961c3c881d0269b4e7bdf7881d69623e10f9f7aecb52ea1e93af46f",
+        "consensusTimestamp": "1791149004.178664701",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148997-428620691",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148997.428620691"
+      },
+      {
+        "type": "hedera-transaction",
+        "kind": "unfreeze-lender",
+        "transactionId": "0.0.10862468@1791149008.945602296",
+        "transactionHash": "0x0194d4699dd7d84900c3a02916bcfea10d862a510ff95d2083eabcceecef31b5036ecd7c7c7e0ed351fa49eeb83a4df1",
+        "consensusTimestamp": "1791149016.348916104",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791149008-945602296",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791149008.945602296"
+      },
+      {
+        "type": "hedera-transaction",
+        "kind": "pause-settlement-token",
+        "transactionId": "0.0.10862468@1791149013.066625447",
+        "transactionHash": "0x3bd0f48a2b87eaa786fc6cef5fdc758d9cc304e046e90baf36285de79793062af8238946aefefd581126ba9f4e28c5d9",
+        "consensusTimestamp": "1791149020.258347104",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791149013-066625447",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791149013.066625447"
+      },
+      {
+        "type": "hedera-transaction",
+        "kind": "unpause-settlement-token",
+        "transactionId": "0.0.10862468@1791149027.927585358",
+        "transactionHash": "0x67fc865353b5334e03412030f7e2a19e39b17f5b7f11da2610cd6ef51fefb0c1bcbe38755da618d29696d212ea6d5d7b",
+        "consensusTimestamp": "1791149033.095493104",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791149027-927585358",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791149027.927585358"
+      }
+    ],
+    "oracleUpdate": null,
+    "fundedOffer": {
+      "type": "transaction",
+      "kind": "fund-offer-1",
+      "hash": "0xc724b115542acbecdbc0f3032e51decb421aeed809e79ef7c550ea5b1dc87e14",
+      "consensusTimestamp": "1791149061.478483646",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0xc724b115542acbecdbc0f3032e51decb421aeed809e79ef7c550ea5b1dc87e14",
+      "hashScan": "https://hashscan.io/testnet/transaction/0xc724b115542acbecdbc0f3032e51decb421aeed809e79ef7c550ea5b1dc87e14"
+    },
+    "holdCreation": {
+      "type": "transaction",
+      "kind": "accept-offer-1",
+      "hash": "0x4cc28a1192253cd1ebe682799eb54fdf314c4c85ed09967f09cfc9f482b45821",
+      "consensusTimestamp": "1791149068.555941104",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x4cc28a1192253cd1ebe682799eb54fdf314c4c85ed09967f09cfc9f482b45821",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x4cc28a1192253cd1ebe682799eb54fdf314c4c85ed09967f09cfc9f482b45821"
+    },
+    "repaidFacility": {
+      "type": "transaction",
+      "kind": "repay-position",
+      "hash": "0x164131875d350c99d1c5767622f3de36bc0cc4a22f2d100491d0396319158909",
+      "consensusTimestamp": "1791149105.275549104",
+      "result": "SUCCESS",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x164131875d350c99d1c5767622f3de36bc0cc4a22f2d100491d0396319158909",
+      "hashScan": "https://hashscan.io/testnet/transaction/0x164131875d350c99d1c5767622f3de36bc0cc4a22f2d100491d0396319158909"
+    },
+    "maturedDefault": {
+      "type": "schedule",
+      "address": "0x0000000000000000000000000000000000A5BfF0",
+      "scheduleId": "0.0.10862576",
+      "executedTimestamp": "1791149205.038221558",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/schedules/0.0.10862576",
+      "hashScan": "https://hashscan.io/testnet/schedule/0.0.10862576"
+    },
+    "liveConfigurationRead": {
+      "type": "state",
+      "blockNumber": "41362350",
+      "rpcOrigin": "https://testnet.hashio.io",
+      "assertions": {
+        "rail.settlementInitialized": true,
+        "rail.settlementDecimals": 6,
+        "rail.cashTokenLiabilities": "0",
+        "rail.settlementTokenBalance": "0",
+        "rail.reservedAutomationTinybar": "0",
+        "rail.policy.maximumAdvanceBps": 6000,
+        "rail.policy.maximumAnnualRateBps": 5000,
+        "rail.policy.maximumQuoteMovementBps": 100,
+        "rail.policy.minimumTermSeconds": 120,
+        "rail.policy.maximumTermSeconds": 31536000,
+        "rail.policy.maximumOfferLifetimeSeconds": 3600,
+        "positions.repaidState": "REPAID",
+        "positions.defaultedState": "DEFAULTED",
+        "oracle.kind": "fixed-test",
+        "oracle.priceUsdE8": "100000000",
+        "oracle.confidenceUsdE8": "0",
+        "oracle.observedAt": 1791149210
+      }
+    }
+  },
+  "complianceProbes": [
+    {
+      "kind": "association",
+      "expectedFailure": "Settlement account is not associated",
+      "rejectedTransaction": {
+        "type": "transaction",
+        "kind": "probe-association",
+        "hash": "0x870a8933e4fe5ad4de913ee396ea562a4f698dc4321a49c730052a3aa1b8ba3a",
+        "consensusTimestamp": "1791148949.578395104",
+        "result": "CONTRACT_REVERT_EXECUTED",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x870a8933e4fe5ad4de913ee396ea562a4f698dc4321a49c730052a3aa1b8ba3a",
+        "hashScan": "https://hashscan.io/testnet/transaction/0x870a8933e4fe5ad4de913ee396ea562a4f698dc4321a49c730052a3aa1b8ba3a"
+      },
+      "recoveryTransaction": {
+        "type": "hedera-transaction",
+        "kind": "associate-lender",
+        "transactionId": "0.0.10862468@1791148949.765855670",
+        "transactionHash": "0xdaa5ad664f421c4e0839d3c4924c1cae2fb5cdc3bcbe2bfbf1626c1b17634ffed8677c7a8778d3bfc1e047475df7eb59",
+        "consensusTimestamp": "1791148956.058360640",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148949-765855670",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148949.765855670"
+      },
+      "verified": true
+    },
+    {
+      "kind": "kyc-revoked",
+      "expectedFailure": "Settlement KYC was revoked",
+      "rejectedTransaction": {
+        "type": "transaction",
+        "kind": "probe-kyc-revoked",
+        "hash": "0x3fd17bcdab73e4587035bb2499b45528905a4be0d78858d3799da3224c6d7182",
+        "consensusTimestamp": "1791148984.865574122",
+        "result": "CONTRACT_REVERT_EXECUTED",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x3fd17bcdab73e4587035bb2499b45528905a4be0d78858d3799da3224c6d7182",
+        "hashScan": "https://hashscan.io/testnet/transaction/0x3fd17bcdab73e4587035bb2499b45528905a4be0d78858d3799da3224c6d7182"
+      },
+      "recoveryTransaction": {
+        "type": "hedera-transaction",
+        "kind": "regrant-settlement-kyc-lender",
+        "transactionId": "0.0.10862468@1791148985.004865749",
+        "transactionHash": "0x3701c5a33b3adf7fbc00298fdc65db3ebabfdeb48164fd75ad74316fd73e7dff4a89fcdb5e3b0d454782cddf44fed6bf",
+        "consensusTimestamp": "1791148990.357955626",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791148985-004865749",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791148985.004865749"
+      },
+      "verified": true
+    },
+    {
+      "kind": "account-frozen",
+      "expectedFailure": "Settlement account is frozen",
+      "rejectedTransaction": {
+        "type": "transaction",
+        "kind": "probe-account-frozen",
+        "hash": "0x1859530748f5c66d98977b76f615205e9561af4612f70e7d1346815a5eec9962",
+        "consensusTimestamp": "1791149011.908188546",
+        "result": "CONTRACT_REVERT_EXECUTED",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x1859530748f5c66d98977b76f615205e9561af4612f70e7d1346815a5eec9962",
+        "hashScan": "https://hashscan.io/testnet/transaction/0x1859530748f5c66d98977b76f615205e9561af4612f70e7d1346815a5eec9962"
+      },
+      "recoveryTransaction": {
+        "type": "hedera-transaction",
+        "kind": "unfreeze-lender",
+        "transactionId": "0.0.10862468@1791149008.945602296",
+        "transactionHash": "0x0194d4699dd7d84900c3a02916bcfea10d862a510ff95d2083eabcceecef31b5036ecd7c7c7e0ed351fa49eeb83a4df1",
+        "consensusTimestamp": "1791149016.348916104",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791149008-945602296",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791149008.945602296"
+      },
+      "verified": true
+    },
+    {
+      "kind": "token-paused",
+      "expectedFailure": "Settlement token is paused",
+      "rejectedTransaction": {
+        "type": "transaction",
+        "kind": "probe-token-paused",
+        "hash": "0x0f379925e746a5f9ec4708ed087989b869d159668c16e552364c8745fc9bb73c",
+        "consensusTimestamp": "1791149025.298374104",
+        "result": "CONTRACT_REVERT_EXECUTED",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x0f379925e746a5f9ec4708ed087989b869d159668c16e552364c8745fc9bb73c",
+        "hashScan": "https://hashscan.io/testnet/transaction/0x0f379925e746a5f9ec4708ed087989b869d159668c16e552364c8745fc9bb73c"
+      },
+      "recoveryTransaction": {
+        "type": "hedera-transaction",
+        "kind": "unpause-settlement-token",
+        "transactionId": "0.0.10862468@1791149027.927585358",
+        "transactionHash": "0x67fc865353b5334e03412030f7e2a19e39b17f5b7f11da2610cd6ef51fefb0c1bcbe38755da618d29696d212ea6d5d7b",
+        "consensusTimestamp": "1791149033.095493104",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/transactions/0.0.10862468-1791149027-927585358",
+        "hashScan": "https://hashscan.io/testnet/transaction/0.0.10862468@1791149027.927585358"
+      },
+      "verified": true
+    },
+    {
+      "kind": "insufficient-allowance",
+      "expectedFailure": "Settlement allowance is below principal",
+      "rejectedTransaction": {
+        "type": "transaction",
+        "kind": "probe-insufficient-allowance",
+        "hash": "0x07bfb5502f55bb5cc4db1c5e98877ce5d067575c3a7bee3e924174e97e34f9b9",
+        "consensusTimestamp": "1791149037.775536104",
+        "result": "CONTRACT_REVERT_EXECUTED",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x07bfb5502f55bb5cc4db1c5e98877ce5d067575c3a7bee3e924174e97e34f9b9",
+        "hashScan": "https://hashscan.io/testnet/transaction/0x07bfb5502f55bb5cc4db1c5e98877ce5d067575c3a7bee3e924174e97e34f9b9"
+      },
+      "recoveryTransaction": {
+        "type": "transaction",
+        "kind": "approve-lender-token",
+        "hash": "0x132b686333a0141022efa9360f2861e90bd0715dc5c5aebcd031a449162497a1",
+        "consensusTimestamp": "1791149045.035416104",
+        "result": "SUCCESS",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/results/0x132b686333a0141022efa9360f2861e90bd0715dc5c5aebcd031a449162497a1",
+        "hashScan": "https://hashscan.io/testnet/transaction/0x132b686333a0141022efa9360f2861e90bd0715dc5c5aebcd031a449162497a1"
+      },
+      "verified": true
+    }
+  ],
+  "ats": {
+    "internalKyc": true,
+    "issuer": true,
+    "kyc": {
+      "lender": 1,
+      "borrower": 1
+    },
+    "roles": {
+      "issuer": true,
+      "kyc": true,
+      "ssiManager": true
+    },
+    "assetMaturity": "1854220561",
+    "clearingActive": false,
+    "tokenDecimals": 0,
+    "nominalValue": "10000",
+    "nominalValueDecimals": 2,
+    "nominalValueCurrency": "0x555344",
+    "balances": {
+      "borrower": {
+        "free": "990",
+        "held": "0"
+      },
+      "lender": {
+        "free": "10",
+        "held": "0"
+      }
+    }
+  },
+  "positions": [
+    {
+      "id": "0x8a4e886bf34b4cfd34bd9ff96bce2d47305a076123c7297452e72f788eda81dc",
+      "lender": "0x7A959025E71cda98643676C05A99d069BeF7558c",
+      "borrower": "0x849B38eE24C752a946840cEf63b081f042eBC83b",
+      "collateralAmount": "10",
+      "holdId": "1",
+      "principalTokenUnits": "4000000",
+      "repaymentTokenUnits": "4000001",
+      "openedAt": 1791149067,
+      "maturity": 1791149187,
+      "scheduleAddress": "0x0000000000000000000000000000000000A5bFed",
+      "state": "REPAID",
+      "automation": "COMPLETED",
+      "terminalPath": "repayment"
+    },
+    {
+      "id": "0x36213861056dce6350ab3ae51534fbe7da9d0a966b7655c20a42bc29b324e33e",
+      "lender": "0x7A959025E71cda98643676C05A99d069BeF7558c",
+      "borrower": "0x849B38eE24C752a946840cEf63b081f042eBC83b",
+      "collateralAmount": "10",
+      "holdId": "2",
+      "principalTokenUnits": "4000000",
+      "repaymentTokenUnits": "4000001",
+      "openedAt": 1791149083,
+      "maturity": 1791149203,
+      "scheduleAddress": "0x0000000000000000000000000000000000A5BfF0",
+      "state": "DEFAULTED",
+      "automation": "COMPLETED",
+      "terminalPath": "hss"
+    }
+  ],
+  "holds": [
+    {
+      "positionId": "0x8a4e886bf34b4cfd34bd9ff96bce2d47305a076123c7297452e72f788eda81dc",
+      "holdId": "1",
+      "holder": "0x849b38ee24c752a946840cef63b081f042ebc83b",
+      "partition": "0x0000000000000000000000000000000000000000000000000000000000000001",
+      "amount": "10",
+      "expirationTimestamp": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+      "escrow": "0x0b112a48342f01648244E2D1c4C342309a40A4eF",
+      "destination": "0x0000000000000000000000000000000000000000",
+      "data": "0x8a4e886bf34b4cfd34bd9ff96bce2d47305a076123c7297452e72f788eda81dc",
+      "operatorData": "0x",
+      "thirdPartyType": 1,
+      "state": {
+        "type": "state",
+        "blockNumber": "41362280",
+        "rpcOrigin": "https://testnet.hashio.io",
+        "assertions": {
+          "hold.positionId": "0x8a4e886bf34b4cfd34bd9ff96bce2d47305a076123c7297452e72f788eda81dc",
+          "hold.holdId": "1",
+          "hold.holder": "0x849b38ee24c752a946840cef63b081f042ebc83b",
+          "hold.partition": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "hold.amount": "10",
+          "hold.expirationTimestamp": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+          "hold.escrow": "0x0b112a48342f01648244E2D1c4C342309a40A4eF",
+          "hold.destination": "0x0000000000000000000000000000000000000000",
+          "hold.data": "0x8a4e886bf34b4cfd34bd9ff96bce2d47305a076123c7297452e72f788eda81dc",
+          "hold.operatorData": "0x",
+          "hold.thirdPartyType": 1
+        }
+      },
+      "terminalState": {
+        "type": "state",
+        "blockNumber": "41362350",
+        "rpcOrigin": "https://testnet.hashio.io",
+        "assertions": {
+          "hold.positionId": "0x8a4e886bf34b4cfd34bd9ff96bce2d47305a076123c7297452e72f788eda81dc",
+          "hold.holdId": "1",
+          "hold.holder": "0x849b38ee24c752a946840cef63b081f042ebc83b",
+          "hold.partition": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "hold.remainingAmount": "0",
+          "hold.deleted": true
+        }
+      }
+    },
+    {
+      "positionId": "0x36213861056dce6350ab3ae51534fbe7da9d0a966b7655c20a42bc29b324e33e",
+      "holdId": "2",
+      "holder": "0x849b38ee24c752a946840cef63b081f042ebc83b",
+      "partition": "0x0000000000000000000000000000000000000000000000000000000000000001",
+      "amount": "10",
+      "expirationTimestamp": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+      "escrow": "0x0b112a48342f01648244E2D1c4C342309a40A4eF",
+      "destination": "0x0000000000000000000000000000000000000000",
+      "data": "0x36213861056dce6350ab3ae51534fbe7da9d0a966b7655c20a42bc29b324e33e",
+      "operatorData": "0x",
+      "thirdPartyType": 1,
+      "state": {
+        "type": "state",
+        "blockNumber": "41362288",
+        "rpcOrigin": "https://testnet.hashio.io",
+        "assertions": {
+          "hold.positionId": "0x36213861056dce6350ab3ae51534fbe7da9d0a966b7655c20a42bc29b324e33e",
+          "hold.holdId": "2",
+          "hold.holder": "0x849b38ee24c752a946840cef63b081f042ebc83b",
+          "hold.partition": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "hold.amount": "10",
+          "hold.expirationTimestamp": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+          "hold.escrow": "0x0b112a48342f01648244E2D1c4C342309a40A4eF",
+          "hold.destination": "0x0000000000000000000000000000000000000000",
+          "hold.data": "0x36213861056dce6350ab3ae51534fbe7da9d0a966b7655c20a42bc29b324e33e",
+          "hold.operatorData": "0x",
+          "hold.thirdPartyType": 1
+        }
+      },
+      "terminalState": {
+        "type": "state",
+        "blockNumber": "41362350",
+        "rpcOrigin": "https://testnet.hashio.io",
+        "assertions": {
+          "hold.positionId": "0x36213861056dce6350ab3ae51534fbe7da9d0a966b7655c20a42bc29b324e33e",
+          "hold.holdId": "2",
+          "hold.holder": "0x849b38ee24c752a946840cef63b081f042ebc83b",
+          "hold.partition": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "hold.remainingAmount": "0",
+          "hold.deleted": true
+        }
+      }
+    }
+  ],
+  "schedules": [
+    {
+      "type": "schedule",
+      "address": "0x0000000000000000000000000000000000A5bFed",
+      "scheduleId": "0.0.10862573",
+      "executedTimestamp": "1791149189.035962208",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/schedules/0.0.10862573",
+      "hashScan": "https://hashscan.io/testnet/schedule/0.0.10862573"
+    },
+    {
+      "type": "schedule",
+      "address": "0x0000000000000000000000000000000000A5BfF0",
+      "scheduleId": "0.0.10862576",
+      "executedTimestamp": "1791149205.038221558",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/schedules/0.0.10862576",
+      "hashScan": "https://hashscan.io/testnet/schedule/0.0.10862576"
+    }
+  ],
+  "accounting": {
+    "cashTokenLiabilities": "0",
+    "railTokenBalance": "0",
+    "reservedAutomationTinybar": "0",
+    "railHbarBalanceTinybar": "951593022"
+  },
+  "verification": {
+    "complete": true,
+    "state": {
+      "type": "state",
+      "blockNumber": "41362350",
+      "rpcOrigin": "https://testnet.hashio.io",
+      "assertions": {
+        "rail.settlementInitialized": true,
+        "rail.settlementDecimals": 6,
+        "rail.cashTokenLiabilities": "0",
+        "rail.settlementTokenBalance": "0",
+        "rail.reservedAutomationTinybar": "0",
+        "rail.policy.maximumAdvanceBps": 6000,
+        "rail.policy.maximumAnnualRateBps": 5000,
+        "rail.policy.maximumQuoteMovementBps": 100,
+        "rail.policy.minimumTermSeconds": 120,
+        "rail.policy.maximumTermSeconds": 31536000,
+        "rail.policy.maximumOfferLifetimeSeconds": 3600,
+        "positions.repaidState": "REPAID",
+        "positions.defaultedState": "DEFAULTED",
+        "oracle.kind": "fixed-test",
+        "oracle.priceUsdE8": "100000000",
+        "oracle.confidenceUsdE8": "0",
+        "oracle.observedAt": 1791149210
+      }
+    },
+    "settlementBalances": [
+      {
+        "type": "token-balance",
+        "basis": "current-mirror-token-relationship",
+        "tokenId": "0.0.10862472",
+        "accountId": "0.0.10862470",
+        "evmAddress": "0x7a959025e71cda98643676c05a99d069bef7558c",
+        "associated": true,
+        "kycStatus": "GRANTED",
+        "freezeStatus": "UNFROZEN",
+        "balanceTokenUnits": "0",
+        "checkedAt": "2026-10-04T21:27:15.019Z",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/accounts/0.0.10862470/tokens?token.id=0.0.10862472"
+      },
+      {
+        "type": "token-balance",
+        "basis": "current-mirror-token-relationship",
+        "tokenId": "0.0.10862472",
+        "accountId": "0.0.10862471",
+        "evmAddress": "0x849b38ee24c752a946840cef63b081f042ebc83b",
+        "associated": true,
+        "kycStatus": "GRANTED",
+        "freezeStatus": "UNFROZEN",
+        "balanceTokenUnits": "0",
+        "checkedAt": "2026-10-04T21:27:15.059Z",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/accounts/0.0.10862471/tokens?token.id=0.0.10862472"
+      },
+      {
+        "type": "token-balance",
+        "basis": "current-mirror-token-relationship",
+        "tokenId": "0.0.10862472",
+        "accountId": "0.0.10862553",
+        "evmAddress": "0x0b112a48342f01648244E2D1c4C342309a40A4eF",
+        "associated": true,
+        "kycStatus": "GRANTED",
+        "freezeStatus": "UNFROZEN",
+        "balanceTokenUnits": "0",
+        "checkedAt": "2026-10-04T21:27:15.159Z",
+        "mirror": "https://testnet.mirrornode.hedera.com/api/v1/accounts/0.0.10862553/tokens?token.id=0.0.10862472"
+      }
+    ],
+    "hbarBalance": {
+      "type": "balance",
+      "basis": "current-mirror-account",
+      "accountId": "0.0.10862553",
+      "evmAddress": "0x0b112a48342f01648244e2d1c4c342309a40a4ef",
+      "balanceTinybar": "951593022",
+      "balanceTimestamp": "1791149205.038221558",
+      "checkedAt": "2026-10-04T21:27:13.759Z",
+      "mirror": "https://testnet.mirrornode.hedera.com/api/v1/accounts/0x0b112a48342f01648244e2d1c4c342309a40a4ef?transactions=false"
+    },
+    "mirrorOrigin": "https://testnet.mirrornode.hedera.com",
+    "sourceUrls": {
+      "factoryHashScan": "https://hashscan.io/testnet/contract/0xd1F118A40f3b02883D35909eF2517e7EDd78379d",
+      "factoryMirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/0xd1F118A40f3b02883D35909eF2517e7EDd78379d",
+      "resolverHashScan": "https://hashscan.io/testnet/contract/0xBA2D5FC2083A0b8f164c50e65d782087fBA18E0a",
+      "resolverMirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/0xBA2D5FC2083A0b8f164c50e65d782087fBA18E0a",
+      "atsTokenHashScan": "https://hashscan.io/testnet/contract/0x6d6097885dD60cD6967e46D352420aE8EFB2aaBF",
+      "atsTokenMirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/0x6d6097885dD60cD6967e46D352420aE8EFB2aaBF",
+      "settlementTokenHashScan": "https://hashscan.io/testnet/token/0.0.10862472",
+      "settlementTokenMirror": "https://testnet.mirrornode.hedera.com/api/v1/tokens/0.0.10862472",
+      "oracleHashScan": "https://hashscan.io/testnet/contract/0x722591Ba4c62726621bbBBD1e4135FC501e6C17E",
+      "oracleMirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/0x722591Ba4c62726621bbBBD1e4135FC501e6C17E",
+      "railHashScan": "https://hashscan.io/testnet/contract/0x0b112a48342f01648244E2D1c4C342309a40A4eF",
+      "railMirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/0x0b112a48342f01648244E2D1c4C342309a40A4eF",
+      "acceptanceHashScan": "https://hashscan.io/testnet/contract/0x19d46d5b006682a524cB24ceb17CE05198A948b0",
+      "acceptanceMirror": "https://testnet.mirrornode.hedera.com/api/v1/contracts/0x19d46d5b006682a524cB24ceb17CE05198A948b0"
+    },
+    "linkAudit": {
+      "checkedAt": null,
+      "hashScanStatus": "unchecked",
+      "mirrorStatus": "verified",
+      "hashScanChecked": 0,
+      "mirrorChecked": 54,
+      "finding": null
+    }
+  },
+  "metrics": {
+    "startedAt": "2026-10-04T21:15:54.543Z",
+    "completedAt": "2026-10-04T21:27:15.160Z",
+    "elapsedMilliseconds": 680617,
+    "mirrorConfirmedTransactions": 41
+  },
+  "limitations": [
+    "The controlled settlement token and fixed oracle prove mechanics, not market value.",
+    "HBAR balance is a current Mirror account proof, not an exact-block RPC assertion."
+  ],
+  "notice": "Observed on Hedera testnet. This evidence contains no signer material or raw transaction payloads."
+}
