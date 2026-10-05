@@ -1,0 +1,37 @@
+{
+  "reviewedAt": "2026-09-29",
+  "license": "Apache-2.0",
+  "repositories": {
+    "spec": {
+      "url": "https://github.com/LFDT-CLPR/clpr-spec",
+      "commit": "945082d69e65dd0fd9e9bdf8d59cb8121579f6fd",
+      "files": {
+        "clpr-service-spec.md": "800de282118071658405294ac28ad59a2daa1d9c5072b932ffc845fcc9d298be"
+      }
+    },
+    "contracts": {
+      "url": "https://github.com/LFDT-CLPR/clpr-smart-contracts",
+      "commit": "276c8d524e6ce3b5ef01da9d68ce3e8f27798a44",
+      "solidity": "0.8.28",
+      "node": ">=24",
+      "files": {
+        "src/interfaces/IClprApplication.sol": "1e07814048a97c22a3474f2f1d8f035631658a5dc0ba58d3802de8080865ec7f",
+        "src/interfaces/IClprService.sol": "2d2085f3aa62d6eaaeaab3dee489ff35e114bf29a14a42410ffeeab850b0d1b5",
+        "src/interfaces/IClprConnector.sol": "51b90035d30426934538a8ab55d4680f3efca66709c19fd9c331c228b98ce910",
+        "test/e2e/tests/besu-solo-roundtrip.spec.ts": "5d33cb9a84568ac251f1dc088a3a707c66b62ba95e7cf1cdf96826efdb1699b1"
+      }
+    },
+    "endpoint": {
+      "url": "https://github.com/LFDT-CLPR/clpr-endpoint",
+      "commit": "2ccd48d2d5d0d2f15d0829b1a057f27d88fd085e",
+      "files": {
+        "docs/sync-protocol.md": "bb49968a15f661afd66d2cb1c3df6c448b94044891d02bbb10af07eba47f9836"
+      }
+    }
+  },
+  "observedPaths": {
+    "localBesuBidirectional": "required-before-merge",
+    "besuToSolo": "implemented-upstream",
+    "soloToBesu": "not-demonstrated-proof-service-unavailable"
+  }
+}

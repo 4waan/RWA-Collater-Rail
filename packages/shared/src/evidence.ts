@@ -346,3 +346,64 @@ export type HtsReferenceDeployment = {
   limitations: string[];
   notice: string;
 };
+
+export type ClprObservationKind =
+  | "observed-local-besu"
+  | "observed-besu-to-solo"
+  | "observed-hosted-testnet";
+
+export type ClprMessageProof = {
+  observation: ClprObservationKind;
+  direction: string;
+  channelId: string;
+  sourceService: string;
+  destinationService: string;
+  sourceApplication: string;
+  destinationApplication: string;
+  mobilityId: string;
+  messageKind: string;
+  messageId: string;
+  bundleHash: string;
+  proofVerifier: string;
+  sourceBlock: string;
+  destinationBlock: string;
+  observedAt: string;
+};
+
+export type ClprMobilityReferenceDeployment = {
+  schemaVersion: 1;
+  evidenceKind: "clpr-collateral-mobility";
+  status: "verified-experimental";
+  generatedAt: string;
+  upstream: {
+    specificationCommit: string;
+    contractsCommit: string;
+    endpointCommit: string;
+  };
+  observations: ClprObservationKind[];
+  ledgers: Array<{
+    domain: string;
+    kind: "besu" | "hedera-solo" | "hosted";
+    chainId: string;
+    clprService: string;
+    application: string;
+  }>;
+  messages: ClprMessageProof[];
+  lifecycle: {
+    repaymentMobilityId: string;
+    defaultMobilityId: string;
+    repaymentTerminalState: "REPAID";
+    defaultTerminalState: "DEFAULTED";
+  };
+  accounting: {
+    remoteTokenBalance: string;
+    remoteCashLiabilities: string;
+    hederaHbarBalanceTinybar: string;
+    reservedAutomationTinybar: string;
+  };
+  exactState: StateProof[];
+  sourceUrls: Record<string, string>;
+  notDemonstrated: string[];
+  limitations: string[];
+  notice: string;
+};
