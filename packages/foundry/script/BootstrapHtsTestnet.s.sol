@@ -53,7 +53,6 @@ contract BootstrapHtsTestnet is BootstrapTestnet {
             _readHtsPolicy(),
             config.operator
         );
-        rail.fundAutomation{value: 2 * rail.HSS_RESERVE_TINYBAR() * WEIBAR_PER_TINYBAR}();
         HtsRailAcceptance acceptance = new HtsRailAcceptance(IHtsRailReadiness(address(rail)));
         vm.stopBroadcast();
 

@@ -16,10 +16,7 @@ import {
   htsTokenAbi,
   usdOracleAbi,
 } from "@collateral-rail/shared/abis";
-import {
-  DEFAULT_PARTITION,
-  weibarToTinybar,
-} from "@collateral-rail/shared/hedera";
+import { DEFAULT_PARTITION } from "@collateral-rail/shared/hedera";
 import {
   DEFAULT_MIRROR_URL,
   DEFAULT_RPC_URL,
@@ -270,9 +267,6 @@ async function verifyTokenTransfer(transfer) {
       : transfer.transaction.transactionId,
     transfer.transaction.consensusTimestamp,
   );
-  if (!Array.isArray(transaction.token_transfers)) {
-    throw new Error("Mirror transaction omitted token transfers.");
-  }
   const addressToAccount = new Map(
     [
       ...Object.values(record.actors),
@@ -290,19 +284,53 @@ async function verifyTokenTransfer(transfer) {
   if (!from || !to) {
     throw new Error("Token transfer proof uses an unknown public identity.");
   }
-  const outgoing = transaction.token_transfers.some(
-    (item) =>
-      item.token_id === transfer.tokenId &&
-      item.account === from &&
-      BigInt(item.amount) === -BigInt(transfer.amount),
-  );
-  const incoming = transaction.token_transfers.some(
-    (item) =>
-      item.token_id === transfer.tokenId &&
-      item.account === to &&
-      BigInt(item.amount) === BigInt(transfer.amount),
-  );
-  if (!outgoing || !incoming) {
+  let records = [transaction];
+  if (transfer.transaction.type === "transaction") {
+    const nativeId = transaction.transaction_id;
+    if (!/^0\.0\.\d+-\d+-\d{9}$/u.test(nativeId ?? "")) {
+      throw new Error("Mirror omitted the EVM base transaction ID.");
+    }
+    records = await fetchMirrorPages({
+      mirrorOrigin,
+      pathname: `/api/v1/transactions/${nativeId}`,
+      collectionKey: "transactions",
+    });
+    const base = records.filter(
+      (item) =>
+        item.transaction_id === nativeId &&
+        item.consensus_timestamp === transfer.transaction.consensusTimestamp &&
+        Number(item.nonce ?? 0) === 0 &&
+        item.result === "SUCCESS",
+    );
+    if (base.length !== 1) {
+      throw new Error(
+        "Mirror child transfer is not bound to one EVM base transaction.",
+      );
+    }
+  }
+  const matchingRecords = records.filter((item) => {
+    if (
+      item.result !== "SUCCESS" ||
+      !Array.isArray(item.token_transfers) ||
+      item.transaction_id !== transaction.transaction_id
+    ) {
+      return false;
+    }
+    const outgoing = item.token_transfers.some(
+      (entry) =>
+        entry.token_id === transfer.tokenId &&
+        entry.account === from &&
+        BigInt(entry.amount) === -BigInt(transfer.amount),
+    );
+    const incoming = item.token_transfers.some(
+      (entry) =>
+        entry.token_id === transfer.tokenId &&
+        entry.account === to &&
+        BigInt(entry.amount) === BigInt(transfer.amount),
+    );
+    return outgoing && incoming;
+  });
+  if (matchingRecords.length !== 1) {
     throw new Error("Mirror token transfer differs from its typed proof.");
   }
 }
@@ -442,7 +470,6 @@ const [
   cashTokenLiabilities,
   reservedAutomation,
   tokenBalance,
-  hbarBalance,
   oraclePrice,
   acceptanceRail,
 ] = await Promise.all([
@@ -531,7 +558,6 @@ const [
     args: [rail],
     blockNumber: verifiedBlock,
   }),
-  client.getBalance({ address: rail, blockNumber: verifiedBlock }),
   client.readContract({
     address: oracle,
     abi: usdOracleAbi,
@@ -579,11 +605,6 @@ for (const [actual, expected, label] of [
     tokenBalance.toString(),
     record.accounting.railTokenBalance,
     "exact-block token balance",
-  ],
-  [
-    weibarToTinybar(hbarBalance).toString(),
-    record.accounting.railHbarBalanceTinybar,
-    "exact-block HBAR balance",
   ],
   [oraclePrice[0].toString(), record.oracle.priceUsdE8, "oracle price"],
   [

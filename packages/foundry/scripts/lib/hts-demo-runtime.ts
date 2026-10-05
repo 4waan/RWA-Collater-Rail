@@ -64,8 +64,9 @@ export const HTS_PRINCIPAL_TOKEN_UNITS = 4_000_000n;
 export const HTS_ACTOR_TOKEN_UNITS = 9_000_000n;
 export const HTS_GAS = {
   initialize: 1_500_000n,
+  automationFunding: 500_000n,
   oracleUpdate: 750_000n,
-  tokenApproval: 250_000n,
+  tokenApproval: 1_500_000n,
   atsApproval: 500_000n,
   fundOffer: 1_500_000n,
   acceptOffer: 3_500_000n,

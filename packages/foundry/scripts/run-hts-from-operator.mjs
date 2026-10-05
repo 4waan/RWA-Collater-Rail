@@ -163,14 +163,35 @@ async function prepareUsdc(client) {
   );
 }
 
-async function sweepControlledToken(client, signerKey, signerAccountId) {
-  const candidate = JSON.parse(
-    await readFile(htsOutputPath("controlled"), "utf8"),
-  );
-  const tokenIdText = candidate.settlementToken?.tokenId;
+async function sweepControlledToken(
+  client,
+  signerKey,
+  signerAccountId,
+  recoveryTokenId,
+) {
+  const tokenIdText =
+    recoveryTokenId ??
+    JSON.parse(await readFile(htsOutputPath("controlled"), "utf8"))
+      .settlementToken?.tokenId;
   if (!/^0\.0\.\d+$/u.test(tokenIdText ?? "")) {
     throw new Error(
       "The controlled candidate has no settlement token ID for cleanup.",
+    );
+  }
+  const metadata = await fetchAllowedJson(
+    new URL(`/api/v1/tokens/${tokenIdText}`, MIRROR),
+    MIRROR,
+  );
+  if (
+    metadata.token_id !== tokenIdText ||
+    metadata.name !== "Collateral Rail Controlled Test Dollar" ||
+    metadata.symbol !== "CRTD" ||
+    metadata.treasury_account_id !== signerAccountId ||
+    metadata.type !== "FUNGIBLE_COMMON" ||
+    metadata.deleted !== false
+  ) {
+    throw new Error(
+      "The recovery token is not this signer's controlled test token.",
     );
   }
   const tokenId = TokenId.fromString(tokenIdText);
@@ -205,6 +226,113 @@ async function sweepControlledToken(client, signerKey, signerAccountId) {
   await (
     await (await transfer.sign(signerKey)).execute(client)
   ).getReceipt(client);
+}
+
+async function returnRemainingHbar(client, signerKey, signerAccountId) {
+  const signerMirror = await confirmMirrorAccountIdentity({
+    mirrorOrigin: MIRROR,
+    accountId: signerAccountId,
+    evmAddress: `0x${signerKey.publicKey.toEvmAddress()}`,
+  });
+  if (signerMirror.balanceTinybar <= 0n) return;
+  const amount = Hbar.fromTinybars(signerMirror.balanceTinybar.toString());
+  const transfer = await new TransferTransaction()
+    .addHbarTransfer(signerAccountId, amount.negated())
+    .addHbarTransfer(sourceAccountId, amount)
+    .freezeWith(client);
+  await (
+    await (await transfer.sign(signerKey)).execute(client)
+  ).getReceipt(client);
+  console.log(
+    `Returned remaining HBAR from ${signerAccountId} to the operator.`,
+  );
+}
+
+async function discoverControlledTokenId(signerAccountId) {
+  const relationships = await fetchAllowedJson(
+    new URL(`/api/v1/accounts/${signerAccountId}/tokens?limit=100`, MIRROR),
+    MIRROR,
+  );
+  if (!Array.isArray(relationships.tokens)) {
+    throw new Error("Mirror omitted the capped signer's token relationships.");
+  }
+  const matches = [];
+  for (const relationship of relationships.tokens) {
+    if (!/^0\.0\.\d+$/u.test(relationship.token_id ?? "")) continue;
+    const metadata = await fetchAllowedJson(
+      new URL(`/api/v1/tokens/${relationship.token_id}`, MIRROR),
+      MIRROR,
+    );
+    if (
+      metadata.name === "Collateral Rail Controlled Test Dollar" &&
+      metadata.symbol === "CRTD" &&
+      metadata.treasury_account_id === signerAccountId
+    ) {
+      matches.push(relationship.token_id);
+    }
+  }
+  if (matches.length > 1) {
+    throw new Error(
+      "More than one controlled token belongs to the capped signer.",
+    );
+  }
+  return matches[0] ?? null;
+}
+
+async function recoverControlled(client, source) {
+  const directory = process.env.HTS_RECOVERY_DIRECTORY;
+  const tokenId = process.env.HTS_RECOVERY_TOKEN_ID;
+  if (
+    typeof directory !== "string" ||
+    path.dirname(directory) !== os.tmpdir() ||
+    !path.basename(directory).startsWith("rwa-hts-signer-") ||
+    !/^0\.0\.\d+$/u.test(tokenId ?? "")
+  ) {
+    throw new Error(
+      "A private HTS recovery directory and token ID are required.",
+    );
+  }
+  const directoryStat = await lstat(directory);
+  const signerPath = path.join(directory, "signer.json");
+  const accountIdPath = path.join(directory, "account-id.txt");
+  const signerStat = await lstat(signerPath);
+  if (
+    !directoryStat.isDirectory() ||
+    (directoryStat.mode & 0o077) !== 0 ||
+    !signerStat.isFile() ||
+    (signerStat.mode & 0o077) !== 0
+  ) {
+    throw new Error("The signer recovery files are not private regular files.");
+  }
+  const recovery = JSON.parse(await readFile(signerPath, "utf8"));
+  const signerAccountId = (await readFile(accountIdPath, "utf8")).trim();
+  if (
+    recovery.network !== "testnet" ||
+    !/^0x[a-fA-F0-9]{64}$/u.test(recovery.privateKey ?? "") ||
+    !/^0\.0\.\d+$/u.test(signerAccountId)
+  ) {
+    throw new Error("The private signer recovery record is malformed.");
+  }
+  const signerKey = PrivateKey.fromStringECDSA(recovery.privateKey.slice(2));
+  const signerAddress = `0x${signerKey.publicKey.toEvmAddress()}`;
+  if (signerAddress.toLowerCase() !== recovery.evmAddress?.toLowerCase()) {
+    throw new Error("The recovery signer key and address disagree.");
+  }
+  await confirmMirrorAccountIdentity({
+    mirrorOrigin: MIRROR,
+    accountId: sourceAccountId,
+    evmAddress: source.address,
+  });
+  await confirmMirrorAccountIdentity({
+    mirrorOrigin: MIRROR,
+    accountId: signerAccountId,
+    evmAddress: signerAddress,
+  });
+  await sweepControlledToken(client, signerKey, signerAccountId, tokenId);
+  await returnRemainingHbar(client, signerKey, signerAccountId);
+  console.log(
+    `The controlled test token still names ${signerAccountId} as treasury. Its private recovery file remains at ${signerPath}.`,
+  );
 }
 
 async function runLifecycle(client, source) {
@@ -251,6 +379,7 @@ async function runLifecycle(client, source) {
 
   let signerAccountId;
   let swept = false;
+  let hbarReturned = false;
   let childSucceeded = false;
   try {
     const response = await new AccountCreateTransaction()
@@ -330,8 +459,18 @@ async function runLifecycle(client, source) {
   } finally {
     if (signerAccountId) {
       try {
-        if (mode === "controlled" && childSucceeded) {
-          await sweepControlledToken(client, signerKey, signerAccountId);
+        if (mode === "controlled") {
+          const tokenId = childSucceeded
+            ? undefined
+            : await discoverControlledTokenId(signerAccountId);
+          if (childSucceeded || tokenId) {
+            await sweepControlledToken(
+              client,
+              signerKey,
+              signerAccountId,
+              tokenId,
+            );
+          }
         }
         if (mode === "usdc") {
           const tokenBalance = await waitForCircleBalance(signerAccountId, 0n);
@@ -365,7 +504,19 @@ async function runLifecycle(client, source) {
           `Swept capped signer ${signerAccountId} back to the operator.`,
         );
       } catch {
-        console.error(`Sweep needs manual recovery from ${recoveryPath}.`);
+        if (mode === "controlled") {
+          try {
+            await returnRemainingHbar(client, signerKey, signerAccountId);
+            hbarReturned = true;
+          } catch {
+            console.error(
+              `HBAR return needs manual recovery from ${recoveryPath}.`,
+            );
+          }
+        }
+        if (!hbarReturned) {
+          console.error(`Sweep needs manual recovery from ${recoveryPath}.`);
+        }
       }
     }
     if (swept) {
@@ -373,16 +524,23 @@ async function runLifecycle(client, source) {
       await unlink(accountIdPath);
       await rmdir(recoveryDirectory);
     } else {
+      const reason = hbarReturned
+        ? "The controlled token treasury remains on the capped signer."
+        : "The capped signer may still hold funds.";
       console.error(
-        `Private signer recovery file retained at ${recoveryPath}.`,
+        `${reason} Private recovery file retained at ${recoveryPath}.`,
       );
     }
     if (!childSucceeded) console.error("No HTS lifecycle claim was published.");
   }
 }
 
-if (!["prepare-usdc", "controlled", "usdc"].includes(mode)) {
-  throw new Error("Choose prepare-usdc, controlled, or usdc.");
+if (
+  !["prepare-usdc", "controlled", "usdc", "recover-controlled"].includes(mode)
+) {
+  throw new Error(
+    "Choose prepare-usdc, controlled, usdc, or recover-controlled.",
+  );
 }
 const source = requireSource();
 const client = Client.forTestnet().setOperator(
@@ -390,7 +548,9 @@ const client = Client.forTestnet().setOperator(
   source.key,
 );
 try {
-  if (mode === "prepare-usdc") {
+  if (mode === "recover-controlled") {
+    await recoverControlled(client, source);
+  } else if (mode === "prepare-usdc") {
     await confirmMirrorAccountIdentity({
       mirrorOrigin: MIRROR,
       accountId: sourceAccountId,

@@ -624,7 +624,7 @@ test("HIP-475 preflight requires a positive canonical system response", async ()
 
 test("bootstrap proofs are categorized by semantics instead of position", () => {
   const hash = (digit) => `0x${digit.repeat(64)}`;
-  const categorized = categorizeBootstrapTransactions([
+  const transactions = [
     {
       hash: hash("1"),
       function: "grantKyc(address,string,uint256,uint256,address)",
@@ -640,7 +640,8 @@ test("bootstrap proofs are categorized by semantics instead of position", () => 
       function: "grantKyc(address,string,uint256,uint256,address)",
     },
     { hash: hash("9"), function: "fundAutomation()" },
-  ]);
+  ];
+  const categorized = categorizeBootstrapTransactions(transactions);
   assert.equal(
     proofForSemanticKind(categorized, "ats-bond-deployment").hash,
     hash("3"),
@@ -648,6 +649,11 @@ test("bootstrap proofs are categorized by semantics instead of position", () => 
   assert.equal(
     proofForSemanticKind(categorized, "kyc-grant", "last").hash,
     hash("8"),
+  );
+  assert.doesNotThrow(() =>
+    categorizeBootstrapTransactions(transactions.slice(0, -1), {
+      requireAutomationFunding: false,
+    }),
   );
 });
 

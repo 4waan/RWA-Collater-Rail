@@ -327,7 +327,10 @@ function semanticBootstrapCategory(transaction) {
   return "bootstrap-call";
 }
 
-export function categorizeBootstrapTransactions(transactions) {
+export function categorizeBootstrapTransactions(
+  transactions,
+  { requireAutomationFunding = true } = {},
+) {
   if (!Array.isArray(transactions) || transactions.length === 0) {
     throw new Error("Foundry bootstrap emitted no transactions.");
   }
@@ -354,8 +357,8 @@ export function categorizeBootstrapTransactions(transactions) {
     "collateral-issuance",
     "oracle-deployment",
     "rail-deployment",
-    "automation-funding",
     "acceptance-deployment",
+    ...(requireAutomationFunding ? ["automation-funding"] : []),
   ]) {
     if (!categorized.some(({ kind }) => kind.startsWith(`${required}-`))) {
       throw new Error(`Foundry bootstrap omitted semantic step ${required}.`);

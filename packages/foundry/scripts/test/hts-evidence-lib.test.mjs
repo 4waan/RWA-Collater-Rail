@@ -170,7 +170,6 @@ function controlledEvidence() {
     "rail.cashTokenLiabilities": "0",
     "rail.settlementTokenBalance": "0",
     "rail.reservedAutomationTinybar": "0",
-    "rail.hbarBalanceTinybar": "1000000",
     "rail.policy.maximumAdvanceBps": 6000,
     "rail.policy.maximumAnnualRateBps": 5000,
     "rail.policy.maximumQuoteMovementBps": 100,

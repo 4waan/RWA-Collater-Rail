@@ -342,7 +342,7 @@ async function main() {
       if (!settlementTokenId) throw new Error("Token creation returned no ID.");
       settlementTokenAddress = requireAddress(
         "controlled settlement token",
-        `0x${settlementTokenId.toSolidityAddress()}`,
+        `0x${settlementTokenId.toEvmAddress()}`,
       );
       settlementTokenCreation = creation.proof;
     } else {
@@ -402,6 +402,7 @@ async function main() {
     const deploymentProofs = [];
     for (const transaction of categorizeBootstrapTransactions(
       broadcast.transactions ?? [],
+      { requireAutomationFunding: false },
     )) {
       const confirmed = await waitForEvmProof({
         hash: transaction.hash,
@@ -446,6 +447,17 @@ async function main() {
         abi: htsRailAbi,
         functionName: "initializeSettlement",
         gas: HTS_GAS.initialize,
+        ...(await feeFields()),
+      }),
+    );
+
+    const automationFunding = await evmWrite("automation-funding", async () =>
+      operatorWallet.writeContract({
+        address: rail,
+        abi: htsRailAbi,
+        functionName: "fundAutomation",
+        value: 2n * 500_000_000n * WEIBAR_PER_TINYBAR,
+        gas: HTS_GAS.automationFunding,
         ...(await feeFields()),
       }),
     );
@@ -1075,7 +1087,6 @@ async function main() {
         "rail.cashTokenLiabilities": final.cashTokenLiabilities.toString(),
         "rail.settlementTokenBalance": final.tokenBalance.toString(),
         "rail.reservedAutomationTinybar": final.reservedAutomation.toString(),
-        "rail.hbarBalanceTinybar": final.hbarBalanceTinybar.toString(),
         "rail.policy.maximumAdvanceBps": final.policy.maximumAdvanceBps,
         "rail.policy.maximumAnnualRateBps": final.policy.maximumAnnualRateBps,
         "rail.policy.maximumQuoteMovementBps":
@@ -1164,6 +1175,7 @@ async function main() {
         ),
         settlementTokenCreation,
         settlementInitialization: initialized.proof,
+        automationFunding: automationFunding.proof,
         actorProvisioning,
         oracleUpdate: finalPythUpdate?.proof ?? null,
         fundedOffer: fundTransactions[0].proof,
@@ -1223,7 +1235,7 @@ async function main() {
         cashTokenLiabilities: final.cashTokenLiabilities.toString(),
         railTokenBalance: final.tokenBalance.toString(),
         reservedAutomationTinybar: final.reservedAutomation.toString(),
-        railHbarBalanceTinybar: final.hbarBalanceTinybar.toString(),
+        railHbarBalanceTinybar: hbarBalanceProof.balanceTinybar,
       },
       verification: {
         complete: true,
@@ -1256,6 +1268,7 @@ async function main() {
         profile === "controlled"
           ? "The controlled settlement token and fixed oracle prove mechanics, not market value."
           : "Circle testnet USDC and Pyth demonstrate testnet market-valued mechanics only.",
+        "HBAR balance is a current Mirror account proof, not an exact-block RPC assertion.",
       ],
       notice:
         "Observed on Hedera testnet. This evidence contains no signer material or raw transaction payloads.",

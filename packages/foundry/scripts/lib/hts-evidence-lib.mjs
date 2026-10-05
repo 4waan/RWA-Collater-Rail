@@ -802,7 +802,6 @@ export function validateHtsEvidenceRecord(record) {
     "rail.settlementTokenBalance": record.accounting.railTokenBalance,
     "rail.reservedAutomationTinybar":
       record.accounting.reservedAutomationTinybar,
-    "rail.hbarBalanceTinybar": record.accounting.railHbarBalanceTinybar,
     "rail.policy.maximumAdvanceBps": record.policy.maximumAdvanceBps,
     "rail.policy.maximumAnnualRateBps": record.policy.maximumAnnualRateBps,
     "rail.policy.maximumQuoteMovementBps":
@@ -876,6 +875,11 @@ export function validateHtsEvidenceRecord(record) {
   );
   if (hbarProof.balanceTinybar !== record.accounting.railHbarBalanceTinybar) {
     throw new Error("Current Mirror HBAR balance differs from HTS accounting.");
+  }
+  if (Object.hasOwn(state.assertions, "rail.hbarBalanceTinybar")) {
+    throw new Error(
+      "Current Mirror HBAR balance cannot be an exact-block assertion.",
+    );
   }
 
   const expectedSources = {
