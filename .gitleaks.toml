@@ -1,2 +1,10 @@
 [extend]
 useDefault = true
+
+[[allowlists]]
+description = "Public ATS token address in HTS testnet evidence"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "line"
+regexes = ['''^\s*"atsToken": "0x[a-fA-F0-9]{40}",?\s*$''']
+paths = ['''^(packages/foundry/)?deployments/(testnet-hts-controlled|testnet-hts-usdc|reference-testnet-hts-controlled|reference-testnet-hts-usdc)\.json$''']

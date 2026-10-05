@@ -9,8 +9,11 @@ const expectedFingerprints = [
 
 test("Gitleaks ignores only the reviewed historical fingerprints", () => {
   const configuration = readFileSync(".gitleaks.toml", "utf8");
-  assert.doesNotMatch(configuration, /\[\[allowlists\]\]/);
-  assert.doesNotMatch(configuration, /\[0-9a-fA-F\]\{40\}/);
+  assert.match(configuration, /targetRules = \["generic-api-key"\]/);
+  assert.match(configuration, /condition = "AND"/);
+  assert.match(configuration, /regexTarget = "line"/);
+  assert.match(configuration, /"atsToken": "0x\[a-fA-F0-9\]\{40\}"/);
+  assert.match(configuration, /testnet-hts-controlled\|testnet-hts-usdc/);
 
   const fingerprints = readFileSync(".gitleaksignore", "utf8")
     .split("\n")

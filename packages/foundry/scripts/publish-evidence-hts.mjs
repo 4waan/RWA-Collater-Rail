@@ -30,10 +30,10 @@ const candidatePath = path.join(deploymentsDirectory, selected.candidate);
 const referencePath = path.join(deploymentsDirectory, selected.reference);
 const gitleaksConfigPath = path.join(repositoryRoot, ".gitleaks.toml");
 
-async function run(command, args, failureMessage) {
+async function run(command, args, failureMessage, cwd = foundryRoot) {
   await new Promise((resolve, reject) => {
     const child = spawn(command, args, {
-      cwd: foundryRoot,
+      cwd,
       stdio: "inherit",
       shell: false,
     });
@@ -86,12 +86,13 @@ try {
       gitleaksConfigPath,
       "--no-git",
       "--source",
-      deploymentsDirectory,
+      path.relative(repositoryRoot, candidatePath),
       "--redact",
       "--exit-code",
       "1",
     ],
     "Gitleaks rejected the HTS evidence candidate.",
+    repositoryRoot,
   );
   await writeFile(temporaryPath, `${JSON.stringify(candidate, null, 2)}\n`, {
     mode: 0o600,
