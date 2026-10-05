@@ -1,13 +1,32 @@
 # RWA Credit Rail
 
-Originate bilateral loans against securities issued with Hedera Asset
-Tokenization Studio.
+Build, understand, and verify secured RWA credit on Hedera.
 
-RWA Credit Rail is a Scaffold-HBAR template for bilateral HBAR financing against
-Asset Tokenization Studio securities. It locks collateral in ATS partition
-holds, schedules maturity through Hedera Schedule Service, and publishes a
-Mirror-verifiable record of funding, repayment, and default. Declarative recipes
-change facility policy without changing the custody or accounting model.
+RWA Credit Rail is an executable reference for building, testing, and proving
+secured RWA credit on Hedera. It is a Scaffold-HBAR template that finances
+Asset Tokenization Studio (ATS) securities with HBAR. Collateral stays in an ATS
+partition hold, Hedera Schedule Service settles the position at maturity with a
+permissionless fallback, and every lifecycle claim links to Mirror Node
+evidence. Declarative recipes change facility policy without changing the
+custody or accounting model.
+
+Start with a working ATS-backed financing lifecycle:
+
+| If you want to                                                          | Start here                                                                                                                                                         |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Build a product** by configuring a facility recipe                    | [Choose a recipe](#choose-a-recipe), then read [Build a Financing Recipe](docs/build-a-financing-recipe.md)                                                        |
+| **Understand the system** by replaying both outcomes without a wallet   | [Reference mode](https://rwa-credit-rail.vercel.app/facility?recipe=term-credit&mode=reference) and the [Architecture](docs/architecture.md)                       |
+| **Verify the claims** in transactions, schedules, and exact-block state | [Verification ledger](https://rwa-credit-rail.vercel.app/verify?position=repaid) and the [reference evidence](packages/foundry/deployments/reference-testnet.json) |
+
+Hedera maintainers can start with the [compatibility matrix](docs/compatibility.md)
+and the dated [findings](docs/findings/). Teams working with coding agents can
+start with [AGENTS.md](AGENTS.md), which keeps the invariant model and evidence
+rules in one place, and with the Hedera Harness specifications in
+[`.harness/`](.harness/).
+
+Each published claim follows the same path from implementation to adversarial
+tests, observed testnet execution, typed public evidence, and an independently
+checkable record.
 
 Use it to start a term facility, maturity bridge, treasury advance, receivables
 facility, or another bilateral secured-credit pattern. The recipe can change.
